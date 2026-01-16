@@ -1,0 +1,12 @@
+id,default_code,name,type,categ_id/id,uom_id/id,uom_po_id/id,route_ids/id,work_instruction_code,routing_code,quality_control_code,logistics_area,warehouse_location,warehouse_id,circular_tag
+prod_019_2_008,019.2.008,Grundplatte EVO 2 Spartan weiss,product,product_category_drohne,product.product_uom_unit,product.product_uom_unit,mrp_route_manufacture,AA_02,AP_LASERCUTTER,QC_GRUNDPLATTE,Supermarkt,101C-4-A,019.2.008,recyclable
+prod_019_2_010,019.2.010,Grundplatte EVO 2 Spartan blau,product,product_category_drohne,product.product_uom_unit,product.product_uom_unit,mrp_route_manufacture,AA_02,AP_LASERCUTTER,QC_GRUNDPLATTE,Supermarkt,101C-4-B,019.2.010,recyclable
+prod_019_2_012,019.2.012,Grundplatte EVO 2 Spartan schwarz,product,product_category_drohne,product.product_uom_unit,product.product_uom_unit,mrp_route_manufacture,AA_02,AP_LASERCUTTER,QC_GRUNDPLATTE,Supermarkt,101C-4-C,019.2.012,recyclable
+
+prod_019_2_014,019.2.014,Grundplatte EVO 2 Lightweight weiss,product,product_category_drohne,product.product_uom_unit,product.product_uom_unit,mrp_route_manufacture,AA_02,AP_LASERCUTTER,QC_GRUNDPLATTE,Supermarkt,101C-5-A,019.2.014,recyclable
+prod_019_2_015,019.2.015,Grundplatte EVO 2 Lightweight blau,product,product_category_drohne,product.product_uom_unit,product.product_uom_unit,mrp_route_manufacture,AA_02,AP_LASERCUTTER,QC_GRUNDPLATTE,Supermarkt,101C-5-B,019.2.015,recyclable
+prod_019_2_016,019.2.016,Grundplatte EVO 2 Lightweight schwarz,product,product_category_drohne,product.product_uom_unit,product.product_uom_unit,mrp_route_manufacture,AA_02,AP_LASERCUTTER,QC_GRUNDPLATTE,Supermarkt,101C-5-C,019.2.016,recyclable
+
+prod_019_2_017,019.2.017,Grundplatte EVO 2 Balance weiss,product,product_category_drohne,product.product_uom_unit,product.product_uom_unit,mrp_route_manufacture,AA_02,AP_LASERCUTTER,QC_GRUNDPLATTE,Supermarkt,101C-3-A,019.2.017,recyclable
+prod_019_2_018,019.2.018,Grundplatte EVO 2 Balance blau,product,product_category_drohne,product.product_uom_unit,product.product_uom_unit,mrp_route_manufacture,AA_02,AP_LASERCUTTER,QC_GRUNDPLATTE,Supermarkt,101C-3-B,019.2.018,recyclable
+prod_019_2_019,019.2.019,Grundplatte EVO 2 Balance schwarz,product,product_category_drohne,product.product_uom_unit,product.product_uom_unit,mrp_route_manufacture,AA_02,AP_LASERCUTTER,QC_GRUNDPLATTE,Supermarkt,101C-3-C,019.2.019,recyclable

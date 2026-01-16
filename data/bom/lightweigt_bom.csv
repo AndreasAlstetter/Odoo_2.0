@@ -1,0 +1,54 @@
+id,product_tmpl_id/default_code,product_qty,product_uom_id/id,bom_line_ids/id,bom_line_ids/product_id/default_code,bom_line_ids/product_qty,bom_line_ids/product_uom_id/id
+bom_evo_light,029.3.001,1,unit.product_uom_unit,bom_evo_light_0001000,000.1.000,4,unit.product_uom_unit
+bom_evo_light,029.3.001,1,unit.product_uom_unit,bom_evo_light_0011000,001.1.000,7,unit.product_uom_unit
+bom_evo_light,029.3.001,1,unit.product_uom_unit,bom_evo_light_0020000,002.0.000,2,unit.product_uom_unit
+bom_evo_light,029.3.001,1,unit.product_uom_unit,bom_evo_light_0030000,003.0.000,2,unit.product_uom_unit
+bom_evo_light,029.3.001,1,unit.product_uom_unit,bom_evo_light_0041000,004.1.000,1,unit.product_uom_unit
+bom_evo_light,029.3.001,1,unit.product_uom_unit,bom_evo_light_0051000,005.1.000,1,unit.product_uom_unit
+bom_evo_light,029.3.001,1,unit.product_uom_unit,bom_evo_light_0061000,006.1.000,1,unit.product_uom_unit
+bom_evo_light,029.3.001,1,unit.product_uom_unit,bom_evo_light_0071000,007.1.000,8.5,unit.product_uom_unit
+bom_evo_light,029.3.001,1,unit.product_uom_unit,bom_evo_light_0091000,009.1.000,1,unit.product_uom_unit
+bom_evo_light,029.3.001,1,unit.product_uom_unit,bom_evo_light_0101000,010.1.000,4,unit.product_uom_unit
+bom_evo_light,029.3.001,1,unit.product_uom_unit,bom_evo_light_0111000,011.1.000,4,unit.product_uom_unit
+bom_evo_light,029.3.001,1,unit.product_uom_unit,bom_evo_light_0120000,012.0.000,8,unit.product_uom_unit
+bom_evo_light,029.3.001,1,unit.product_uom_unit,bom_evo_light_0130000,013.0.000,4,unit.product_uom_unit
+bom_evo_light,029.3.001,1,unit.product_uom_unit,bom_evo_light_0141000,014.1.000,30,unit.product_uom_unit
+bom_evo_light,029.3.001,1,unit.product_uom_unit,bom_evo_light_0151000,015.1.000,12,unit.product_uom_unit
+bom_evo_light,029.3.001,1,unit.product_uom_unit,bom_evo_light_0161000,016.1.000,1,unit.product_uom_unit
+bom_evo_light,029.3.001,1,unit.product_uom_unit,bom_evo_light_0171000,017.1.000,1,unit.product_uom_unit
+bom_evo_light,029.3.001,1,unit.product_uom_unit,bom_evo_light_0211000,021.1.000,1,unit.product_uom_unit
+bom_evo_light,029.3.001,1,unit.product_uom_unit,bom_evo_light_0221000,022.1.000,1,unit.product_uom_unit
+# Hauben (gleich wie Spartan – Variantensteuerung später über Attribute)
+bom_evo_light,029.3.001,1,unit.product_uom_unit,bom_evo_light_0182000,018.2.000,1,unit.product_uom_unit
+bom_evo_light,029.3.001,1,unit.product_uom_unit,bom_evo_light_0182001,018.2.001,1,unit.product_uom_unit
+bom_evo_light,029.3.001,1,unit.product_uom_unit,bom_evo_light_0182002,018.2.002,1,unit.product_uom_unit
+bom_evo_light,029.3.001,1,unit.product_uom_unit,bom_evo_light_0182003,018.2.003,1,unit.product_uom_unit
+bom_evo_light,029.3.001,1,unit.product_uom_unit,bom_evo_light_0182004,018.2.004,1,unit.product_uom_unit
+bom_evo_light,029.3.001,1,unit.product_uom_unit,bom_evo_light_0182005,018.2.005,1,unit.product_uom_unit
+bom_evo_light,029.3.001,1,unit.product_uom_unit,bom_evo_light_0182006,018.2.006,1,unit.product_uom_unit
+bom_evo_light,029.3.001,1,unit.product_uom_unit,bom_evo_light_0182007,018.2.007,1,unit.product_uom_unit
+# Grundplatten Lightweight
+bom_evo_light,029.3.001,1,unit.product_uom_unit,bom_evo_light_0192014,019.2.014,1,unit.product_uom_unit
+bom_evo_light,029.3.001,1,unit.product_uom_unit,bom_evo_light_0192015,019.2.015,1,unit.product_uom_unit
+bom_evo_light,029.3.001,1,unit.product_uom_unit,bom_evo_light_0192016,019.2.016,1,unit.product_uom_unit
+# Füße Lightweight (alle Farben)
+bom_evo_light,029.3.001,1,unit.product_uom_unit,bom_evo_light_0202008,020.2.008,4,unit.product_uom_unit
+bom_evo_light,029.3.001,1,unit.product_uom_unit,bom_evo_light_0202009,020.2.009,4,unit.product_uom_unit
+bom_evo_light,029.3.001,1,unit.product_uom_unit,bom_evo_light_0202010,020.2.010,4,unit.product_uom_unit
+bom_evo_light,029.3.001,1,unit.product_uom_unit,bom_evo_light_0202011,020.2.011,4,unit.product_uom_unit
+bom_evo_light,029.3.001,1,unit.product_uom_unit,bom_evo_light_0202012,020.2.012,4,unit.product_uom_unit
+bom_evo_light,029.3.001,1,unit.product_uom_unit,bom_evo_light_0202013,020.2.013,4,unit.product_uom_unit
+bom_evo_light,029.3.001,1,unit.product_uom_unit,bom_evo_light_0202014,020.2.014,4,unit.product_uom_unit
+bom_evo_light,029.3.001,1,unit.product_uom_unit,bom_evo_light_0202015,020.2.015,4,unit.product_uom_unit
+# Materialanteile (PLA / Acryl, z.B. für Kalkulation)
+bom_evo_light,029.3.001,1,unit.product_uom_unit,bom_evo_light_0191000,019.1.000,14.21,unit.product_uom_unit
+bom_evo_light,029.3.001,1,unit.product_uom_unit,bom_evo_light_0191001,019.1.001,14.21,unit.product_uom_unit
+bom_evo_light,029.3.001,1,unit.product_uom_unit,bom_evo_light_0191002,019.1.002,14.21,unit.product_uom_unit
+bom_evo_light,029.3.001,1,unit.product_uom_unit,bom_evo_light_0191003,019.1.003,14.21,unit.product_uom_unit
+bom_evo_light,029.3.001,1,unit.product_uom_unit,bom_evo_light_0191004,019.1.004,14.21,unit.product_uom_unit
+bom_evo_light,029.3.001,1,unit.product_uom_unit,bom_evo_light_0191005,019.1.005,14.21,unit.product_uom_unit
+bom_evo_light,029.3.001,1,unit.product_uom_unit,bom_evo_light_0191006,019.1.006,14.21,unit.product_uom_unit
+bom_evo_light,029.3.001,1,unit.product_uom_unit,bom_evo_light_0191007,019.1.007,14.21,unit.product_uom_unit
+bom_evo_light,029.3.001,1,unit.product_uom_unit,bom_evo_light_0201000,020.1.000,1.063,unit.product_uom_unit
+bom_evo_light,029.3.001,1,unit.product_uom_unit,bom_evo_light_0201001,020.1.001,1.063,unit.product_uom_unit
+bom_evo_light,029.3.001,1,unit.product_uom_unit,bom_evo_light_0201002,020.1.002,1.063,unit.product_uom_unit

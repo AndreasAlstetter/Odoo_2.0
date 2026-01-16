@@ -1,0 +1,82 @@
+id,default_code,name,type,categ_id/id,uom_id/id,uom_po_id/id,route_ids/id,work_instruction_code,routing_code,quality_control_code,logistics_area,warehouse_location,warehouse_id,circular_tag
+prod_000_1_000,000.1.000,Kabelbinder,product,product_category_drohne,product.product_uom_unit,product.product_uom_unit,,,,,Assembly 2,101B-3-D,000.1.000,
+prod_001_1_000,001.1.000,Steckverbindungen,product,product_category_drohne,product.product_uom_unit,product.product_uom_unit,,,,,Assembly 2,101C-3-D,001.1.000,
+prod_002_0_000,002.0.000,Rotoren Links,product,product_category_drohne,product.product_uom_unit,product.product_uom_unit,,,,,Assembly 1,101C-4-D,002.0.000,
+prod_003_0_000,003.0.000,Rotoren Rechts,product,product_category_drohne,product.product_uom_unit,product.product_uom_unit,,,,,Assembly 1,101C-4-D,003.0.000,
+prod_025_1_000,025.1.000,Fernbedienung,product,product_category_drohne,product.product_uom_unit,product.product_uom_unit,,,,,Assembly 2,101B-0-A,025.1.000,
+prod_004_1_000,004.1.000,RFID-tag,product,product_category_drohne,product.product_uom_unit,product.product_uom_unit,,,,,Supermarkt,101B-4-D,004.1.000,
+prod_005_1_000,005.1.000,Akku,product,product_category_drohne,product.product_uom_unit,product.product_uom_unit,,,,,Supermarkt,101B-4-B,005.1.000,
+prod_006_1_000,006.1.000,Akkukabel,product,product_category_drohne,product.product_uom_unit,product.product_uom_unit,,,,,Supermarkt,101B-3-C,006.1.000,
+prod_009_1_000,009.1.000,Steuergerät,product,product_category_drohne,product.product_uom_unit,product.product_uom_unit,,AA_060_070,AP_ELEKTRONIK,QC_ELEKTRONIK,Lötplatz,101B-3-B,009.1.000,reparable
+prod_011_1_000,011.1.000,Motor,product,product_category_drohne,product.product_uom_unit,product.product_uom_unit,,,,,Supermarkt,101C-5-D,011.1.000,
+prod_010_1_000,010.1.000,Motoreinheit,product,product_category_drohne,product.product_uom_unit,product.product_uom_unit,mrp_route_manufacture,AA_080,AP_MONTAGE_GEH,QC_MONTAGE,Assembly 2,101B-4-A,010.1.000,reparable
+prod_014_1_000,014.1.000,Verlängerungskabel,product,product_category_drohne,product.product_uom_unit,product.product_uom_unit,,,,,Supermarkt,101B-3-C,014.1.000,
+prod_015_1_000,015.1.000,Schrumpfschläuche,product,product_category_drohne,product.product_uom_unit,product.product_uom_unit,,,,,Supermarkt,101D-5-D,015.1.000,
+prod_016_1_000,016.1.000,Receiver Kabel,product,product_category_drohne,product.product_uom_unit,product.product_uom_unit,,,,,Supermarkt,101B-3-A,016.1.000,
+prod_017_1_000,017.1.000,Receiver,product,product_category_drohne,product.product_uom_unit,product.product_uom_unit,,AA_060_070,AP_ELEKTRONIK,QC_ELEKTRONIK,Lötplatz,101B-4-C,017.1.000,reparable
+prod_021_1_000,021.1.000,Verpackung-Karton,product,product_category_drohne,product.product_uom_unit,product.product_uom_unit,,,,,Assembly 2,101D-1,021.1.000,recyclable
+prod_022_1_000,022.1.000,Verpackung-Füllmaterial,product,product_category_drohne,product.product_uom_unit,product.product_uom_unit,,,,,Assembly 2,101D-0,022.1.000,recyclable
+prod_012_0_000,012.0.000,Motorschrauben,product,product_category_drohne,product.product_uom_unit,product.product_uom_unit,,,,,Assembly 1,101D-5-A,012.0.000,
+prod_013_0_000,013.0.000,Motormuttern,product,product_category_drohne,product.product_uom_unit,product.product_uom_unit,,,,,Assembly 1,101D-5-B,013.0.000,
+
+prod_018_2_000,018.2.000,Haube EVO2 weiss,product,product_category_drohne,product.product_uom_unit,product.product_uom_unit,mrp_route_manufacture,AA_030_03,AP_3DDRUCK,QC_HAUBE,Supermarkt,101B-1-D,018.2.000,reparable
+prod_018_2_001,018.2.001,HAUBE EVO2 gelb,product,product_category_drohne,product.product_uom_unit,product.product_uom_unit,mrp_route_manufacture,AA_030_03,AP_3DDRUCK,QC_HAUBE,Supermarkt,101B-1-C,018.2.001,reparable
+prod_018_2_002,018.2.002,HAUBE EVO2 rot,product,product_category_drohne,product.product_uom_unit,product.product_uom_unit,mrp_route_manufacture,AA_030_03,AP_3DDRUCK,QC_HAUBE,Supermarkt,101B-1-A,018.2.002,reparable
+prod_018_2_003,018.2.003,HAUBE EVO2 grün,product,product_category_drohne,product.product_uom_unit,product.product_uom_unit,mrp_route_manufacture,AA_030_03,AP_3DDRUCK,QC_HAUBE,Supermarkt,101B-2-D,018.2.003,reparable
+prod_018_2_004,018.2.004,HAUBE EVO2 blau,product,product_category_drohne,product.product_uom_unit,product.product_uom_unit,mrp_route_manufacture,AA_030_03,AP_3DDRUCK,QC_HAUBE,Supermarkt,101B-2-C,018.2.004,reparable
+prod_018_2_005,018.2.005,HAUBE EVO2 braun,product,product_category_drohne,product.product_uom_unit,product.product_uom_unit,mrp_route_manufacture,AA_030_03,AP_3DDRUCK,QC_HAUBE,Supermarkt,101B-2-B,018.2.005,reparable
+prod_018_2_006,018.2.006,HAUBE EVO2 orange,product,product_category_drohne,product.product_uom_unit,product.product_uom_unit,mrp_route_manufacture,AA_030_03,AP_3DDRUCK,QC_HAUBE,Supermarkt,101B-1-B,018.2.006,reparable
+prod_018_2_007,018.2.007,HAUBE EVO2 schwarz,product,product_category_drohne,product.product_uom_unit,product.product_uom_unit,mrp_route_manufacture,AA_030_03,AP_3DDRUCK,QC_HAUBE,Supermarkt,101B-2-A,018.2.007,reparable
+
+prod_019_2_008,019.2.008,Grundplatte EVO 2 Spartan weiss,product,product_category_drohne,product.product_uom_unit,product.product_uom_unit,mrp_route_manufacture,AA_02,AP_LASERCUTTER,QC_GRUNDPLATTE,Supermarkt,101C-4-A,019.2.008,recyclable
+prod_019_2_010,019.2.010,Grundplatte EVO 2 Spartan blau,product,product_category_drohne,product.product_uom_unit,product.product_uom_unit,mrp_route_manufacture,AA_02,AP_LASERCUTTER,QC_GRUNDPLATTE,Supermarkt,101C-4-B,019.2.010,recyclable
+prod_019_2_012,019.2.012,Grundplatte EVO 2 Spartan schwarz,product,product_category_drohne,product.product_uom_unit,product.product_uom_unit,mrp_route_manufacture,AA_02,AP_LASERCUTTER,QC_GRUNDPLATTE,Supermarkt,101C-4-C,019.2.012,recyclable
+
+prod_020_2_000,020.2.000,Fuß EVO2 Spartan weiss,product,product_category_drohne,product.product_uom_unit,product.product_uom_unit,mrp_route_manufacture,AA_030_02,AP_3DDRUCK,QC_FUESSE,Omron,101A-0-A,020.2.000,reparable
+prod_020_2_001,020.2.001,Fuß EVO2 Spartan gelb,product,product_category_drohne,product.product_uom_unit,product.product_uom_unit,mrp_route_manufacture,AA_030_02,AP_3DDRUCK,QC_FUESSE,Omron,101A-0-B,020.2.001,reparable
+prod_020_2_002,020.2.002,Fuß EVO2 Spartan rot,product,product_category_drohne,product.product_uom_unit,product.product_uom_unit,mrp_route_manufacture,AA_030_02,AP_3DDRUCK,QC_FUESSE,Omron,101A-0-C,020.2.002,reparable
+prod_020_2_003,020.2.003,Fuß EVO2 Spartan grün,product,product_category_drohne,product.product_uom_unit,product.product_uom_unit,mrp_route_manufacture,AA_030_02,AP_3DDRUCK,QC_FUESSE,Omron,101A-0-D,020.2.003,reparable
+prod_020_2_004,020.2.004,Fuß EVO2 Spartan blau,product,product_category_drohne,product.product_uom_unit,product.product_uom_unit,mrp_route_manufacture,AA_030_02,AP_3DDRUCK,QC_FUESSE,Omron,101A-1-A,020.2.004,reparable
+prod_020_2_005,020.2.005,Fuß EVO2 Spartan braun,product,product_category_drohne,product.product_uom_unit,product.product_uom_unit,mrp_route_manufacture,AA_030_02,AP_3DDRUCK,QC_FUESSE,Omron,101A-1-B,020.2.005,reparable
+prod_020_2_006,020.2.006,Fuß EVO2 Spartan orange,product,product_category_drohne,product.product_uom_unit,product.product_uom_unit,mrp_route_manufacture,AA_030_02,AP_3DDRUCK,QC_FUESSE,Omron,101A-1-C,020.2.006,reparable
+prod_020_2_007,020.2.007,Fuß EVO2 Spartan schwarz,product,product_category_drohne,product.product_uom_unit,product.product_uom_unit,mrp_route_manufacture,AA_030_02,AP_3DDRUCK,QC_FUESSE,Omron,101A-1-D,020.2.007,reparable
+
+prod_019_2_014,019.2.014,Grundplatte EVO 2 Lightweight weiss,product,product_category_drohne,product.product_uom_unit,product.product_uom_unit,mrp_route_manufacture,AA_02,AP_LASERCUTTER,QC_GRUNDPLATTE,Supermarkt,101C-5-A,019.2.014,recyclable
+prod_019_2_015,019.2.015,Grundplatte EVO 2 Lightweight blau,product,product_category_drohne,product.product_uom_unit,product.product_uom_unit,mrp_route_manufacture,AA_02,AP_LASERCUTTER,QC_GRUNDPLATTE,Supermarkt,101C-5-B,019.2.015,recyclable
+prod_019_2_016,019.2.016,Grundplatte EVO 2 Lightweight schwarz,product,product_category_drohne,product.product_uom_unit,product.product_uom_unit,mrp_route_manufacture,AA_02,AP_LASERCUTTER,QC_GRUNDPLATTE,Supermarkt,101C-5-C,019.2.016,recyclable
+
+prod_020_2_008,020.2.008,Fuß EVO2 Lightweight weiss,product,product_category_drohne,product.product_uom_unit,product.product_uom_unit,mrp_route_manufacture,AA_030_02,AP_3DDRUCK,QC_FUESSE,Omron,101A-2-A,020.2.008,reparable
+prod_020_2_009,020.2.009,Fuß EVO2 Lightweight gelb,product,product_category_drohne,product.product_uom_unit,product.product_uom_unit,mrp_route_manufacture,AA_030_02,AP_3DDRUCK,QC_FUESSE,Omron,101A-2-B,020.2.009,reparable
+prod_020_2_010,020.2.010,Fuß EVO2 Lightweight rot,product,product_category_drohne,product.product_uom_unit,product.product_uom_unit,mrp_route_manufacture,AA_030_02,AP_3DDRUCK,QC_FUESSE,Omron,101A-2-C,020.2.010,reparable
+prod_020_2_011,020.2.011,Fuß EVO2 Lightweight grün,product,product_category_drohne,product.product_uom_unit,product.product_uom_unit,mrp_route_manufacture,AA_030_02,AP_3DDRUCK,QC_FUESSE,Omron,101A-2-D,020.2.011,reparable
+prod_020_2_012,020.2.012,Fuß EVO2 Lightweight blau,product,product_category_drohne,product.product_uom_unit,product.product_uom_unit,mrp_route_manufacture,AA_030_02,AP_3DDRUCK,QC_FUESSE,Omron,101A-3-A,020.2.012,reparable
+prod_020_2_013,020.2.013,Fuß EVO2 Lightweight braun,product,product_category_drohne,product.product_uom_unit,product.product_uom_unit,mrp_route_manufacture,AA_030_02,AP_3DDRUCK,QC_FUESSE,Omron,101A-3-B,020.2.013,reparable
+prod_020_2_014,020.2.014,Fuß EVO2 Lightweight orange,product,product_category_drohne,product.product_uom_unit,product.product_uom_unit,mrp_route_manufacture,AA_030_02,AP_3DDRUCK,QC_FUESSE,Omron,101A-3-C,020.2.014,reparable
+prod_020_2_015,020.2.015,Fuß EVO2 Lightweight schwarz,product,product_category_drohne,product.product_uom_unit,product.product_uom_unit,mrp_route_manufacture,AA_030_02,AP_3DDRUCK,QC_FUESSE,Omron,101A-3-D,020.2.015,reparable
+
+prod_019_2_017,019.2.017,Grundplatte EVO 2 Balance weiss,product,product_category_drohne,product.product_uom_unit,product.product_uom_unit,mrp_route_manufacture,AA_02,AP_LASERCUTTER,QC_GRUNDPLATTE,Supermarkt,101C-3-A,019.2.017,recyclable
+prod_019_2_018,019.2.018,Grundplatte EVO 2 Balance blau,product,product_category_drohne,product.product_uom_unit,product.product_uom_unit,mrp_route_manufacture,AA_02,AP_LASERCUTTER,QC_GRUNDPLATTE,Supermarkt,101C-3-B,019.2.018,recyclable
+prod_019_2_019,019.2.019,Grundplatte EVO 2 Balance schwarz,product,product_category_drohne,product.product_uom_unit,product.product_uom_unit,mrp_route_manufacture,AA_02,AP_LASERCUTTER,QC_GRUNDPLATTE,Supermarkt,101C-3-C,019.2.019,recyclable
+
+prod_020_2_016,020.2.016,Fuß EVO2 Balance weiss,product,product_category_drohne,product.product_uom_unit,product.product_uom_unit,mrp_route_manufacture,AA_030_02,AP_3DDRUCK,QC_FUESSE,Omron,101A-4-A,020.2.016,reparable
+prod_020_2_017,020.2.017,Fuß EVO2 Balance gelb,product,product_category_drohne,product.product_uom_unit,product.product_uom_unit,mrp_route_manufacture,AA_030_02,AP_3DDRUCK,QC_FUESSE,Omron,101A-4-B,020.2.017,reparable
+prod_020_2_018,020.2.018,Fuß EVO2 Balance rot,product,product_category_drohne,product.product_uom_unit,product.product_uom_unit,mrp_route_manufacture,AA_030_02,AP_3DDRUCK,QC_FUESSE,Omron,101A-4-C,020.2.018,reparable
+prod_020_2_019,020.2.019,Fuß EVO2 Balance grün,product,product_category_drohne,product.product_uom_unit,product.product_uom_unit,mrp_route_manufacture,AA_030_02,AP_3DDRUCK,QC_FUESSE,Omron,101A-4-D,020.2.019,reparable
+prod_020_2_020,020.2.020,Fuß EVO2 Balance blau,product,product_category_drohne,product.product_uom_unit,product.product_uom_unit,mrp_route_manufacture,AA_030_02,AP_3DDRUCK,QC_FUESSE,Omron,101A-5-A,020.2.020,reparable
+prod_020_2_021,020.2.021,Fuß EVO2 Balance braun,product,product_category_drohne,product.product_uom_unit,product.product_uom_unit,mrp_route_manufacture,AA_030_02,AP_3DDRUCK,QC_FUESSE,Omron,101A-5-B,020.2.021,reparable
+prod_020_2_022,020.2.022,Fuß EVO2 Balance orange,product,product_category_drohne,product.product_uom_unit,product.product_uom_unit,mrp_route_manufacture,AA_030_02,AP_3DDRUCK,QC_FUESSE,Omron,101A-5-C,020.2.022,reparable
+prod_020_2_023,020.2.023,Fuß EVO2 Balance schwarz,product,product_category_drohne,product.product_uom_unit,product.product_uom_unit,mrp_route_manufacture,AA_030_02,AP_3DDRUCK,QC_FUESSE,Omron,101A-5-D,020.2.023,reparable
+
+prod_019_1_009,019.1.009,Acryl Glasplatte - weiß,product,product_category_drohne,product.product_uom_unit,product.product_uom_unit,,AA_02,AP_LASERCUTTER,,Lasercutter,101D-2,019.1.009,recyclable
+prod_019_1_011,019.1.011,Acryl Glasplatte - blau,product,product_category_drohne,product.product_uom_unit,product.product_uom_unit,,AA_02,AP_LASERCUTTER,,Lasercutter,101D-3,019.1.011,recyclable
+prod_019_1_013,019.1.013,Acryl Glasplatte - schwarz,product,product_category_drohne,product.product_uom_unit,product.product_uom_unit,,AA_02,AP_LASERCUTTER,,Lasercutter,101D-4,019.1.013,recyclable
+
+prod_007_1_000,007.1.000,Lötzinn,product,product_category_drohne,product.product_uom_unit,product.product_uom_unit,,AA_060,AP_LOETEN,,Lötplatz,101D-4-C,007.1.000,consumable
+prod_019_1_000,019.1.000,PLA Filament - Weiß,product,product_category_drohne,product.product_uom_unit,product.product_uom_unit,,AA_030_01,AP_3DDRUCK_MAT,,3D-Druck,101C-2-B,019.1.000,recyclable
+prod_019_1_001,019.1.001,PLA Filament - Gelb,product,product_category_drohne,product.product_uom_unit,product.product_uom_unit,,AA_030_01,AP_3DDRUCK_MAT,,3D-Druck,101C-2-C,019.1.001,recyclable
+prod_019_1_002,019.1.002,PLA Filament - Rot,product,product_category_drohne,product.product_uom_unit,product.product_uom_unit,,AA_030_01,AP_3DDRUCK_MAT,,3D-Druck,101C-1-A,019.1.002,recyclable
+prod_019_1_003,019.1.003,PLA Filament - Grün,product,product_category_drohne,product.product_uom_unit,product.product_uom_unit,,AA_030_01,AP_3DDRUCK_MAT,,3D-Druck,101C-2-D,019.1.003,recyclable
+prod_019_1_004,019.1.004,PLA Filament - Blau,product,product_category_drohne,product.product_uom_unit,product.product_uom_unit,,AA_030_01,AP_3DDRUCK_MAT,,3D-Druck,101C-1-B,019.1.004,recyclable
+prod_019_1_005,019.1.005,PLA Filament - Braun,product,product_category_drohne,product.product_uom_unit,product.product_uom_unit,,AA_030_01,AP_3DDRUCK_MAT,,3D-Druck,101C-2-A,019.1.005,recyclable
+prod_019_1_006,019.1.006,PLA Filament - Orange,product,product_category_drohne,product.product_uom_unit,product.product_uom_unit,,AA_030_01,AP_3DDRUCK_MAT,,3D-Druck,101C-1-C,019.1.006,recyclable
+prod_019_1_007,019.1.007,PLA Filament - Schwarz,product,product_category_drohne,product.product_uom_unit,product.product_uom_unit,,AA_030_01,AP_3DDRUCK_MAT,,3D-Druck,101C-1-D,019.1.007,recyclable

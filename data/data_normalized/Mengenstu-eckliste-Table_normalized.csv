@@ -1,0 +1,41 @@
+lfd. Nummer,Artikelart,Benennung,Artikelbezeichnung,Menge EVO Spartan,Menge EVO Lightweight,Menge EVO Balance,default_code_nextlap_raw,default_code,Einzelpreis_raw,Gesamtpreis_raw,qty_spartan,qty_lightweight,qty_balance,qty_unit,unit_price_eur,unit_price_unit,total_price_eur,warehouse_id
+1,Kaufartikel,Kabelbinder,Kabelbinder 3.5mmx150mm,4 stk.,4 stk.,4 stk.,1,22,"0,02€/stk.","0,08€",4.0,4.0,4.0,stk.,0.02,€/stk.,0.08,000.1.000
+2,Kaufartikel,Steckverbindungen,SRVO-4120B,7 stk.,7 stk.,7 stk.,2,14,"0,30€/stk.","2,10€",7.0,7.0,7.0,stk.,0.3,€/stk.,2.1,001.1.000
+3,Kaufartikel,Rotoren Links,HQ Durable Prop 5X4.3X3V1S Links,2 stk.,2 stk.,2 stk.,3,L_23,"0,86€/stk.","1,72€",2.0,2.0,2.0,stk.,0.86,€/stk.,1.72,002.0.000
+4,Kaufartikel,Rotoren Rechts,HQ Durable Prop 5X4.3X3V1S Rechts,2 stk.,2 stk.,2 stk.,4,R_23,"0,86€/stk.","1,72€",2.0,2.0,2.0,stk.,0.86,€/stk.,1.72,003.0.000
+5,Kaufartikel,RFID-tag,BALLUF BIS M1B2-03_L,1 stk.,1 stk.,1 stk.,5,21,"4,50€/stk.","4,50€",1.0,1.0,1.0,stk.,4.5,€/stk.,4.5,004.1.000
+6,Kaufartikel,Akku,2200mAh 50C 11.1V 24.52Wh Zeee,1 stk.,1 stk.,1 stk.,6,15,"18,07€/stk.","18,07€",1.0,1.0,1.0,stk.,18.07,€/stk.,18.07,005.1.000
+7,Kaufartikel,Akkukabel,Anstecker an Akku (zweipolig),1 stk.,1 stk.,1 stk.,7,006.1.000,"0,95€/stk.","0,95€",1.0,1.0,1.0,stk.,0.95,€/stk.,0.95,006.1.000
+8,Kaufartikel,Steuergerät,Mamba F405 MK2 kpl.,1 stk.,1 stk.,1 stk.,8,17,"84,90€/stk.","84,90€",1.0,1.0,1.0,stk.,84.9,€/stk.,84.9,009.1.000
+9,Kaufartikel,Motor,XING-E Pro2207 2750kv,4 stk.,4 stk.,4 stk.,9,66,"16,90€/stk.","67,60€",4.0,4.0,4.0,stk.,16.9,€/stk.,67.6,011.1.000
+10,Kaufartikel,Verlängerungskabel,Kabelverlängerung Motor (5cm),"30,00 cm","30,00 cm","30,00 cm",10,61,"0,50€/cm","15,00€",30.0,30.0,30.0,cm,0.5,€/cm,15.0,014.1.000
+11,Kaufartikel,Schrumpfschläuche,Schrumpfschlauch,12 stk.,12 stk.,12 stk.,11,62,"0,01€/stk.","0,14€",12.0,12.0,12.0,stk.,0.01,€/stk.,0.14,015.1.000
+12,Kaufartikel,Receiver Kabel,RUDOG ESC RX Cable Black 60mm),1 stk.,1 stk.,1 stk.,12,24,"3,99€/stk.","3,99€",1.0,1.0,1.0,stk.,3.99,€/stk.,3.99,016.1.000
+13,Kaufartikel,Receiver,FS-IA10B Receiver,1 stk.,1 stk.,1 stk.,13,16,"17,42€/stk.","17,42€",1.0,1.0,1.0,stk.,17.42,€/stk.,17.42,017.1.000
+14,Kaufartikel,Verpackung-Karton,KARTONAGE 130MM,1 stk.,1 stk.,1 stk.,14,54,"2,39€/stk.","2,39€",1.0,1.0,1.0,stk.,2.39,€/stk.,2.39,021.1.000
+15,Kaufartikel,Verpackung-Füllmaterial,Papierreste,"10,00 g","10,00 g","10,00 g",15,74,"0,20€/gram","2,00€",10.0,10.0,10.0,g,0.2,€/gram,2.0,022.1.000
+16,Lagerartikel,Motorschrauben,Motorschrauben für iFlight.Xing.2207 2,8 stk.,8 stk.,8 stk.,16,63,"0,08€/stk.","0,64€",8.0,8.0,8.0,stk.,0.08,€/stk.,0.64,012.0.000
+17,Lagerartikel,Motormuttern,Motormuttern für iFlight.Xing.2207 2,4 stk.,4 stk.,4 stk.,17,64,"0,05€/stk.","0,20€",4.0,4.0,4.0,stk.,0.05,€/stk.,0.20,013.0.000
+18,Eigenfertigung,Haube EVO2 weiss,Haube EVO2 weiss,1 stk.,1 stk.,1 stk.,18,V_WHITE_13,"4,69€/gram","4,69€",1.0,1.0,1.0,stk.,4.69,€/gram,4.69,018.2.000
+19,Eigenfertigung,HAUBE EVO2 gelb,HAUBE EVO2 gelb,1 stk.,1 stk.,1 stk.,19,V_YELLOW_13,"4,69€/gram","4,69€",1.0,1.0,1.0,stk.,4.69,€/gram,4.69,018.2.001
+20,Eigenfertigung,HAUBE EVO2 rot,HAUBE EVO2 rot,1 stk.,1 stk.,1 stk.,20,V_RED_13,"4,69€/gram","4,69€",1.0,1.0,1.0,stk.,4.69,€/gram,4.69,018.2.002
+21,Eigenfertigung,HAUBE EVO2 grün,HAUBE EVO2 grün,1 stk.,1 stk.,1 stk.,21,V_GREEN_13,"4,69€/gram","4,69€",1.0,1.0,1.0,stk.,4.69,€/gram,4.69,018.2.003
+22,Eigenfertigung,HAUBE EVO2 blau,HAUBE EVO2 blau,1 stk.,1 stk.,1 stk.,22,V_BLUE_13,"4,69€/gram","4,69€",1.0,1.0,1.0,stk.,4.69,€/gram,4.69,018.2.004
+23,Eigenfertigung,HAUBE EVO2 braun,HAUBE EVO2 braun,1 stk.,1 stk.,1 stk.,23,V_BROWN_13,"4,69€/gram","4,69€",1.0,1.0,1.0,stk.,4.69,€/gram,4.69,018.2.005
+24,Eigenfertigung,HAUBE EVO2 orange,HAUBE EVO2 orange,1 stk.,1 stk.,1 stk.,24,V_ORANGE_13,"4,69€/gram","4,69€",1.0,1.0,1.0,stk.,4.69,€/gram,4.69,018.2.006
+25,Eigenfertigung,HAUBE EVO2 schwarz,HAUBE EVO2 schwarz,1 stk.,1 stk.,1 stk.,25,V_BLACK_13,"4,69€/gram","4,69€",1.0,1.0,1.0,stk.,4.69,€/gram,4.69,018.2.007
+26,Eigenfertigung,Grundplatte EVO 2 Spartan weiss,Grundplatte EVO 2 Spartan weiss,1 stk.,,1 stk.,26,V_WHITE_75,"6,48€/stk.","6,48€",1.0,,1.0,stk.,6.48,€/stk.,6.48,019.2.008
+27,Eigenfertigung,Grundplatte EVO 2 Spartan blau,Grundplatte EVO 2 Spartan blau,1 stk.,,1 stk.,27,V_BLUE_75,"6,48€/stk.","6,48€",1.0,,1.0,stk.,6.48,€/stk.,6.48,019.2.010
+28,Eigenfertigung,Grundplatte EVO 2 Spartan schwarz,Grundplatte EVO 2 Spartan schwarz,1 stk.,,1 stk.,28,V_BLACK_75,"6,48€/stk.","6,48€",1.0,,1.0,stk.,6.48,€/stk.,6.48,019.2.012
+61,Kaufartikel,Acryl Glasplatte - weiß,Acryl Glasplatte - Weiß 1000mm*330mm*5mm (3300 cm^2),"1.063,00 cm^2","1.063,00 cm^2","1.063,00 cm^2",61,V_WHITE_7,"11,56€/3300cm^2","3,72€",1.063,1.063,1.063,cm^2,11.56,€/3300cm^2,3.72,019.1.009
+62,Kaufartikel,Acryl Glasplatte - blau,Acryl Glasplatte - Weiß 1000mm*330mm*5mm (3300 cm^2),"1.063,00 cm^2","1.063,00 cm^2","1.063,00 cm^2",62,V_BLUE_7,"11,56€/3300cm^2","3,72€",1.063,1.063,1.063,cm^2,11.56,€/3300cm^2,3.72,019.1.011
+63,Kaufartikel,Acryl Glasplatte - schwarz,Acryl Glasplatte - Weiß 1000mm*330mm*5mm (3300 cm^2),"1.063,00 cm^2","1.063,00 cm^2","1.063,00 cm^2",63,V_BLACK_7,"11,56€/3300cm^2","3,72€",1.063,1.063,1.063,cm^2,11.56,€/3300cm^2,3.72,019.1.013
+64,Kaufartikel,Lötzinn,Lötzinn 1.0mm 50g,"8,50 g","8,50 g","8,50 g",64,67,"0,07€/gram","0,60€",8.5,8.5,8.5,g,0.07,€/gram,0.6,007.1.000
+65,Kaufartikel,PLA Filament - Weiß,PLA Filament 3mm - Weiß,"22,37 g","14,21 g","17,59 g",65,V_WHITE_9,"0,03€/gram","0,67€",22.37,14.21,17.59,g,0.03,€/gram,0.67,019.1.000
+66,Kaufartikel,PLA Filament - Gelb,PLA Filament 3mm - Gelb,"22,37 g","14,21 g","17,59 g",66,V_YELLOW_9,"0,03€/gram","0,67€",22.37,14.21,17.59,g,0.03,€/gram,0.67,019.1.001
+67,Kaufartikel,PLA Filament - Rot,PLA Filament 3mm  - Rot,"22,37 g","14,21 g","17,59 g",67,V_RED_9,"0,03€/gram","0,67€",22.37,14.21,17.59,g,0.03,€/gram,0.67,019.1.002
+68,Kaufartikel,PLA Filament - Grün,PLA Filament 3mm  - Grün,"22,37 g","14,21 g","17,59 g",68,V_GREEN_9,"0,03€/gram","0,67€",22.37,14.21,17.59,g,0.03,€/gram,0.67,019.1.003
+69,Kaufartikel,PLA Filament - Blau,PLA Filament 3mm - Blau,"22,37 g","14,21 g","17,59 g",69,V_BLUE_9,"0,03€/gram","0,67€",22.37,14.21,17.59,g,0.03,€/gram,0.67,019.1.004
+70,Kaufartikel,PLA Filament - Braun,PLA Filament 3mm - Braun,"22,37 g","14,21 g","17,59 g",70,V_BROWN_9,"0,03€/gram","0,67€",22.37,14.21,17.59,g,0.03,€/gram,0.67,019.1.005
+71,Kaufartikel,PLA Filament - Orange,PLA Filament 3mm - Orange,"22,37 g","14,21 g","17,59 g",71,V_ORANGE_9,"0,03€/gram","0,67€",22.37,14.21,17.59,g,0.03,€/gram,0.67,019.1.006
+72,Kaufartikel,PLA Filament - Schwarz,PLA Filament 3mm - Schwarz,"22,37 g","14,21 g","17,59 g",72,V_BLACK_9,"0,03€/gram","0,67€",22.37,14.21,17.59,g,0.03,€/gram,0.67,019.1.007

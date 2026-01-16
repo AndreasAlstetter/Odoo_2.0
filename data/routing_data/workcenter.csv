@@ -1,0 +1,7 @@
+name,code
+3D-Drucker,mrp_wc_3d_printer
+Lasercutter,mrp_wc_laser
+Nacharbeit,mrp_wc_rework
+Elektronik-Montage,mrp_wc_electronics
+Gehäuse & Rotoren,mrp_wc_assembly
+Qualität,mrp_wc_quality

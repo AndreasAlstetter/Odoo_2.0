@@ -1,0 +1,4 @@
+qp_id,title,product_default_code,operation_name,control_type,testing_percentage,tolerance_min,tolerance_max
+qp_endtest_spartan,Funktionstest EVO Spartan,029.3.000,Endkontrolle Drohne,pass_fail,100,,
+qp_endtest_lightweight,Funktionstest EVO Lightweight,029.3.001,Endkontrolle Drohne,pass_fail,100,,
+qp_endtest_balance,Funktionstest EVO Balance,029.3.002,Endkontrolle Drohne,pass_fail,100,,
