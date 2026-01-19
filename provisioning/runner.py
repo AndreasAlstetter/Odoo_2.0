@@ -1,4 +1,4 @@
-# runner.py (deine Datei aus der letzten Nachricht)
+# runner.py
 
 import os
 from typing import Optional, Dict
@@ -15,7 +15,7 @@ from provisioning.utils import (
     log_success,
     log_warn,
     log_error,
-    set_progress_hook,   # neu
+    set_progress_hook,
 )
 
 from .loaders.products_loader import ProductsLoader
@@ -24,6 +24,9 @@ from .loaders.supplierinfo_loader import SupplierInfoLoader
 from .loaders.bom_loader import BomLoader
 from .loaders.routing_loader import RoutingLoader
 from .loaders.quality_loader import QualityLoader
+from .loaders.manufacturing_config_loader import ManufacturingConfigLoader  # ← NEU
+from .loaders.mailserver_loader import MailServerLoader
+from .loaders.stock_structure_loader import StockStructureLoader
 from .flows.kpi_extractor import KPIExtractor
 
 
@@ -66,18 +69,16 @@ def print_kpi_summary(report: Dict, console: Console) -> None:
 
     console.print(table)
 
-    # Einfache „Balkendiagramme“ aus ASCII für Visualisierung
+    # ASCII-Balken
     console.print()
     console.print("[bold]Visualisierung:[/bold]")
 
-    # MO-Dauer (einfacher Balken)
-    mo_bar_len = min(40, int(mo["avg_throughput_days"] * 1000))  # skaliert
+    mo_bar_len = min(40, int(mo["avg_throughput_days"] * 1000))
     console.print(
         f"Ø MO-Durchlauf: "
         f"[green]{'█' * mo_bar_len}[/green] {mo['avg_throughput_days']:.4f} Tage"
     )
 
-    # QC Pass-Rate
     pass_len = int(qc["pass_rate"] * 40)
     fail_len = 40 - pass_len
     console.print(
@@ -86,7 +87,6 @@ def print_kpi_summary(report: Dict, console: Console) -> None:
         f"{qc['pass_rate']:.2%} Pass"
     )
 
-    # Top-Lagerbestände grob
     top_products = report["inventory_metrics"]["top_products"][:5]
     console.print()
     console.print("[bold]Top 5 Lagerprodukte (qty):[/bold]")
@@ -129,11 +129,12 @@ def run(kpi_only: bool = False, base_data_dir: Optional[str] = None) -> None:
         "Supplierinfos laden",
         "BoMs laden",
         "Routings/Arbeitspläne laden",
+        "Manufacturing Sequences",  # ← NEU
         "Qualitätsdaten laden",
         "KPIs berechnen",
     ]
 
-    total_units = 300
+    total_units = 400  # +50 für ManufacturingConfig
 
     progress_console = Console()
 
@@ -145,60 +146,82 @@ def run(kpi_only: bool = False, base_data_dir: Optional[str] = None) -> None:
 
         set_progress_hook(progress_hook)
         try:
-                # 1) Produkte
-            log_header("Produkte aus Lagerdaten laden")
+            # 1) Produkte (50)
+            log_header("📦 Produkte aus Lagerdaten laden")
             products_loader = ProductsLoader(client, base_data_dir)
             products_loader.run()
             log_success("[STEP] Produkte geladen/aktualisiert")
 
-            # 2) Lieferanten
-            log_header("Lieferanten aus CSV laden")
+            # 2) Lieferanten (50)
+            log_header("👥 Lieferanten aus CSV laden")
             suppliers_loader = SuppliersLoader(client, base_data_dir)
             suppliers_loader.run()
             log_success("[STEP] Lieferanten geladen/aktualisiert")
 
-            # 3) Supplierinfos
-            log_header("Supplierinfos aus 'product_supplierinfo.csv' laden")
+            # 3) Supplierinfos (50)
+            log_header("🔗 Supplierinfos laden")
             supplierinfo_loader = SupplierInfoLoader(client, base_data_dir)
             supplierinfo_loader.run()
-            log_success("[STEP] Lieferanteninfos (product.supplierinfo) geladen/aktualisiert")
+            log_success("[STEP] Supplierinfos geladen/aktualisiert")
 
-            # 4) BoMs
-            log_header("BoMs aus 'bom.csv' laden")
+            # 3.5) Mail-Server (25)
+            log_header("📧 Mail-Server-Konfigurationen laden")
+            mailserver_loader = MailServerLoader(client, base_data_dir)
+            mailserver_loader.run()
+            log_success("[STEP] Mail-Server geladen/aktualisiert")
+
+            # 3.6) Lagerstruktur + Kanban (60)
+            log_header("🏭 Lagerorte, Routen & Kanban laden")
+            stock_loader = StockStructureLoader(client, base_data_dir)
+            stock_loader.run()
+            log_success("[STEP] Lager/Kanban/Routen eingerichtet")
+
+            # 4) BoMs (60)
+            log_header("🔩 BoMs aus 'bom.csv' laden")
             bom_loader = BomLoader(client, base_data_dir)
             bom_loader.run(filename="bom.csv")
             log_success("[STEP] Stücklisten geladen/aktualisiert")
 
-            # 5) Routings
-            log_header("Routing-Operationen aus CSV laden")
+            # 5) Routings (50)
+            log_header("🔄 Routing-Operationen laden")
             routing_loader = RoutingLoader(client, base_data_dir)
             routing_loader.run()
-            log_success("[STEP] Routings/Arbeitspläne geladen/aktualisiert")
+            log_success("[STEP] Routings geladen/aktualisiert")
 
-            # 6) Qualität
-            log_header("Quality Points aus CSV laden")
+            # 5.5) ManufacturingConfig ← NEU! MO-Sequences fixen (50)
+            log_header("⚙️ Manufacturing Sequences (MO-Reference Fix)")
+            mfg_config_loader = ManufacturingConfigLoader(client, base_data_dir)
+            mfg_config_loader.run()
+            log_success("[STEP] Manufacturing picking_types + Sequences ready")
+
+            # 6) Qualität (50)
+            log_header("✅ Quality Points laden")
             quality_loader = QualityLoader(client, base_data_dir)
             quality_loader.run()
-            log_success("[STEP] Qualitätsdaten (quality.point) geladen/aktualisiert")
+            log_success("[STEP] Qualitätsdaten geladen/aktualisiert")
 
-            # 7) KPIs
-            log_header("Nur KPI-Auswertung starten (kpi_only=False)")
+            # 7) KPIs (35)
+            log_header("📊 KPIs berechnen")
             extractor = KPIExtractor(api=client, base_data_dir=base_data_dir)
             report = extractor.generate_report()
             log_success("[STEP] KPI-Report erstellt")
 
             progress.update(task, completed=total_units)
+        except Exception as e:
+            log_error(f"[RUNNER:FAIL] {str(e)}")
+            raise
         finally:
             set_progress_hook(None)
 
-    # Jetzt statische, einzeilige Zusammenfassung des Fortschritts:
     console.rule("[bold]Provisioning Status[/bold]")
     console.print("[bold cyan]Provisioning...[/bold cyan] [bold green]100% abgeschlossen[/bold green]")
+    print_kpi_summary(report, console)  # ← Auch im Full-Run anzeigen
+
 
 def _run_kpi_only(client: OdooClient, base_data_dir: str) -> Dict:
-    log_header("Nur KPI-Auswertung starten (kpi_only=True)")
+    log_header("📊 Nur KPI-Auswertung (kpi_only=True)")
     extractor = KPIExtractor(api=client, base_data_dir=base_data_dir)
     report = extractor.generate_report()
-    log_success("[STEP] KPI-Report erstellt")
+    log_success("[KPI] Report erstellt")
     log_info(f"[KPI] Rohdaten: {report}")
     return report

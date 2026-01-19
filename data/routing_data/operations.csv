@@ -1,10 +1,10 @@
-id,name,workcenter_id/id,time_cycle_manual,sequence
-op_3ddruck_haube,3D-Druck Haube,mrp_wc_3d_printer,30,10
-op_3ddruck_fuesse,3D-Druck Füße,mrp_wc_3d_printer,40,20
-op_lasercut_grundplatte,Laserschneiden Grundplatte,mrp_wc_laser,10,30
-op_nacharbeit_haube,Nacharbeit Haube,mrp_wc_rework,5,40
-op_nacharbeit_fuesse,Nacharbeit Füße,mrp_wc_rework,5,50
-op_nacharbeit_grundplatte,Nacharbeit Grundplatte,mrp_wc_rework,5,60
-op_montage_elektronik,Montage Elektronik,mrp_wc_electronics,15,70
-op_montage_gehaeuse_rotoren,Montage Gehäuse & Rotoren,mrp_wc_assembly,20,80
-op_qualitaetskontrolle,Endkontrolle Drohne,mrp_wc_quality,10,90
+name,cost_per_hour,code,blocking_method,capacity,location_id
+3D-Drucker,25.0,mrp_wc_3dprinter,confirmed_wo,1.0,Zwischenlager 3D
+Lasercutter,35.0,mrp_wc_laser,confirmed_wo,1.0,Zwischenlager Laser
+Nacharbeit,45.0,mrp_wc_rework,confirmed_wo,2.0,Zwischenlager Nacharbeit
+WT bestücken,55.0,mrp_wc_wt_bestuecken,no,1.0,Produktion
+Löten Elektronik,65.0,mrp_wc_loeten,confirmed_wo,1.0,Zwischenlager Löten
+Montage Elektronik,75.0,mrp_wc_electronics,no,2.0,Produktion
+Flashen Flugcontroller,85.0,mrp_wc_flash,confirmed_wo,1.0,Zwischenlager Flash
+Montage Gehäuse Rotoren,95.0,mrp_wc_assembly,no,1.0,Produktion
+End-Qualitätskontrolle,105.0,mrp_wc_quality,confirmed_wo,1.0,Qualitätskontrolle

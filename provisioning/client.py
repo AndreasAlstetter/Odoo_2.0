@@ -21,10 +21,19 @@ class OdooClient:
                 {},
             )
             if not self._uid:
-                raise RuntimeError("Authentication to Odoo failed")
+                raise RuntimeError(
+                    f"Odoo Authentication failed: "
+                    f"DB={self.config.db}, User={self.config.user}, "
+                    f"URL={self.config.url}"
+                )
         return self._uid
 
-    def call(self, model: str, method: str, args, **kwargs):
+    @property
+    def base_data_dir(self) -> str:
+        """Kompatibilität für Loader: config.base_data_dir."""
+        return self.config.base_data_dir or "./data"
+
+    def call(self, model: str, method: str, args, **kwargs) -> Any:
         """
         Low-Level-Wrapper um execute_kw.
 
@@ -42,7 +51,6 @@ class OdooClient:
         )
 
     # Convenience-Methoden
-
     def search(self, model: str, domain: List, limit: Optional[int] = None) -> List[int]:
         kwargs: Dict[str, Any] = {}
         if limit:
@@ -79,9 +87,10 @@ class OdooClient:
         create_vals: Dict[str, Any],
         update_vals: Optional[Dict[str, Any]] = None,
     ) -> Tuple[int, bool]:
+        """Erstelle Record oder update existierenden (idempotent)."""
         ids = self.search(model, domain, limit=1)
         if ids:
-            if update_vals:
+            if update_vals is not None:  # FIX: None-Check
                 self.write(model, ids, update_vals)
             return ids[0], False
 

@@ -325,7 +325,6 @@ class KPIExtractor:
             "example_lead_time_days": lead_time,
         }
 
-        log_info("KPI-Report erstellt.")
         log_kpi_summary(report)
         return report
 
