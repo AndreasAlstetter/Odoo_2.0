@@ -134,7 +134,7 @@ def run(kpi_only: bool = False, base_data_dir: Optional[str] = None) -> None:
         "KPIs berechnen",
     ]
 
-    total_units = 400  # +50 für ManufacturingConfig
+    total_units = 500  # +50 für ManufacturingConfig
 
     progress_console = Console()
 

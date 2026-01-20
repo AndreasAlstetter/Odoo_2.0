@@ -6,12 +6,7 @@ from pathlib import Path
 from typing import Dict, List, Tuple
 
 from provisioning.client import OdooClient
-from provisioning.config import (
-    MENGE_CSV_PATH,
-    PRODUCT_SPARTAN_NAME,
-    PRODUCT_LIGHTWEIGHT_NAME,
-    PRODUCT_BALANCE_NAME,
-)
+from provisioning.config import config  # 🔥 Neue Config!
 from provisioning.utils import (
     log_header,
     log_info,
@@ -20,13 +15,12 @@ from provisioning.utils import (
 )
 from rich.progress import track
 
-# ---------- Datenmodelle ----------
 
+# ---------- Datenmodelle (unverändert) ----------
 @dataclass
 class BaseVariant:
     name: str   # z.B. "EVO 029.3.000"
     key: str    # "spartan" | "lightweight" | "balance"
-
 
 @dataclass
 class DroneConfig:
@@ -36,190 +30,131 @@ class DroneConfig:
     plate_color: str     # Grundplatte
 
 
-# ---------- CSV-Helfer ----------
-
-def load_mengenstueckliste(path: str) -> List[Dict[str, str]]:
-    rows: List[Dict[str, str]] = []
-    csv_path = Path(path)
-    with csv_path.open(encoding="utf-8-sig") as f:
-        reader = csv.DictReader(f)
-        for row in reader:
-            rows.append(row)
-    return rows
-
-
-def build_color_maps_mengen(
-    rows: List[Dict[str, str]]
-) -> Tuple[Dict[str, str], Dict[str, Dict[str, str]], Dict[str, Dict[str, str]]]:
-    """
-    Erzeugt:
-      - hauben[color] -> interner Code
-      - fuesse[variante][color] -> interner Code
-      - grundplatten[variante][color] -> interner Code
-    """
-    hauben: Dict[str, str] = {}
-    fuesse: Dict[str, Dict[str, str]] = {"spartan": {}, "lightweight": {}, "balance": {}}
-    grundplatten: Dict[str, Dict[str, str]] = {"spartan": {}, "lightweight": {}, "balance": {}}
-
-    for r in rows:
-        bezeichnung = (r.get("item_name") or "").strip()
-        name = (r.get("item_description") or "").strip()
-        internal_code = (r.get("default_code") or "").strip()
-
-        if not internal_code:
-            continue
-
-        text_bez = bezeichnung.lower()
-        text_name = name.lower()
-
-        # ---------- Hauben (varianteunabhängig) ----------
-        if "haube evo2" in text_bez or "haube evo 2" in text_bez:
-            parts = text_bez.split()
-            if parts:
-                color = parts[-1]
-                hauben[color] = internal_code
-            continue
-
-        # ---------- Grundplatten je Variante ----------
-        if "grundplatte evo 2 spartan" in text_bez:
-            parts = text_bez.split()
-            color = parts[-1] if parts else ""
-            if color:
-                grundplatten["spartan"][color] = internal_code
-            continue
-
-        if "grundplatte evo 2 lightweight" in text_bez:
-            parts = text_bez.split()
-            color = parts[-1] if parts else ""
-            if color:
-                grundplatten["lightweight"][color] = internal_code
-            continue
-
-        if "grundplatte evo 2 balance" in text_bez:
-            parts = text_bez.split()
-            color = parts[-1] if parts else ""
-            if color:
-                grundplatten["balance"][color] = internal_code
-            continue
-
-        # ---------- Füße je Variante ----------
-        if "fuß evo2 spartan" in text_bez:
-            parts = text_bez.split()
-            color = parts[-1] if parts else ""
-            if color:
-                fuesse["spartan"][color] = internal_code
-            continue
-
-        if "fuß evo2 lightweight" in text_bez:
-            parts = text_bez.split()
-            color = parts[-1] if parts else ""
-            if color:
-                fuesse["lightweight"][color] = internal_code
-            continue
-
-        if "fuß evo2 balance" in text_bez:
-            parts = text_bez.split()
-            color = parts[-1] if parts else ""
-            if color:
-                fuesse["balance"][color] = internal_code
-            continue
-
-    return hauben, fuesse, grundplatten
+    # ---------- CSV-Helfer (Config-Pfade) ----------
+    def load_mengenstueckliste() -> List[Dict[str, str]]:
+        """🔥 Config-Pfad verwenden"""
+        path = config.MENGENSTUECKLISTE  # [file:18]
+        rows: List[Dict[str, str]] = []
+        csv_path = Path(path)
+        with csv_path.open(encoding="utf-8-sig") as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                rows.append(row)
+        log_info(f"📊 Mengenstückliste geladen: {path} ({len(rows)} Zeilen)")
+        return rows
 
 
-def load_common_components(rows: List[Dict[str, str]]) -> List[Dict[str, str]]:
-    """
-    Teile, die für alle Varianten gleich sind.
-    Farbspezifische Teile (Haube/Füße/Grundplatten) werden hier explizit ausgeschlossen.
-    """
-    common: List[Dict[str, str]] = []
-    for r in rows:
-        bezeichnung = (r.get("item_name") or "").strip()
-        bez_low = bezeichnung.lower()
-        if (
-            "haube evo2" in bez_low
-            or "haube evo 2" in bez_low
-            or "grundplatte evo 2" in bez_low
-            or "fuß evo2" in bez_low
-        ):
-            continue
-        common.append(r)
-    return common
+    def build_color_maps_mengen(
+        rows: List[Dict[str, str]]
+    ) -> Tuple[Dict[str, str], Dict[str, Dict[str, str]], Dict[str, Dict[str, str]]]:
+        """Unverändert - extrahiert Farbmaps aus Mengenstueckliste"""
+        hauben: Dict[str, str] = {}
+        fuesse: Dict[str, Dict[str, str]] = {"spartan": {}, "lightweight": {}, "balance": {}}
+        grundplatten: Dict[str, Dict[str, str]] = {"spartan": {}, "lightweight": {}, "balance": {}}
+
+        for r in rows:
+            bezeichnung = (r.get("item_name") or "").strip()
+            name = (r.get("item_description") or "").strip()
+            internal_code = (r.get("default_code") or "").strip()
+
+            if not internal_code:
+                continue
+
+            text_bez = bezeichnung.lower()
+            text_name = name.lower()
+
+            # Hauben
+            if "haube evo2" in text_bez or "haube evo 2" in text_bez:
+                parts = text_bez.split()
+                if parts:
+                    color = parts[-1]
+                    hauben[color] = internal_code
+                continue
+
+            # Grundplatten
+            if "grundplatte evo 2 spartan" in text_bez:
+                parts = text_bez.split()
+                color = parts[-1] if parts else ""
+                if color: grundplatten["spartan"][color] = internal_code
+                continue
+            if "grundplatte evo 2 lightweight" in text_bez:
+                parts = text_bez.split()
+                color = parts[-1] if parts else ""
+                if color: grundplatten["lightweight"][color] = internal_code
+                continue
+            if "grundplatte evo 2 balance" in text_bez:
+                parts = text_bez.split()
+                color = parts[-1] if parts else ""
+                if color: grundplatten["balance"][color] = internal_code
+                continue
+
+            # Füße
+            if "fuß evo2 spartan" in text_bez:
+                parts = text_bez.split()
+                color = parts[-1] if parts else ""
+                if color: fuesse["spartan"][color] = internal_code
+                continue
+            if "fuß evo2 lightweight" in text_bez:
+                parts = text_bez.split()
+                color = parts[-1] if parts else ""
+                if color: fuesse["lightweight"][color] = internal_code
+                continue
+            if "fuß evo2 balance" in text_bez:
+                parts = text_bez.split()
+                color = parts[-1] if parts else ""
+                if color: fuesse["balance"][color] = internal_code
+                continue
+
+        log_success(f"🎨 Farbmaps: {len(hauben)} Hauben, {sum(len(v) for v in fuesse.values())} Füße, {sum(len(v) for v in grundplatten.values())} Platten")
+        return hauben, fuesse, grundplatten
 
 
-# ---------- Odoo-Helfer ----------
+    def load_common_components(rows: List[Dict[str, str]]) -> List[Dict[str, str]]:
+        """Unverändert - gemeinsame Komponenten"""
+        common: List[Dict[str, str]] = []
+        for r in rows:
+            bezeichnung = (r.get("item_name") or "").strip().lower()
+            if any(skip in bezeichnung for skip in ["haube evo2", "haube evo 2", "grundplatte evo 2", "fuß evo2"]):
+                continue
+            common.append(r)
+        return common
 
-def find_or_create_attribute(api: OdooClient, name: str) -> int:
-    res = api.search_read("product.attribute", [["name", "=", name]], ["id"], limit=1)
-    if res:
+
+    # ---------- Odoo-Helfer (unverändert) ----------
+    def find_or_create_attribute(api: OdooClient, name: str) -> int:
+        res = api.search_read("product.attribute", [["name", "=", name]], ["id"], limit=1)
+        if res: return res[0]["id"]
+        return api.create("product.attribute", {"name": name})
+
+    def find_or_create_attribute_value(api: OdooClient, attribute_id: int, name: str) -> int:
+        res = api.search_read("product.attribute.value", [["name", "=", name], ["attribute_id", "=", attribute_id]], ["id"], limit=1)
+        if res: return res[0]["id"]
+        return api.create("product.attribute.value", {"name": name, "attribute_id": attribute_id})
+
+    def find_template_by_name(api: OdooClient, name: str) -> int:
+        res = api.search_read("product.template", [["name", "=", name]], ["id"], limit=1)
+        if not res: raise RuntimeError(f"Template nicht gefunden: {name}")
         return res[0]["id"]
-    return api.create("product.attribute", {"name": name})
 
+    def attach_attributes_to_template(api: OdooClient, tmpl_id: int, attribute_values: Dict[str, List[str]]) -> None:
+        # ... unverändert ...
+        existing_lines = api.search_read("product.template.attribute.line", [["product_tmpl_id", "=", tmpl_id]], ["id", "attribute_id"])
+        attr_id_to_line: Dict[int, int] = {l["attribute_id"][0]: l["id"] for l in existing_lines if l.get("attribute_id")}
 
-def find_or_create_attribute_value(api: OdooClient, attribute_id: int, name: str) -> int:
-    res = api.search_read(
-        "product.attribute.value",
-        [["name", "=", name], ["attribute_id", "=", attribute_id]],
-        ["id"],
-        limit=1,
-    )
-    if res:
-        return res[0]["id"]
-    return api.create(
-        "product.attribute.value",
-        {"name": name, "attribute_id": attribute_id},
-    )
-
-
-def find_template_by_name(api: OdooClient, name: str) -> int:
-    res = api.search_read(
-        "product.template",
-        [["name", "=", name]],
-        ["id"],
-        limit=1,
-    )
-    if not res:
-        raise RuntimeError(f"Template nicht gefunden: {name}")
-    return res[0]["id"]
-
-
-def attach_attributes_to_template(
-    api: OdooClient,
-    tmpl_id: int,
-    attribute_values: Dict[str, List[str]],
-) -> None:
-    existing_lines = api.search_read(
-        "product.template.attribute.line",
-        [["product_tmpl_id", "=", tmpl_id]],
-        ["id", "attribute_id"],
-    )
-    attr_id_to_line: Dict[int, int] = {
-        l["attribute_id"][0]: l["id"] for l in existing_lines if l.get("attribute_id")
-    }
-
-    for attr_name, values in attribute_values.items():
-        if not values:
-            continue
-
-        attr_id = find_or_create_attribute(api, attr_name)
-        value_ids = [find_or_create_attribute_value(api, attr_id, v) for v in values]
-
-        line_id = attr_id_to_line.get(attr_id)
-        if line_id:
-            api.write(
-                "product.template.attribute.line",
-                [line_id],
-                {"value_ids": [(6, 0, value_ids)]},
-            )
-        else:
-            api.create(
-                "product.template.attribute.line",
-                {
+        for attr_name, values in attribute_values.items():
+            if not values: continue
+            attr_id = find_or_create_attribute(api, attr_name)
+            value_ids = [find_or_create_attribute_value(api, attr_id, v) for v in values]
+            line_id = attr_id_to_line.get(attr_id)
+            if line_id:
+                api.write("product.template.attribute.line", [line_id], {"value_ids": [(6, 0, value_ids)]})
+            else:
+                api.create("product.template.attribute.line", {
                     "product_tmpl_id": tmpl_id,
                     "attribute_id": attr_id,
                     "value_ids": [(6, 0, value_ids)],
-                },
-            )
+                })
+
 
 
 def find_variant_product(
