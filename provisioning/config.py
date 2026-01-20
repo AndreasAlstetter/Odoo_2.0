@@ -44,41 +44,55 @@ UMH_EVENTS_PRODUCTION_FILE = os.path.join(
 # ═══════════════════════════════════════════════════════════════════════════════
 # MAILSERVER KONFIGURATION (hardcoded + ENV-Platzhalter)
 # ═══════════════════════════════════════════════════════════════════════════════
-MAILSERVERS_CONFIG: List[Dict[str, str]] = [
+MAILSERVERS_CONFIG: List[Dict[str, Any]] = [
+    # Gmail SMTP (korrekte Felder für ir.mail_server)
     {
         "type": "smtp",
         "name": "Gmail SMTP",
-        "smtp_host": "smtp.gmail.com",
-        "smtp_port": "587",
-        "smtp_encryption": "starttls",
-        "smtp_user": os.getenv("GMAIL_SMTP_USER"),  # aus .env
-        "smtp_pass": os.getenv("GMAIL_SMTP_PASS"),  # App-Password!
-        "active": "1",
-        "sequence": "10",
+        "smtp_host": "smtp.gmail.com",           # ← smtp_host statt smtp!
+        "smtp_port": 587,
+        "smtp_encryption": "starttls",           # ← smtp_encryption
+        "smtp_user": os.getenv("GMAIL_SMTP_USER"),  # ← smtp_user
+        "smtp_pass": os.getenv("GMAIL_SMTP_PASS"),
+        "active": True,
+        "sequence": 10,
     },
+    # Office365 SMTP
     {
         "type": "smtp",
         "name": "Office365 SMTP",
-        "smtp_host": "smtp.office365.com", 
-        "smtp_port": "587",
+        "smtp_host": "smtp.office365.com",
+        "smtp_port": 587,
         "smtp_encryption": "starttls",
         "smtp_user": os.getenv("OFFICE365_USER"),
-        "smtp_pass": os.getenv("OFFICE365_PASS"),  # FIX: Doppelter Eintrag entfernt
-        "active": "1",
-        "sequence": "20",
+        "smtp_pass": os.getenv("OFFICE365_PASS"),
+        "active": True,
+        "sequence": 20,
     },
+    # Office365 IMAP
     {
         "type": "imap",
         "name": "Office365 IMAP", 
-        "server_type": "imap",
         "server": "outlook.office365.com",
-        "port": "993",
-        "is_ssl": "1",
-        "user": os.getenv("OFFICE365_USER"),
+        "port": 993,
+        "is_ssl": True,
+        "user": os.getenv("OFFICE365_USER"),     # ← user statt login!
         "password": os.getenv("OFFICE365_PASS"),
-        "active": "1",
-        # Kein sequence für fetchmail.server!
+        "active": True,
+        "priority": 10,
     },
+    # Gmail IMAP
+    {
+        "type": "imap",
+        "name": "Gmail IMAP",
+        "server": "imap.gmail.com",
+        "port": 993,
+        "is_ssl": True,
+        "user": os.getenv("GMAIL_SMTP_USER"),    # ← user
+        "password": os.getenv("GMAIL_SMTP_PASS"),
+        "active": True,
+        "priority": 20,
+    }
 ]
 MAILSERVERS_CSV_PATH = os.path.join(BASE_DIR, "mailserver_config.csv")  # Export-Pfad
 

@@ -14,59 +14,79 @@ class ProductsLoader:
         self.price_cache: Dict[str, Dict[str, float]] = {}  # default_code -> {'standard_price': x, 'list_price': y}
 
     def parse_price(self, price_str: str) -> float:
-        """Parst Preise wie '0,02', '16,90', '18,07' → float."""
-        if not price_str or price_str == '':
+        """0.02€/stk. → 0.02 | behebt '0.02.' Problem"""
+        if not price_str:
             return 0.0
-        # Ersetze Komma durch Punkt, entferne nicht-numerische Zeichen außer Komma/Punkt
-        price_clean = re.sub(r'[^\d,.]', '', price_str.replace(',', '.'))
+            
+        # 1. Cleanup
+        clean = str(price_str).replace(',', '.')
+        
+        # 2. Nur Zahlen + Punkt/Strich
+        numbers_only = re.sub(r'[^0-9.-]', '', clean)
+        
+        # 🔥 FIX: Trailing Punkt entfernen!
+        numbers_only = numbers_only.rstrip('.')
+        
+        if not numbers_only or numbers_only == '0':
+            return 0.0
+            
         try:
-            return float(price_clean)
+            result = float(numbers_only)
+            return result if result > 0 else 0.0
         except ValueError:
-            log_warn(f"[PRICE:PARSE-FAIL] '{price_str}' → 0.0")
+            log_warn(f"[PRICE-FAIL] '{price_str}' → '{numbers_only}'")
             return 0.0
 
+
+
     def load_prices_from_structure(self) -> None:
-        """Lädt ECHTE Preise aus Strukturstückliste (file:26)."""
         struct_path = join_path(self.normalized_dir, "Strukturstu-eckliste-Table_normalized.csv")
         log_header("💰 Preise aus Strukturstückliste laden")
         
-        for row_num, row in enumerate(csv_rows(struct_path, delimiter=";"), 1):
-            default_code = row.get("defaultcode") or row.get("default_code", "")
+        price_hits = 0
+        for row in csv_rows(struct_path, delimiter=","):  # ✅ Komma!
+            default_code = (row.get('default_code') or 
+                        row.get('ID Nummer') or 
+                        row.get('ID')).strip()
+            
             if not default_code:
                 continue
                 
-            unit_price_raw = row.get("Einzelpreisraw") or row.get("unitpriceeur", "")
-            total_price_raw = row.get("Gesamtpreisraw") or row.get("unitpricetotalpriceeur", "")
+            # ✅ Deine Spalten existieren!
+            unit_price_raw = row.get('Einzelpreis_raw') or row.get('unit_price_eur') or ""
+            total_price_raw = row.get('Gesamtpreis_raw') or row.get('total_price_eur') or ""
             
             standard_price = self.parse_price(unit_price_raw)
-            list_price = self.parse_price(total_price_raw) if total_price_raw else (standard_price * 1.5)
+            list_price = self.parse_price(total_price_raw) or standard_price * 1.5
             
             if standard_price > 0:
-                self.price_cache[default_code] = {
-                    'standard_price': standard_price,
-                    'list_price': list_price
-                }
-                log_success(f"[PRICE:STRUCT] {default_code}: EK=€{standard_price:.2f} VK=€{list_price:.2f}")
-            else:
-                log_warn(f"[PRICE:STRUCT:ZERO] {default_code} (Zeile {row_num})")
+                self.price_cache[default_code] = {'standard_price': standard_price, 'list_price': list_price}
+                price_hits += 1
+                
+                if price_hits <= 5:
+                    log_info(f"✅ PRICE-HIT: {default_code} EK=€{standard_price:.2f}")
         
-        log_info(f"[PRICE:CACHE] {len(self.price_cache)} Preise gecached aus Strukturstückliste.")
+        log_success(f"💰 [PRICE-CACHE] {price_hits} Preise aus Strukturstückliste geladen!")
+
 
     def get_price_for_code(self, default_code: str, row: Dict[str, str]) -> tuple[float, float]:
-        """Priorisiert: Strukturstückliste > CSV-Fallback > berechnet."""
+        """Cache > CSV-Fallback > berechnet"""
         if default_code in self.price_cache:
-            return (self.price_cache[default_code]['standard_price'],
-                    self.price_cache[default_code]['list_price'])
+            data = self.price_cache[default_code]
+            return data['standard_price'], data['list_price']
         
-        # Fallback: alte Logik aus Lagerdaten (falls 'price' existiert)
-        supplier_str = row.get('price', '').strip()
-        supplier_price = float(supplier_str.replace(',', '.')) if supplier_str else 0.0
-        list_price = float(row.get('list_price', '').strip().replace(',', '.')) if row.get('list_price') else (supplier_price * 1.5 if supplier_price > 0 else 0.0)
+        # ✅ None-sichere Fallbacks
+        supplier_str = str(row.get('price') or "").strip()
+        supplier_price = self.parse_price(supplier_str)
+        
+        list_str = str(row.get('list_price') or "").strip()
+        list_price = self.parse_price(list_str) or (supplier_price * 1.5 if supplier_price > 0 else 0.0)
         
         if supplier_price > 0:
             self.price_cache[default_code] = {'standard_price': supplier_price, 'list_price': list_price}
         
         return supplier_price, list_price
+
 
     def ensure_uom(self, name: str) -> int:
         n = (name or "").strip().lower()
@@ -135,20 +155,33 @@ class ProductsLoader:
             # Supplierinfo aus Cache/CSV
             supplier_price = vals['standard_price']
             if supplier_price > 0:
-                supplier_name = row.get('Lieferant', 'Drohnen GmbH')  # Aus Lieferanten-Tabelle später
+                supplier_name = row.get('Lieferant', 'Drohnen GmbH').strip()
+                
+                # ✅ Supplier erstellen/finden
+                partner_domain = [('name', 'ilike', supplier_name)]
+                partner_id, _ = self.client.ensure_record(
+                    'res.partner',
+                    partner_domain,
+                    create_vals={'name': supplier_name, 'supplier_rank': 1},
+                    update_vals={'supplier_rank': 1}
+                )
+                
                 supplier_vals = {
-                    'name': supplier_name,
+                    'product_tmpl_id': prod_id,
+                    'partner_id': partner_id,
                     'price': supplier_price,
                     'min_qty': 1,
                     'currency_id': 1,  # EUR
+                    'delay': 7,        # Standard Lieferzeit
                 }
+                
                 self.client.ensure_record(
                     'product.supplierinfo',
-                    [('product_tmpl_id', '=', prod_id)],
+                    [('product_tmpl_id', '=', prod_id), ('partner_id', '=', partner_id)],
                     create_vals=supplier_vals,
                     update_vals=supplier_vals
                 )
-            
+                log_info(f"  📦 Supplier {supplier_name} → EK:€{supplier_price:.2f}")
             if created:
                 created_count += 1
             else:
