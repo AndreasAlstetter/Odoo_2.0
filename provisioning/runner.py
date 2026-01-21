@@ -1,3 +1,4 @@
+Hergestellt mit Perplexity
 """
 runner.py - Orchestrierung für Odoo ERP Provisioning
 
@@ -8,6 +9,8 @@ Usage:
     python -m provisioning.runner
     python -m provisioning.runner --kpi-only
     python -m provisioning.runner --full
+
+FIXED VERSION: All imports use absolute 'provisioning.' prefix
 """
 
 import os
@@ -16,15 +19,23 @@ import logging
 import argparse
 from typing import Optional, Dict, List, Tuple
 from datetime import datetime
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
-from provisioning.config import ( 
+
+# ✅ FIXED: Use absolute imports with 'provisioning.' prefix
+from provisioning.config import (
     OdooRPCConfig,
     get_odoo_config,
     DataPaths,
     LoggingConfig,
 )
-from client import OdooClient, OdooClientError, AuthenticationError
+
+from provisioning.client import (
+    OdooClient,
+    OdooClientError,
+    AuthenticationError,
+)
+
 from provisioning.utils import (
     log_header,
     log_info,
@@ -34,17 +45,19 @@ from provisioning.utils import (
     set_progress_hook,
 )
 
-from loaders.products_loader import ProductsLoader
-from loaders.suppliers_loader import SuppliersLoader
-from loaders.supplierinfo_loader import SupplierInfoLoader
-from loaders.bom_loader import BomLoader
-from loaders.routing_loader import RoutingLoader
-from loaders.quality_loader import QualityLoader
-from loaders.manufacturing_config_loader import ManufacturingConfigLoader
-from loaders.mailserver_loader import MailServerLoader
-from loaders.stock_structure_loader import StockStructureLoader
+# Import loaders
+from provisioning.loaders.products_loader import ProductsLoader
+from provisioning.loaders.suppliers_loader import SuppliersLoader
+from provisioning.loaders.supplierinfo_loader import SupplierInfoLoader
+from provisioning.loaders.bom_loader import BomLoader
+from provisioning.loaders.routing_loader import RoutingLoader
+from provisioning.loaders.quality_loader import QualityLoader
+from provisioning.loaders.manufacturing_config_loader import ManufacturingConfigLoader
+from provisioning.loaders.mailserver_loader import MailServerLoader
+from provisioning.loaders.stock_structure_loader import StockStructureLoader
 
-from flows.kpi_extractor import KPIExtractor
+# Import flows
+from provisioning.flows.kpi_extractor import KPIExtractor
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -60,17 +73,17 @@ def _setup_logging(level: str = LoggingConfig.LEVEL) -> None:
         LoggingConfig.FORMAT,
         datefmt=LoggingConfig.DATE_FORMAT
     )
-    
+
     # Console
     console_handler = logging.StreamHandler(sys.stdout)
     console_handler.setLevel(level)
     console_handler.setFormatter(formatter)
-    
+
     # Root logger
     root_logger = logging.getLogger()
     root_logger.setLevel(level)
     root_logger.addHandler(console_handler)
-    
+
     # File logging
     if LoggingConfig.AUDIT_ENABLED:
         os.makedirs(LoggingConfig.LOG_DIR, exist_ok=True)
@@ -87,19 +100,13 @@ def _setup_logging(level: str = LoggingConfig.LEVEL) -> None:
 @dataclass
 class ProvisioningStep:
     """Definition einer Provisioning-Phase."""
-    
+
     name: str
     description: str
     loader_class: type
-    loader_kwargs: Dict = None
-    depends_on: List[str] = None
+    loader_kwargs: Dict = field(default_factory=dict)
+    depends_on: List[str] = field(default_factory=list)
     weight: int = 100  # Progress weight (relativ)
-    
-    def __post_init__(self):
-        if self.loader_kwargs is None:
-            self.loader_kwargs = {}
-        if self.depends_on is None:
-            self.depends_on = []
 
 
 # Schritt-Definitionen (mit korrektem Weight)
@@ -179,27 +186,27 @@ TOTAL_WEIGHT = sum(step.weight for step in PROVISIONING_STEPS)
 def _build_client_from_env() -> OdooClient:
     """
     Initialize Odoo RPC Client mit Fehlerbehandlung.
-    
+
     Raises:
         OdooClientError: Wenn Connection/Auth fehlschlägt
     """
     try:
         log_info("[CLIENT] Loading configuration from .env...")
         config = get_odoo_config()
-        
+
         log_info(
             f"[CLIENT] Connecting to Odoo at {config.url} "
             f"(DB: {config.db}, timeout: {config.timeout}s)"
         )
-        
+
         client = OdooClient(config)
-        
+
         # Test authentication
         uid = client.uid
         log_success(f"[CLIENT] Successfully authenticated as UID {uid}")
-        
+
         return client
-        
+
     except AuthenticationError as e:
         log_error(f"[CLIENT] Authentication failed: {e}")
         raise
@@ -218,27 +225,27 @@ def _build_client_from_env() -> OdooClient:
 def _validate_dependencies(steps: List[ProvisioningStep]) -> None:
     """
     Validiere dass alle Dependencies existieren.
-    
+
     Raises:
         ValueError: Wenn Dependency nicht gefunden oder zirkulär
     """
     step_names = {step.name for step in steps}
-    
+
     for step in steps:
         for dep in step.depends_on:
             if dep not in step_names:
                 raise ValueError(
                     f"Step '{step.name}' depends on '{dep}' which doesn't exist"
                 )
-    
+
     # Simple cycle detection (DFS)
     visited = set()
     rec_stack = set()
-    
+
     def _has_cycle(name: str) -> bool:
         visited.add(name)
         rec_stack.add(name)
-        
+
         step = next((s for s in steps if s.name == name), None)
         if step:
             for dep in step.depends_on:
@@ -247,10 +254,10 @@ def _validate_dependencies(steps: List[ProvisioningStep]) -> None:
                         return True
                 elif dep in rec_stack:
                     return True
-        
+
         rec_stack.remove(name)
         return False
-    
+
     for step in steps:
         if step.name not in visited:
             if _has_cycle(step.name):
@@ -260,38 +267,38 @@ def _validate_dependencies(steps: List[ProvisioningStep]) -> None:
 def _sort_steps_by_dependency(steps: List[ProvisioningStep]) -> List[ProvisioningStep]:
     """
     Topological sort für Provisioning Steps.
-    
+
     Returns:
         Steps in korrekter Ausführungsreihenfolge
     """
     _validate_dependencies(steps)
-    
+
     sorted_steps = []
     visited = set()
     temp_mark = set()
-    
+
     def _visit(step_name: str) -> None:
         if step_name in visited:
             return
         if step_name in temp_mark:
             raise ValueError(f"Circular dependency in {step_name}")
-        
+
         temp_mark.add(step_name)
-        
+
         step = next((s for s in steps if s.name == step_name), None)
         if step:
             for dep in step.depends_on:
                 _visit(dep)
-        
+
         temp_mark.remove(step_name)
         visited.add(step_name)
-        
+
         if step:
             sorted_steps.append(step)
-    
+
     for step in steps:
         _visit(step.name)
-    
+
     return sorted_steps
 
 
@@ -302,25 +309,25 @@ def _sort_steps_by_dependency(steps: List[ProvisioningStep]) -> List[Provisionin
 @dataclass
 class ProgressTracker:
     """Track provisioning progress."""
-    
+
     total_weight: int
     current_progress: float = 0.0
     _hook: Optional[callable] = None
-    
+
     def set_hook(self, hook: callable) -> None:
         """Set callback function for progress updates."""
         self._hook = hook
-    
+
     def update(self, step_weight: int) -> None:
         """Update progress by step weight."""
         self.current_progress += (step_weight / self.total_weight) * 100
-        
+
         if self._hook:
             try:
                 self._hook(step_weight / self.total_weight * 100)
             except Exception as e:
                 logger.error(f"Progress hook error: {e}")
-    
+
     def get_percentage(self) -> int:
         """Get current percentage."""
         return int(self.current_progress)
@@ -333,7 +340,7 @@ class ProgressTracker:
 def _print_kpi_summary(report: Dict, console=None) -> None:
     """
     Print KPI Summary (mit Fehlerbehandlung).
-    
+
     Args:
         report: KPI Report dict
         console: Rich Console (optional)
@@ -341,21 +348,21 @@ def _print_kpi_summary(report: Dict, console=None) -> None:
     try:
         from rich.console import Console
         from rich.table import Table
-        
+
         if console is None:
             console = Console()
-        
+
         # Validate report structure
         if not isinstance(report, dict):
             log_warn(f"KPI report is not dict: {type(report)}")
             return
-        
+
         required_keys = ['mo_performance', 'qc_metrics', 'inventory_metrics']
         missing = [k for k in required_keys if k not in report]
         if missing:
             log_warn(f"KPI report missing keys: {missing}")
             return
-        
+
         # Build table
         table = Table(
             title="🎯 KPI-Report (Übersicht)",
@@ -363,13 +370,13 @@ def _print_kpi_summary(report: Dict, console=None) -> None:
         )
         table.add_column("Kategorie", style="bold cyan")
         table.add_column("Kennzahlen", style="white")
-        
+
         # Safe dictionary access
         mo = report.get('mo_performance', {}).get('summary', {})
         qc = report.get('qc_metrics', {}).get('summary', {})
         inv = report.get('inventory_metrics', {}).get('summary', {})
         lt = report.get('example_lead_time_days', 0)
-        
+
         # Manufacturing
         mo_count = mo.get('mo_count', 0)
         avg_throughput = mo.get('avg_throughput_days', 0)
@@ -377,7 +384,7 @@ def _print_kpi_summary(report: Dict, console=None) -> None:
             "Fertigung",
             f"MOs: {mo_count}\nØ Durchlauf: {avg_throughput:.4f} Tage"
         )
-        
+
         # Quality
         checks_total = qc.get('checks_total', 0)
         checks_passed = qc.get('checks_passed', 0)
@@ -389,7 +396,7 @@ def _print_kpi_summary(report: Dict, console=None) -> None:
             f"Pass: {checks_passed} | Fail: {checks_failed}\n"
             f"Pass-Rate: {pass_rate:.2%}"
         )
-        
+
         # Inventory
         products_with_stock = inv.get('products_with_stock', 0)
         total_stock = inv.get('total_stock_qty', 0)
@@ -398,27 +405,27 @@ def _print_kpi_summary(report: Dict, console=None) -> None:
             f"Produkte mit Bestand: {products_with_stock}\n"
             f"Gesamtbestand: {total_stock}"
         )
-        
+
         # Lead Time
         table.add_row(
             "Lead-Time",
             f"Verkauf → Lieferung: {lt:.2f} Tage"
         )
-        
+
         console.print(table)
-        
+
         # Visualizations (mit Limits)
         console.print()
         console.print("[bold]Visualisierungen:[/bold]")
-        
+
         # MO Throughput Bar
         if avg_throughput > 0:
-            bar_len = min(40, max(1, int(avg_throughput * 10)))  # Scale: 1 char = 0.1 day
+            bar_len = min(40, max(1, int(avg_throughput * 10)))
             console.print(
                 f"MO Ø-Durchlauf: "
                 f"[green]{'█' * bar_len}[/green] {avg_throughput:.4f} Tage"
             )
-        
+
         # Pass Rate Bar
         if 0 <= pass_rate <= 1:
             pass_len = int(pass_rate * 40)
@@ -428,7 +435,7 @@ def _print_kpi_summary(report: Dict, console=None) -> None:
                 f"[green]{'█' * pass_len}[/green][red]{'█' * fail_len}[/red] "
                 f"{pass_rate:.2%}"
             )
-        
+
         # Top Products
         top_products = inv.get('top_products', [])[:5]
         if top_products:
@@ -439,7 +446,7 @@ def _print_kpi_summary(report: Dict, console=None) -> None:
                 qty = p.get('qty_available', 0.0)
                 bar = '█' * min(40, max(1, int(qty / 5)))
                 console.print(f"{name:30} {bar} {qty:.1f}")
-        
+
     except Exception as e:
         log_error(f"Error printing KPI summary: {e}", exc_info=True)
 
@@ -455,26 +462,26 @@ def run_provisioning(
 ) -> Dict:
     """
     Run complete provisioning flow.
-    
+
     Args:
         client: Initialized OdooClient
         base_data_dir: Path to data directory
         skip_kpi: Skip KPI extraction if True
-    
+
     Returns:
         KPI report dict
-    
+
     Raises:
         RuntimeError: Bei kritischen Fehlern
     """
-    
+
     # Validate data paths
     try:
         DataPaths.validate_all()
     except FileNotFoundError as e:
         log_error(f"[PROVISIONING] Data path validation failed: {e}")
         raise
-    
+
     # Sort steps by dependency
     try:
         sorted_steps = _sort_steps_by_dependency(PROVISIONING_STEPS)
@@ -482,64 +489,64 @@ def run_provisioning(
     except ValueError as e:
         log_error(f"[PROVISIONING] Dependency resolution failed: {e}")
         raise
-    
+
     progress = ProgressTracker(total_weight=TOTAL_WEIGHT)
     failed_steps: List[str] = []
     step_results: Dict[str, Dict] = {}
-    
+
     log_header("[PROVISIONING] Starting ERP initialization")
     log_info(f"[PROVISIONING] Total weight: {TOTAL_WEIGHT}")
     log_info(f"[PROVISIONING] Steps: {len(sorted_steps)}")
-    
+
     # Execute each step
     for step in sorted_steps:
         try:
             step_start = datetime.now()
-            
+
             log_header(step.description)
             log_info(
                 f"[STEP:{step.name}] Progress: {progress.get_percentage()}% | "
                 f"Weight: {step.weight} | "
                 f"Dependencies: {step.depends_on or 'none'}"
             )
-            
+
             # Instantiate loader
             loader = step.loader_class(
                 client=client,
                 base_data_dir=base_data_dir,
                 **step.loader_kwargs
             )
-            
+
             # Execute
             result = loader.run()
-            
+
             # Track result
             step_results[step.name] = {
                 'status': 'success',
                 'duration': (datetime.now() - step_start).total_seconds(),
                 'result': result,
             }
-            
+
             # Update progress
             progress.update(step.weight)
-            
+
             log_success(
                 f"[STEP:{step.name}] Completed in "
                 f"{step_results[step.name]['duration']:.2f}s"
             )
-            
+
         except Exception as e:
             log_error(
                 f"[STEP:{step.name}] FAILED: {str(e)}",
                 exc_info=True
             )
-            
+
             failed_steps.append(step.name)
             step_results[step.name] = {
                 'status': 'failed',
                 'error': str(e),
             }
-            
+
             # Decide: Continue or Abort?
             # Für >500 Drohnen/Tag: Nicht abbrechen bei nicht-kritischen Steps
             critical_steps = {'products', 'routing', 'bom', 'quality'}
@@ -553,7 +560,7 @@ def run_provisioning(
                     f"[PROVISIONING] Non-critical step '{step.name}' failed, "
                     f"continuing with remaining steps"
                 )
-    
+
     # Log summary
     log_header("[PROVISIONING] Step Summary")
     for step_name, result in step_results.items():
@@ -564,7 +571,7 @@ def run_provisioning(
         else:
             error = result.get('error', 'unknown')
             log_error(f"  ✗ {step_name:30} ({error[:50]})")
-    
+
     # KPI Extraction
     report = {}
     if not skip_kpi:
@@ -579,7 +586,7 @@ def run_provisioning(
         except Exception as e:
             log_error(f"[PROVISIONING] KPI extraction failed: {e}", exc_info=True)
             # KPI failure ist non-critical
-    
+
     # Final status
     if failed_steps:
         log_warn(
@@ -591,7 +598,7 @@ def run_provisioning(
             f"[PROVISIONING] COMPLETED SUCCESSFULLY: "
             f"All {len(sorted_steps)} steps passed"
         )
-    
+
     return report
 
 
@@ -605,28 +612,28 @@ def run_kpi_only(
 ) -> Dict:
     """
     Run only KPI extraction (no provisioning).
-    
+
     Args:
         client: Initialized OdooClient
         base_data_dir: Path to data directory
-    
+
     Returns:
         KPI report dict
     """
     try:
         log_header("[KPI] Running KPI-only extraction")
-        
+
         extractor = KPIExtractor(
             api=client,
             base_data_dir=base_data_dir
         )
-        
+
         report = extractor.generate_report()
-        
+
         log_success("[KPI] Report generated successfully")
-        
+
         return report
-        
+
     except Exception as e:
         log_error(f"[KPI] Extraction failed: {e}", exc_info=True)
         raise
@@ -642,32 +649,32 @@ def main():
         description='Odoo ERP Provisioning for Drone Manufacturing',
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
-    
+
     parser.add_argument(
         '--kpi-only',
         action='store_true',
         help='Run KPI extraction only (no provisioning)'
     )
-    
+
     parser.add_argument(
         '--full',
         action='store_true',
         help='Run complete provisioning with KPI extraction'
     )
-    
+
     parser.add_argument(
         '--skip-kpi',
         action='store_true',
         help='Skip KPI extraction after provisioning'
     )
-    
+
     parser.add_argument(
         '--data-dir',
         type=str,
         default=None,
         help='Override data directory path'
     )
-    
+
     parser.add_argument(
         '--log-level',
         type=str,
@@ -675,26 +682,26 @@ def main():
         choices=['DEBUG', 'INFO', 'WARNING', 'ERROR'],
         help='Logging level'
     )
-    
+
     args = parser.parse_args()
-    
+
     # Setup logging
     _setup_logging(args.log_level)
-    
+
     log_header("[MAIN] Odoo ERP Provisioning Started")
     log_info(f"[MAIN] Log level: {args.log_level}")
-    
+
     try:
         # Validate data directory
         base_data_dir = args.data_dir or DataPaths.DATA_DIR
         if not os.path.isdir(base_data_dir):
             raise RuntimeError(f"Data directory not found: {base_data_dir}")
-        
+
         log_info(f"[MAIN] Using data directory: {base_data_dir}")
-        
+
         # Build client
         client = _build_client_from_env()
-        
+
         # Run appropriate mode
         if args.kpi_only:
             log_info("[MAIN] Running in KPI-only mode")
@@ -706,17 +713,17 @@ def main():
                 base_data_dir,
                 skip_kpi=args.skip_kpi
             )
-        
+
         # Display results
         _print_kpi_summary(report)
-        
+
         log_header("[MAIN] Provisioning finished successfully")
         return 0
-        
+
     except KeyboardInterrupt:
         log_warn("[MAIN] Interrupted by user")
         return 130
-    
+
     except Exception as e:
         log_error(f"[MAIN] Fatal error: {e}", exc_info=True)
         return 1
