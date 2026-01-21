@@ -1,238 +1,615 @@
-import os
-import ast
-from typing import Dict, Any, Optional, List, Tuple
-from .csv_cleaner import csv_rows, join_path
-from ..client import OdooClient
-from provisioning.utils import log_header, log_info, log_success, log_warn
+"""
+routing_loader.py - Manufacturing Routing Orchestration
 
+Lädt Fertigungspläne (Routings) mit:
+- Workcenter-Kapazitäten
+- Operations mit Sequenzierung
+- Varianten-Support
+- Validierung des kompletten Produktionsflusses
+- Audit-Trail für Compliance
+"""
+
+import csv
+import logging
+from pathlib import Path
+from typing import Dict, Any, Optional, List, Tuple, Set
+from decimal import Decimal, InvalidOperation
+from datetime import datetime
+
+from client import OdooClient, RecordAmbiguousError, ValidationError
+from config import (
+    DataPaths,
+    ManufacturingConfig,
+    ProductTemplates,
+    CSVConfig,
+)
+from utils import log_header, log_info, log_success, log_warn, log_error
+
+
+logger = logging.getLogger(__name__)
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# EXCEPTIONS
+# ═══════════════════════════════════════════════════════════════════════════════
+
+class RoutingError(Exception):
+    """Base exception for routing operations."""
+    pass
+
+
+class WorkcenterNotFoundError(RoutingError):
+    """Workcenter not found."""
+    pass
+
+
+class RoutingValidationError(RoutingError):
+    """Routing validation failed."""
+    pass
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# WORKCENTER MAPPER
+# ═══════════════════════════════════════════════════════════════════════════════
+
+class WorkcenterMapper:
+    """Map Workcenter codes from CSV to Odoo Workcenter IDs."""
+    
+    @staticmethod
+    def load_mapping_from_config() -> Dict[str, str]:
+        """
+        Load Workcenter mapping from config.
+        
+        Returns:
+            Dict: csv_code → workcenter_name
+            
+        Example:
+            {'WC-3D': '3D-Drucker', 'WC-LC': 'Lasercutter', ...}
+        """
+        return ManufacturingConfig.WORKCENTERS.keys()
+    
+    @staticmethod
+    def load_mapping_from_csv(csv_path: Path) -> Dict[str, str]:
+        """
+        Load Workcenter mapping from external CSV.
+        
+        CSV Format:
+            workcenter_code,workcenter_name
+            WC-3D,3D-Drucker
+            WC-LC,Lasercutter
+        
+        Args:
+            csv_path: Path to workcenter_mapping.csv
+        
+        Returns:
+            Dict: code → name
+        
+        Raises:
+            FileNotFoundError: Wenn Datei nicht existiert
+        """
+        if not csv_path.exists():
+            raise FileNotFoundError(f"Workcenter mapping CSV missing: {csv_path}")
+        
+        mapping = {}
+        
+        try:
+            with open(csv_path, 'r', encoding='utf-8-sig') as f:
+                reader = csv.DictReader(f)
+                
+                for row_idx, row in enumerate(reader, start=2):
+                    code = row.get('workcenter_code', '').strip()
+                    name = row.get('workcenter_name', '').strip()
+                    
+                    if not code or not name:
+                        logger.warning(f"Workcenter mapping row {row_idx}: empty fields")
+                        continue
+                    
+                    mapping[code] = name
+        
+        except csv.Error as e:
+            raise RoutingError(f"Workcenter mapping CSV error: {e}")
+        
+        return mapping
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# ROUTING VALIDATOR
+# ═══════════════════════════════════════════════════════════════════════════════
+
+class RoutingValidator:
+    """Validate routing completeness and consistency."""
+    
+    @staticmethod
+    def validate_routing_completeness(
+        routing_id: int,
+        operations: List[Dict[str, Any]],
+        client: OdooClient,
+    ) -> Tuple[bool, List[str]]:
+        """
+        Validate dass Routing komplett ist.
+        
+        Args:
+            routing_id: Odoo Routing ID
+            operations: Expected operations
+            client: Odoo client
+        
+        Returns:
+            (is_valid, error_messages)
+        """
+        errors = []
+        
+        # Check: Operation sequence hat keine Lücken
+        sequences = sorted([op['sequence'] for op in operations if 'sequence' in op])
+        
+        if sequences:
+            # 1, 2, 3, 4, 5 OK
+            # 1, 3, 5 → Lücken!
+            expected_sequences = list(range(min(sequences), max(sequences) + 1))
+            if sequences != expected_sequences:
+                missing = set(expected_sequences) - set(sequences)
+                errors.append(f"Missing operation sequences: {missing}")
+        
+        # Check: Alle Workcenters existieren
+        for op in operations:
+            if 'workcenter_id' not in op or not op['workcenter_id']:
+                errors.append(f"Operation {op.get('name')}: no workcenter assigned")
+        
+        # Check: Kapazität ausreichend für Produktionsvolumen
+        for op in operations:
+            capacity = op.get('capacity', 1)
+            if capacity < 5:  # Minimum für >500 Drohnen/Tag
+                errors.append(
+                    f"Operation {op.get('name')}: "
+                    f"capacity {capacity} too low for 500 units/day"
+                )
+        
+        return len(errors) == 0, errors
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# ROUTING LOADER
+# ═══════════════════════════════════════════════════════════════════════════════
 
 class RoutingLoader:
-    def __init__(self, client: OdooClient, base_data_dir: Optional[str] = None) -> None:
+    """Manufacturing Routing Orchestration."""
+    
+    def __init__(self, client: OdooClient, base_data_dir: str):
         self.client = client
-        self.routingdir = join_path(
-            base_data_dir or client.base_data_dir,  # ← FIX: client.base_data_dir
-            'routing/data'
+        self.base_data_dir = Path(base_data_dir)
+        self.routing_dir = self.base_data_dir / 'routing_data'
+        
+        # Get company
+        companies = self.client.search_read('res.company', [], ['id'], limit=1)
+        if not companies:
+            raise RuntimeError("No company found in Odoo")
+        self.company_id = companies[0]['id']
+        
+        # Statistics
+        self.stats = {
+            'workcenters_created': 0,
+            'workcenters_updated': 0,
+            'routings_created': 0,
+            'routings_updated': 0,
+            'operations_created': 0,
+            'operations_updated': 0,
+            'validation_errors': 0,
+        }
+        
+        # Audit log
+        self.audit_log: List[Dict[str, Any]] = []
+        
+        logger.info(f"RoutingLoader initialized: company_id={self.company_id}")
+    
+    # ═══════════════════════════════════════════════════════════════════════════
+    # PRODUCT LOOKUP
+    # ═══════════════════════════════════════════════════════════════════════════
+    
+    def _find_products_by_codes(self, codes: List[str]) -> Dict[str, int]:
+        """Batch lookup products by code."""
+        if not codes:
+            return {}
+        
+        products = self.client.search_read(
+            'product.template',
+            [('default_code', 'in', codes)],
+            ['default_code', 'id'],
+            limit=len(codes) * 2  # Safety margin
         )
-        company_ids = self.client.search('res.company', [])
-        self.company_id = company_ids[0] if company_ids else 1
-        log_info(f"[ROUTING:COMPANY] Verwende Company ID {self.company_id}")
-
-    def find_location_by_name(self, loc_name: str) -> Optional[int]:
-        """Finde stock.location by name."""
-        if not loc_name:
-            return None
-        domain = [('name', '=', loc_name), ('company_id', '=', self.company_id)]
-        res = self.client.search_read('stock.location', domain, ['id'], limit=1)
-        return res[0]['id'] if res else None
-
-    def find_bom_by_headcode(self, head_default_code: str) -> Optional[int]:
-        """Findet BoM-ID zu Endprodukt-Default-Code z.B. '029.3.000'."""
-        res = self.client.search_read(
+        
+        return {p['default_code']: p['id'] for p in products}
+    
+    def _find_bom_by_product_id(self, product_id: int) -> Optional[int]:
+        """Find BoM for given product."""
+        boms = self.client.search_read(
             'mrp.bom',
-            [['product_tmpl_id.default_code', '=', head_default_code]],
+            [('product_tmpl_id', '=', product_id)],
             ['id'],
             limit=1
         )
-        return res[0]['id'] if res else None
-
-    def get_evo_bom_ids(self) -> List[int]:
-        bom_ids = []
-        missing_heads = []
-        for code in ['029.3.000', '029.3.001', '029.3.002']:
-            bom_id = self.find_bom_by_headcode(code)
-            if bom_id:
-                bom_ids.append(bom_id)
-                log_info(f"[ROUTING:BOM] Kopf {code} -> BoM-ID {bom_id}")
-            else:
-                missing_heads.append(code)
-                log_warn(f"[ROUTING:BOM] Keine BoM für Kopf {code}")
-        if not bom_ids:
-            raise RuntimeError(f"Keine BoMs für EVO-Varianten gefunden. Fehlende Köpfe: {', '.join(missing_heads)}")
-        log_success(f"[ROUTING:BOM] {len(bom_ids)} EVO-BoMs geladen: {bom_ids}")
-        return bom_ids
-
-    def load_workcenters_if_needed(self) -> None:
-        """Workcenters aus CSV laden (erweiterte Felder: blocking, capacity, location)."""
-        path = join_path(self.routingdir, 'workcenter.csv')
-        if not os.path.exists(path):
-            log_info(f"[WORKCENTER:SKIP] workcenter.csv fehlt → Skip.")
-            return
-        log_header("Workcenters laden")
-        created_count = updated_count = 0
-        val_template = {'company_id': self.company_id}
-        for row in csv_rows(path):
-            name = row.get('name')
-            if not name:
-                log_warn("[WORKCENTER:WARN] Row ohne Name → Skip.")
-                continue
-            domain = [('name', '=', name), ('company_id', '=', self.company_id)]
-            vals: Dict[str, Any] = val_template.copy()
-            vals.update({
-                'name': name,
-                'code': row.get('code', ''),
-                'costs_hour': float(row.get('cost_per_hour', 0)),
-                'blocking': row.get('blocking_method', 'no'),
-                'capacity': float(row.get('capacity', 1.0)),
-                'time_efficiency': float(row.get('time_efficiency', 1.0)),
-                'location_id': self.find_location_by_name(row.get('location_id')),
-                'alternative_workcenter_id': self.find_workcenter_by_key(row.get('alternative_workcenter_id')),
-            })
-            wcid, created = self.client.ensure_record(
-                'mrp.workcenter',
-                domain,
-                create_vals=vals,
-                update_vals=vals
-            )
-            if created:
-                created_count += 1
-            else:
-                updated_count += 1
-            log_success(f"[WORKCENTER:{'NEW' if created else 'UPD'}] {name} → ID {wcid}")
-        log_info(f"[WORKCENTER:SUMMARY] {created_count} neu, {updated_count} aktualisiert.")
-
-    def find_workcenter_by_key(self, wc_key: str) -> Optional[int]:
-        """Workcenter via erweitertes Mapping (routings.csv + mrp_wc_*)."""
-        if not wc_key:
-            return None
-        mapping = {
-            # routings.csv Codes
-            'WC-3D': '3D-Drucker',
-            'WC-LC': 'Lasercutter',
-            'WC-NACH': 'Nacharbeit',
-            'WC-WTB': 'WT bestücken',
-            'WC-LOET': 'Löten Elektronik',
-            'WC-MONT': 'Montage Elektronik',
-            'WC-FLASH': 'Flashen Flugcontroller',
-            'WC-MONT2': 'Montage Gehäuse Rotoren',
-            'WC-QM-END': 'End-Qualitätskontrolle',
-            # mrp_wc_* Fallback
-            'mrp_wc_3dprinter': '3D-Drucker',
-            'mrp_wc_laser': 'Lasercutter',
-            'mrp_wc_rework': 'Nacharbeit',
-            'mrp_wc_wt_bestuecken': 'WT bestücken',
-            'mrp_wc_loeten': 'Löten Elektronik',
-            'mrp_wc_electronics': 'Montage Elektronik',
-            'mrp_wc_flash': 'Flashen Flugcontroller',
-            'mrp_wc_assembly': 'Montage Gehäuse Rotoren',
-            'mrp_wc_quality': 'End-Qualitätskontrolle',
-        }
-        name = mapping.get(wc_key, wc_key)
-        domain = [('name', '=', name), ('company_id', '=', self.company_id)]
-        res = self.client.search_read('mrp.workcenter', domain, ['id'], limit=1)
-        if res:
-            return res[0]['id']
-        log_warn(f"[WORKCENTER:MISSING] Key '{wc_key}' → '{name}' nicht gefunden")
+        
+        if boms:
+            return boms[0]['id']
         return None
-
-    def get_fallback_workcenter(self) -> int:
-        """Fallback-Workcenter."""
-        candidates = ['End-Qualitätskontrolle', '3D-Drucker', 'Nacharbeit']
-        for name in candidates:
-            domain = [('name', '=', name), ('company_id', '=', self.company_id)]
-            res = self.client.search_read('mrp.workcenter', domain, ['id'], limit=1)
-            if res:
-                log_info(f"[WORKCENTER:FALLBACK] '{name}' → ID {res[0]['id']}")
-                return res[0]['id']
-        domain = [('company_id', '=', self.company_id)]
-        res = self.client.search_read('mrp.workcenter', domain, ['id'], limit=1)
-        if not res:
-            raise RuntimeError(f"Kein mrp.workcenter für Company {self.company_id}!")
-        log_warn(f"[WORKCENTER:FALLBACK] Erster WC → ID {res[0]['id']}")
-        return res[0]['id']
-
-    def find_attribute_values(self, apply_spec: str) -> List[int]:
-        """apply_on_variants parsen → Attribute Value IDs."""
-        if not apply_spec:
-            return []
-        av_ids = []
+    
+    # ═══════════════════════════════════════════════════════════════════════════
+    # WORKCENTER MANAGEMENT
+    # ═══════════════════════════════════════════════════════════════════════════
+    
+    def _load_workcenters_from_csv(self) -> Dict[str, int]:
+        """Load workcenters from CSV with validation."""
+        wc_path = self.routing_dir / 'workcenter.csv'
+        
+        if not wc_path.exists():
+            log_warn(f"Workcenter CSV missing: {wc_path}, using config defaults")
+            return self._create_workcenters_from_config()
+        
+        log_header("Loading Workcenters from CSV")
+        
+        workcenters = {}
+        
         try:
-            parts = apply_spec.split(',') if ',' in apply_spec else [apply_spec]
-            for part in parts:
-                part = part.strip()
-                if not part or ':' not in part:
-                    continue
-                attr_name, values_str = part.split(':', 1)
-                values = [v.strip() for v in values_str.split(',') if v.strip()]
-                av_domain = [('name', 'in', values)]
-                attr_ids = self.client.search('product.attribute', [('name', 'ilike', attr_name)])
-                if attr_ids:
-                    av_domain.append(('attribute_id', 'in', attr_ids))
-                else:
-                    log_warn(f"[VARIANT:WARN] Attribut '{attr_name}' nicht gefunden")
-                    continue
-                part_avs = self.client.search('product.attribute.value', av_domain)
-                av_ids.extend(part_avs)
-            av_ids = sorted(list(set(av_ids)))
-            log_info(f"[VARIANT] '{apply_spec}' → {len(av_ids)} AV-IDs")
-            return av_ids
-        except Exception as e:
-            log_warn(f"[VARIANT:PARSE-ERROR] '{apply_spec}': {str(e)}")
+            with open(wc_path, 'r', encoding='utf-8-sig') as f:
+                reader = csv.DictReader(f, delimiter=CSVConfig.DELIMITER_PRIMARY)
+                
+                for row_idx, row in enumerate(reader, start=2):
+                    wc_name = row.get('name', '').strip()
+                    
+                    if not wc_name:
+                        logger.warning(f"Row {row_idx}: missing name")
+                        continue
+                    
+                    try:
+                        # Parse numeric fields
+                        try:
+                            costs_hour = Decimal(row.get('cost_per_hour', '0'))
+                            capacity = Decimal(row.get('capacity', '1'))
+                            efficiency = Decimal(row.get('time_efficiency', '1'))
+                        except InvalidOperation as e:
+                            logger.warning(f"Row {row_idx}: numeric parse error: {e}")
+                            continue
+                        
+                        # Validate
+                        if capacity <= 0 or capacity > 1000:
+                            logger.warning(f"Row {row_idx}: invalid capacity {capacity}")
+                            continue
+                        
+                        # Create/Update
+                        vals = {
+                            'name': wc_name,
+                            'code': row.get('code', '').strip()[:20],
+                            'costs_hour': float(costs_hour),
+                            'capacity': float(capacity),
+                            'time_efficiency': float(efficiency),
+                            'blocking': row.get('blocking', 'no').strip(),
+                            'company_id': self.company_id,
+                        }
+                        
+                        wc_id, is_new = self.client.ensure_record(
+                            'mrp.workcenter',
+                            [('name', '=', wc_name), ('company_id', '=', self.company_id)],
+                            vals,
+                            vals,
+                        )
+                        
+                        workcenters[wc_name] = wc_id
+                        
+                        if is_new:
+                            self.stats['workcenters_created'] += 1
+                            log_success(f"Created workcenter: {wc_name} → {wc_id}")
+                        else:
+                            self.stats['workcenters_updated'] += 1
+                            log_info(f"Updated workcenter: {wc_name} → {wc_id}")
+                        
+                        self._audit_log({
+                            'action': 'workcenter_created' if is_new else 'workcenter_updated',
+                            'workcenter_name': wc_name,
+                            'workcenter_id': wc_id,
+                            'capacity': float(capacity),
+                        })
+                    
+                    except Exception as e:
+                        logger.error(f"Row {row_idx}: {e}", exc_info=True)
+                        continue
+        
+        except csv.Error as e:
+            raise RoutingError(f"Workcenter CSV error: {e}")
+        
+        return workcenters
+    
+    def _create_workcenters_from_config(self) -> Dict[str, int]:
+        """Create workcenters from config if CSV missing."""
+        log_header("Creating Workcenters from Config")
+        
+        workcenters = {}
+        
+        for wc_code, wc_config in ManufacturingConfig.WORKCENTERS.items():
+            wc_name = wc_config['name']
+            capacity = wc_config['capacity']
+            efficiency = wc_config['efficiency']
+            
+            vals = {
+                'name': wc_name,
+                'code': wc_code,
+                'capacity': capacity,
+                'time_efficiency': efficiency,
+                'company_id': self.company_id,
+            }
+            
+            wc_id, is_new = self.client.ensure_record(
+                'mrp.workcenter',
+                [('name', '=', wc_name), ('company_id', '=', self.company_id)],
+                vals,
+                vals,
+            )
+            
+            workcenters[wc_name] = wc_id
+            
+            if is_new:
+                self.stats['workcenters_created'] += 1
+            
+            log_success(f"{'[NEW]' if is_new else '[UPD]'} {wc_name}")
+        
+        return workcenters
+    
+    # ═══════════════════════════════════════════════════════════════════════════
+    # ROUTING MANAGEMENT
+    # ═══════════════════════════════════════════════════════════════════════════
+    
+    def _ensure_routing_for_bom(self, bom_id: int) -> int:
+        """Get or create Routing for BoM."""
+        # Routing 1:1 zu BoM
+        routings = self.client.search_read(
+            'mrp.routing',
+            [('bom_id', '=', bom_id)],
+            ['id'],
+            limit=1
+        )
+        
+        if routings:
+            return routings[0]['id']
+        
+        # Create new routing
+        routing_id = self.client.create(
+            'mrp.routing',
+            {
+                'name': f'Routing for BoM {bom_id}',
+                'bom_id': bom_id,
+                'company_id': self.company_id,
+            }
+        )
+        
+        self.stats['routings_created'] += 1
+        self._audit_log({
+            'action': 'routing_created',
+            'bom_id': bom_id,
+            'routing_id': routing_id,
+        })
+        
+        logger.info(f"Created routing: {routing_id} for BoM {bom_id}")
+        
+        return routing_id
+    
+    # ═══════════════════════════════════════════════════════════════════════════
+    # OPERATION MANAGEMENT
+    # ═══════════════════════════════════════════════════════════════════════════
+    
+    def _load_operations_from_csv(
+        self,
+        routing_id: int,
+        workcenters: Dict[str, int],
+    ) -> List[Dict[str, Any]]:
+        """Load operations for routing from CSV."""
+        ops_path = self.routing_dir / 'operations.csv'
+        
+        if not ops_path.exists():
+            log_warn(f"Operations CSV missing: {ops_path}")
             return []
-
-    def load_operations(self) -> None:
-        """Operations laden mit Blocking/Sequence-Orchestrierung."""
-        path = join_path(self.routingdir, 'operations.csv')
-        if not os.path.exists(path):
-            log_info("[ROUTING:SKIP] operations.csv fehlt → Skip.")
+        
+        operations = []
+        fallback_wc_id = self._get_fallback_workcenter_id(workcenters)
+        
+        try:
+            with open(ops_path, 'r', encoding='utf-8-sig') as f:
+                reader = csv.DictReader(f, delimiter=CSVConfig.DELIMITER_PRIMARY)
+                
+                for row_idx, row in enumerate(reader, start=2):
+                    op_name = row.get('name', '').strip()
+                    
+                    if not op_name:
+                        logger.warning(f"Row {row_idx}: missing operation name")
+                        continue
+                    
+                    try:
+                        # Parse fields
+                        sequence = int(row.get('sequence', 999))
+                        wc_name = row.get('workcenter_name', '').strip()
+                        
+                        # Resolve workcenter
+                        wc_id = workcenters.get(wc_name)
+                        if not wc_id:
+                            if not wc_name:
+                                logger.warning(f"Row {row_idx}: no workcenter specified, using fallback")
+                            else:
+                                logger.warning(
+                                    f"Row {row_idx}: workcenter '{wc_name}' not found, using fallback"
+                                )
+                            wc_id = fallback_wc_id
+                        
+                        # Parse time cycle (optional)
+                        time_cycle = None
+                        if row.get('time_cycle_manual'):
+                            try:
+                                time_cycle = float(row['time_cycle_manual'])
+                            except ValueError:
+                                logger.warning(f"Row {row_idx}: invalid time_cycle")
+                        
+                        op_vals = {
+                            'name': op_name[:64],
+                            'routing_id': routing_id,
+                            'workcenter_id': wc_id,
+                            'sequence': sequence,
+                            'blocking': row.get('blocking', 'no').strip(),
+                            'company_id': self.company_id,
+                        }
+                        
+                        if time_cycle:
+                            op_vals['time_cycle_manual'] = time_cycle
+                        
+                        operations.append(op_vals)
+                    
+                    except Exception as e:
+                        logger.error(f"Row {row_idx}: {e}", exc_info=True)
+                        continue
+        
+        except csv.Error as e:
+            raise RoutingError(f"Operations CSV error: {e}")
+        
+        return operations
+    
+    def _get_fallback_workcenter_id(self, workcenters: Dict[str, int]) -> int:
+        """Get fallback workcenter ID."""
+        for wc_name in ManufacturingConfig.FALLBACK_WORKCENTERS:
+            if wc_name in workcenters:
+                logger.info(f"Fallback workcenter: {wc_name}")
+                return workcenters[wc_name]
+        
+        # Last resort: first in system
+        wcs = self.client.search_read(
+            'mrp.workcenter',
+            [('company_id', '=', self.company_id)],
+            ['id'],
+            limit=1
+        )
+        
+        if not wcs:
+            raise WorkcenterNotFoundError("No workcenters found in system")
+        
+        return wcs[0]['id']
+    
+    def _batch_create_operations(
+        self,
+        routing_id: int,
+        operations: List[Dict[str, Any]],
+    ) -> None:
+        """Batch create operations for routing."""
+        if not operations:
             return
-        log_header("Operations laden")
-        bom_ids = self.get_evo_bom_ids()
-        fallback_wcid = self.get_fallback_workcenter()
-        val_template = {'company_id': self.company_id}
-        created_count = updated_count = 0
-        for row in csv_rows(path):
-            name = row.get('name')
-            if not name:
-                log_warn("[OP:WARN] Row ohne Name → Skip.")
-                continue
-            wc_key = row.get('workcenter_id')
-            apply_spec = row.get('apply_on_variants', '').strip()
-            time_cycle_manual = row.get('time_cycle_manual')
-            duration = float(time_cycle_manual) if time_cycle_manual else None
-            sequence_raw = row.get('sequence')
-            sequence = int(sequence_raw) if sequence_raw else 999
-            blocking = row.get('blocking', 'no')
-
-            wcid = self.find_workcenter_by_key(wc_key) or fallback_wcid
-            av_ids = self.find_attribute_values(apply_spec)
-
-            for bom_id in bom_ids:
-                vals: Dict[str, Any] = val_template.copy()
-                vals.update({
-                    'name': name,
-                    'workcenter_id': wcid,
-                    'bom_id': bom_id,
-                    'sequence': sequence,
-                    'blocking': blocking,  # ← Orchestrierung!
-                })
-                if duration is not None:
-                    vals['time_cycle_manual'] = duration
-
-                domain = [
-                    ('name', '=', name),
-                    ('bom_id', '=', bom_id),
-                    ('sequence', '=', sequence),
-                    ('company_id', '=', self.company_id),
-                ]
-                try:
-                    op_id, created = self.client.ensure_record(
-                        'mrp.routing.workcenter',
-                        domain,
-                        create_vals=vals,
-                        update_vals=vals
+        
+        log_header(f"Creating {len(operations)} Operations")
+        
+        for op_vals in operations:
+            try:
+                # Ensure operation (unique by name + sequence + routing)
+                op_id, is_new = self.client.ensure_record(
+                    'mrp.routing.workcenter',
+                    [
+                        ('routing_id', '=', routing_id),
+                        ('sequence', '=', op_vals['sequence']),
+                        ('name', '=', op_vals['name']),
+                    ],
+                    op_vals,
+                    op_vals,
+                )
+                
+                if is_new:
+                    self.stats['operations_created'] += 1
+                    log_success(
+                        f"[NEW] {op_vals['name']}:seq{op_vals['sequence']} → {op_id}"
                     )
-                    if created:
-                        created_count += 1
-                    else:
-                        updated_count += 1
-                    variant_info = f" [{apply_spec}]" if apply_spec else ""
-                    log_success(f"[OP:{'NEW' if created else 'UPD'}] {name}:{sequence} (BoM {bom_id}){variant_info} → {op_id}")
+                else:
+                    self.stats['operations_updated'] += 1
+                
+                self._audit_log({
+                    'action': 'operation_created' if is_new else 'operation_updated',
+                    'operation_id': op_id,
+                    'operation_name': op_vals['name'],
+                    'sequence': op_vals['sequence'],
+                })
+            
+            except Exception as e:
+                logger.error(f"Failed to create operation {op_vals['name']}: {e}")
+                self.stats['validation_errors'] += 1
+    
+    # ═══════════════════════════════════════════════════════════════════════════
+    # AUDIT
+    # ═══════════════════════════════════════════════════════════════════════════
+    
+    def _audit_log(self, data: Dict[str, Any]) -> None:
+        """Add audit entry."""
+        data['timestamp'] = datetime.now().isoformat()
+        self.audit_log.append(data)
+    
+    def _persist_audit_log(self) -> None:
+        """Write audit log to file."""
+        import json
+        
+        audit_path = self.base_data_dir / 'audit' / 'routing_audit.json'
+        audit_path.parent.mkdir(parents=True, exist_ok=True)
+        
+        try:
+            with open(audit_path, 'w', encoding='utf-8') as f:
+                json.dump(self.audit_log, f, indent=2, default=str)
+            logger.info(f"Audit log: {audit_path}")
+        except Exception as e:
+            logger.error(f"Failed to write audit log: {e}")
+    
+    # ═══════════════════════════════════════════════════════════════════════════
+    # MAIN ORCHESTRATION
+    # ═══════════════════════════════════════════════════════════════════════════
+    
+    def run(self) -> Dict[str, int]:
+        """Main entry point."""
+        try:
+            log_header("ROUTING LOADER")
+            
+            # 1) Find products
+            log_info("Finding product templates...")
+            product_codes = ProductTemplates.ALL_CODES
+            products = self._find_products_by_codes(product_codes)
+            
+            if not products:
+                missing = set(product_codes) - set(products.keys())
+                raise RoutingError(f"Products not found: {missing}")
+            
+            log_success(f"Found {len(products)} products")
+            
+            # 2) Load workcenters
+            workcenters = self._load_workcenters_from_csv()
+            log_success(f"Loaded {len(workcenters)} workcenters")
+            
+            # 3) For each product: create routing + operations
+            for product_code, product_id in products.items():
+                try:
+                    log_info(f"Processing product: {product_code}")
+                    
+                    # Find or create BoM
+                    bom_id = self._find_bom_by_product_id(product_id)
+                    if not bom_id:
+                        logger.warning(f"No BoM found for product {product_code}")
+                        continue
+                    
+                    # Ensure routing
+                    routing_id = self._ensure_routing_for_bom(bom_id)
+                    
+                    # Load and create operations
+                    operations = self._load_operations_from_csv(routing_id, workcenters)
+                    self._batch_create_operations(routing_id, operations)
+                
                 except Exception as e:
-                    log_warn(f"[OP:ERROR] {name}:{sequence} (BoM {bom_id}): {str(e)[:100]} → Skip.")
-        log_success(f"[OP:SUMMARY] {created_count} neu, {updated_count} aktualisiert.")
-
-    def run(self) -> None:
-        """Vollständige Orchestrierung: Workcenters + Operations."""
-        self.load_workcenters_if_needed()
-        self.load_operations()
-        log_success("[ROUTING:DONE] ✅ Orchestrierung bereit (Blocking/Capacity/Sequence)!")
+                    logger.error(f"Failed to process product {product_code}: {e}")
+                    self.stats['validation_errors'] += 1
+            
+            # 4) Persist audit
+            self._persist_audit_log()
+            
+            # Log summary
+            log_success("Routing loader completed")
+            log_info("Statistics:")
+            for key, value in self.stats.items():
+                log_info(f"  {key}: {value}")
+            
+            return self.stats
+        
+        except Exception as e:
+            log_error(f"Routing loader failed: {e}", exc_info=True)
+            raise

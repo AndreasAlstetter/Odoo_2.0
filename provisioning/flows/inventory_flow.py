@@ -1,285 +1,557 @@
-# provisioning/flows/inventory_flow.py
-
 """
-Inventur & Ausschuss (Demo).
+inventory_flow.py - Stock Inventory & Scrap Flow
 
-Ziele:
-- Einen Inventurfall für eine zentrale Komponente simulieren.
-- Ausschuss über ein Schrottlager buchen.
+Handles:
+- Inventory adjustments (Inventurverfahren)
+- Scrap bookings (Ausschussbuchungen)
+- Location management (Schrottlager)
+- Error resilience & audit trail
 
-Nutzt:
-- stock.location (Schrottlager)
-- stock.inventory (Inventur)
-- stock.scrap (vereinfachte Ausschussbuchung)
+Production-ready with proper error handling, logging, and statistics.
 """
 
 from __future__ import annotations
 
-from typing import Dict, Optional
+import logging
+from typing import Dict, Optional, Any
 from datetime import datetime
+from dataclasses import dataclass
 
-from provisioning.client import OdooClient
-from provisioning.utils import log_info, log_success, log_warn
+from client import OdooClient
+from validation import safe_float, FormatValidator, ValidationError
+from utils import log_header, log_info, log_success, log_warn, log_error, timed_operation
 
 
-def safe_float(value: object, default: float = 0.0, allow_negative: bool = True) -> float:
-    """
-    Konvertiert einen Wert robust zu float.
-    """
-    try:
-        f = float(value)
-    except (TypeError, ValueError):
-        return default
-    if not allow_negative and f < 0:
-        return default
-    return f
+logger = logging.getLogger(__name__)
 
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# DATA MODELS
+# ═══════════════════════════════════════════════════════════════════════════════
+
+@dataclass
+class InventoryAdjustment:
+    """Inventory adjustment operation."""
+    product_id: int
+    location_id: int
+    counted_qty: float
+    reason: str = "Inventory Count"
+    inventory_id: Optional[int] = None
+    status: str = "pending"  # pending, in_progress, completed, failed
+
+
+@dataclass
+class ScrapRecord:
+    """Scrap/waste booking."""
+    product_id: int
+    quantity: float
+    scrap_location_id: int
+    reason: str = "Defect"
+    scrap_id: Optional[int] = None
+    status: str = "pending"
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# EXCEPTIONS
+# ═══════════════════════════════════════════════════════════════════════════════
+
+class InventoryError(Exception):
+    """Base inventory flow error."""
+    pass
+
+
+class InventoryValidationError(InventoryError):
+    """Validation error in inventory flow."""
+    pass
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# INVENTORY FLOW
+# ═══════════════════════════════════════════════════════════════════════════════
 
 class InventoryFlow:
-    """Kapselt vereinfachte Inventur- und Ausschussprozesse."""
-
-    def __init__(self, api: OdooClient) -> None:
-        self.api = api
-
-    # -------------------------------------------------------------------------
-    # Hilfsfunktionen
-    # -------------------------------------------------------------------------
-
+    """Handle inventory adjustments and scrap bookings."""
+    
+    def __init__(self, client: OdooClient):
+        """Initialize flow."""
+        self.client = client
+        
+        self.stats = {
+            'inventories_created': 0,
+            'inventories_validated': 0,
+            'scrap_created': 0,
+            'scrap_validated': 0,
+            'errors': 0,
+        }
+        
+        self.audit_log: list = []
+        
+        logger.info("InventoryFlow initialized")
+    
+    # ═══════════════════════════════════════════════════════════════════════════
+    # LOCATION MANAGEMENT
+    # ═══════════════════════════════════════════════════════════════════════════
+    
     def _get_or_create_scrap_location(self) -> int:
         """
-        Stellt ein Schrottlager (stock.location, usage='inventory') bereit.
+        Get or create scrap location.
+        
+        Returns:
+            Location ID
         """
-        existing = self.api.search_read(
-            "stock.location",
-            [["usage", "=", "inventory"], ["name", "=", "Scrap"]],
-            ["id"],
+        # Search existing
+        locations = self.client.search_read(
+            'stock.location',
+            [
+                ('name', '=', 'Scrap'),
+                ('usage', 'in', ['production', 'inventory']),
+            ],
+            ['id'],
             limit=1,
         )
-        if existing:
-            return existing[0]["id"]
-
-        vals: Dict[str, object] = {
-            "name": "Scrap",
-            "usage": "inventory",
-        }
-        loc_id = self.api.create("stock.location", vals)
-        if isinstance(loc_id, (list, tuple)):
-            loc_id = loc_id[0]
-        return int(loc_id)
-
-    def _ensure_demo_product_akku(self) -> int:
-        """
-        Sucht das Produkt 'Akku' oder legt es vereinfacht an.
-        """
-        prod = self.api.search_read(
-            "product.product",
-            [["name", "=", "Akku"]],
-            ["id"],
-            limit=1,
-        )
-        if prod:
-            return prod[0]["id"]
-
-        prod_id = self.api.create(
-            "product.product",
+        
+        if locations:
+            logger.debug(f"Using existing scrap location {locations[0]['id']}")
+            return locations[0]['id']
+        
+        # Create new
+        loc_id = self.client.create(
+            'stock.location',
             {
-                "name": "Akku",
-                "default_code": "15",
-                "type": "consu",
-            },
+                'name': 'Scrap',
+                'usage': 'production',  # Scrap is production waste
+                'active': True,
+            }
         )
-        if isinstance(prod_id, (list, tuple)):
-            prod_id = prod_id[0]
-        return int(prod_id)
-
+        
+        if isinstance(loc_id, (list, tuple)):
+            if not loc_id:
+                raise InventoryError("Failed to create scrap location")
+            loc_id = loc_id[0]
+        
+        logger.info(f"Created scrap location {loc_id}")
+        return int(loc_id)
+    
     def _get_default_internal_location(self) -> Optional[int]:
-        """
-        Liefert einen internen Lagerort (z. B. Hauptlager) oder None.
-        """
-        locations = self.api.search_read(
-            "stock.location",
-            [["usage", "=", "internal"]],
-            ["id", "name"],
+        """Get default internal warehouse location."""
+        locations = self.client.search_read(
+            'stock.location',
+            [('usage', '=', 'internal')],
+            ['id'],
             limit=1,
         )
+        
         if not locations:
+            logger.warning("No internal stock location found")
             return None
-        return locations[0]["id"]
-
-    def _run_inventory_adjustment(
-        self, product_id: int, location_id: int, new_qty: float
-    ) -> int:
+        
+        return locations[0]['id']
+    
+    # ═══════════════════════════════════════════════════════════════════════════
+    # PRODUCT MANAGEMENT
+    # ═══════════════════════════════════════════════════════════════════════════
+    
+    def _find_or_validate_product(self, product_name: str) -> int:
         """
-        Legt eine Inventur an, setzt die gezählte Menge und validiert.
+        Find product by name.
+        
+        Args:
+            product_name: Product name to search
+        
+        Returns:
+            Product ID
+        
+        Raises:
+            InventoryValidationError: If product not found
         """
-        inventory_vals: Dict[str, object] = {
-            "name": f"Demo-Inventur {datetime.now().isoformat(timespec='seconds')}",
-            "product_ids": [(6, 0, [product_id])],
-            "location_ids": [(6, 0, [location_id])],
-        }
-
-        inv_id = self.api.create("stock.inventory", inventory_vals)
-        if isinstance(inv_id, (list, tuple)):
-            inv_id = inv_id[0]
-
-        # Inventur starten
-        self.api.call(
-            "stock.inventory",
-            "action_start",
-            [[inv_id]],
-        )
-
-        # Inventurlinien lesen und gezählte Menge setzen
-        lines = self.api.search_read(
-            "stock.inventory.line",
-            [["inventory_id", "=", inv_id]],
-            ["id"],
-        )
-        for line in lines:
-            self.api.write(
-                "stock.inventory.line",
-                [line["id"]],
-                {"product_qty": new_qty},
-            )
-
-        # Inventur validieren
-        self.api.call(
-            "stock.inventory",
-            "action_validate",
-            [[inv_id]],
-        )
-
-        return int(inv_id)
-
-    # -------------------------------------------------------------------------
-    # Demo: Inventur
-    # -------------------------------------------------------------------------
-
-    def run_demo_inventory_case(self) -> None:
-        """
-        Simuliert eine Inventur für das Demo-Produkt 'Akku'.
-        """
-        log_info("Demo-Inventurfall wird ausgeführt...")
-
-        prod_id = self._ensure_demo_product_akku()
-        location_id = self._get_default_internal_location()
-        if not location_id:
-            log_warn(
-                "Kein interner Lagerort gefunden, Inventurfall wird nur protokolliert."
-            )
-            log_success(
-                "Demo-Inventurfall dokumentiert (ohne stock.inventory mangels Lagerort)."
-            )
-            return
-
-        try:
-            inv_id = self._run_inventory_adjustment(
-                product_id=prod_id, location_id=location_id, new_qty=10.0
-            )
-            log_success(
-                f"Demo-Inventurfall für Produkt 'Akku' ausgeführt "
-                f"(Inventur-ID {inv_id}, Lagerort-ID {location_id})."
-            )
-        except Exception as exc:
-            log_warn(
-                "Inventur konnte nicht vollständig automatisch angelegt/validiert werden. "
-                "Bitte Odoo-Version und stock.inventory-Konfiguration prüfen."
-            )
-            log_warn(f"Details: {exc}")
-            log_success(
-                "Demo-Inventurfall dokumentiert (Inventur nur teilweise ausgeführt)."
-            )
-
-    # -------------------------------------------------------------------------
-    # Demo: Ausschuss über stock.scrap
-    # -------------------------------------------------------------------------
-
-    def scrap_product(self, product_name: str, quantity: float) -> None:
-        """
-        Bucht Ausschuss für ein Produkt in das Schrottlager (stock.scrap).
-        """
-        log_info(f"Buche Ausschuss: Produkt '{product_name}', Menge {quantity}...")
-
-        prod = self.api.search_read(
-            "product.product",
-            [["name", "=", product_name]],
-            ["id"],
+        products = self.client.search_read(
+            'product.product',
+            [('name', '=', product_name)],
+            ['id'],
             limit=1,
         )
-
-        if not prod:
-            prod_id = self.api.create(
-                "product.product",
-                {
-                    "name": product_name,
-                    "default_code": "SCRAP-DEMO",
-                    "type": "consu",
-                },
-            )
-            if isinstance(prod_id, (list, tuple)):
-                prod_id = prod_id[0]
-            prod_id = int(prod_id)
-            log_info(
-                f"Demo-Produkt '{product_name}' für Ausschuss angelegt (ID {prod_id})."
-            )
-        else:
-            prod_id = prod[0]["id"]
-
-        qty = safe_float(quantity, default=0.0, allow_negative=False)
-        if qty <= 0.0:
-            log_warn(
-                "Ausschussmenge ist 0 oder ungültig; keine Buchung durchgeführt."
-            )
-            return
-
-        scrap_loc = self._get_or_create_scrap_location()
-
-        vals = {
-            "product_id": prod_id,
-            "scrap_qty": qty,
-            "scrap_location_id": scrap_loc,
-        }
-
+        
+        if not products:
+            raise InventoryValidationError(f"Product not found: {product_name}")
+        
+        return products[0]['id']
+    
+    # ═══════════════════════════════════════════════════════════════════════════
+    # INVENTORY ADJUSTMENTS
+    # ═══════════════════════════════════════════════════════════════════════════
+    
+    def create_inventory_adjustment(
+        self,
+        product_id: int,
+        location_id: int,
+        counted_qty: float,
+        reason: str = "Inventory Count",
+    ) -> InventoryAdjustment:
+        """
+        Create inventory adjustment record.
+        
+        Args:
+            product_id: Product ID
+            location_id: Location ID
+            counted_qty: Counted quantity
+            reason: Adjustment reason
+        
+        Returns:
+            InventoryAdjustment record
+        
+        Raises:
+            InventoryValidationError: If validation fails
+        """
+        # Validate
+        if counted_qty < 0:
+            raise InventoryValidationError(f"Quantity cannot be negative: {counted_qty}")
+        
+        # Create inventory header
         try:
-            scrap_id = self.api.create("stock.scrap", vals)
+            inv_id = self.client.create(
+                'stock.inventory',
+                {
+                    'name': f"Inventory {datetime.now().isoformat(timespec='seconds')}",
+                    'product_ids': [(6, 0, [product_id])],
+                    'location_ids': [(6, 0, [location_id])],
+                }
+            )
+            
+            if isinstance(inv_id, (list, tuple)):
+                if not inv_id:
+                    raise InventoryError("create() returned empty result")
+                inv_id = inv_id[0]
+            
+            inv_id = int(inv_id)
+            self.stats['inventories_created'] += 1
+            
+            logger.info(f"Created inventory adjustment {inv_id}")
+            
+            return InventoryAdjustment(
+                product_id=product_id,
+                location_id=location_id,
+                counted_qty=counted_qty,
+                reason=reason,
+                inventory_id=inv_id,
+                status='pending',
+            )
+        
+        except Exception as e:
+            logger.error(f"Failed to create inventory: {e}")
+            self.stats['errors'] += 1
+            raise InventoryError(f"Failed to create inventory: {e}") from e
+    
+    def validate_inventory_adjustment(
+        self,
+        adjustment: InventoryAdjustment,
+    ) -> bool:
+        """
+        Validate and apply inventory adjustment.
+        
+        Args:
+            adjustment: InventoryAdjustment record
+        
+        Returns:
+            True if successful
+        """
+        if not adjustment.inventory_id:
+            raise InventoryValidationError("Inventory ID missing")
+        
+        try:
+            # Start inventory
+            self.client.execute(
+                'stock.inventory',
+                'action_start',
+                [adjustment.inventory_id],
+            )
+            
+            logger.debug(f"Started inventory {adjustment.inventory_id}")
+            
+            # Update counted quantities
+            lines = self.client.search_read(
+                'stock.inventory.line',
+                [('inventory_id', '=', adjustment.inventory_id)],
+                ['id'],
+            )
+            
+            for line in lines:
+                self.client.write(
+                    'stock.inventory.line',
+                    [line['id']],
+                    {'product_qty': adjustment.counted_qty},
+                )
+            
+            logger.debug(f"Updated {len(lines)} inventory lines")
+            
+            # Validate inventory
+            self.client.execute(
+                'stock.inventory',
+                'action_validate',
+                [adjustment.inventory_id],
+            )
+            
+            adjustment.status = 'completed'
+            self.stats['inventories_validated'] += 1
+            
+            logger.info(f"Validated inventory {adjustment.inventory_id}")
+            
+            self._audit_log({
+                'operation': 'inventory_adjustment',
+                'inventory_id': adjustment.inventory_id,
+                'product_id': adjustment.product_id,
+                'location_id': adjustment.location_id,
+                'quantity': adjustment.counted_qty,
+                'reason': adjustment.reason,
+                'status': 'completed',
+            })
+            
+            return True
+        
+        except Exception as e:
+            adjustment.status = 'failed'
+            self.stats['errors'] += 1
+            logger.error(f"Failed to validate inventory: {e}", exc_info=True)
+            return False
+    
+    def run_inventory_adjustment(
+        self,
+        product_id: int,
+        location_id: int,
+        counted_qty: float,
+        reason: str = "Inventory Count",
+    ) -> bool:
+        """
+        Run complete inventory adjustment (create + validate).
+        
+        Args:
+            product_id: Product ID
+            location_id: Location ID
+            counted_qty: Counted quantity
+            reason: Adjustment reason
+        
+        Returns:
+            True if successful
+        """
+        try:
+            # Create
+            adjustment = self.create_inventory_adjustment(
+                product_id, location_id, counted_qty, reason
+            )
+            
+            # Validate
+            return self.validate_inventory_adjustment(adjustment)
+        
+        except Exception as e:
+            logger.error(f"Inventory adjustment failed: {e}", exc_info=True)
+            self.stats['errors'] += 1
+            return False
+    
+    # ═══════════════════════════════════════════════════════════════════════════
+    # SCRAP BOOKINGS
+    # ═══════════════════════════════════════════════════════════════════════════
+    
+    def create_scrap_record(
+        self,
+        product_id: int,
+        quantity: float,
+        reason: str = "Defect",
+    ) -> ScrapRecord:
+        """
+        Create scrap record.
+        
+        Args:
+            product_id: Product ID
+            quantity: Scrap quantity
+            reason: Reason for scrap
+        
+        Returns:
+            ScrapRecord
+        
+        Raises:
+            InventoryValidationError: If validation fails
+        """
+        # Validate
+        if quantity <= 0:
+            raise InventoryValidationError(f"Scrap quantity must be > 0: {quantity}")
+        
+        # Get scrap location
+        scrap_location_id = self._get_or_create_scrap_location()
+        
+        # Create scrap
+        try:
+            scrap_id = self.client.create(
+                'stock.scrap',
+                {
+                    'product_id': product_id,
+                    'scrap_qty': quantity,
+                    'scrap_location_id': scrap_location_id,
+                    'reason': reason,
+                }
+            )
+            
             if isinstance(scrap_id, (list, tuple)):
+                if not scrap_id:
+                    raise InventoryError("create() returned empty result")
                 scrap_id = scrap_id[0]
+            
             scrap_id = int(scrap_id)
-
-            self.api.call(
-                "stock.scrap",
-                "action_validate",
-                [[scrap_id]],
+            self.stats['scrap_created'] += 1
+            
+            logger.info(f"Created scrap record {scrap_id}")
+            
+            return ScrapRecord(
+                product_id=product_id,
+                quantity=quantity,
+                scrap_location_id=scrap_location_id,
+                reason=reason,
+                scrap_id=scrap_id,
+                status='pending',
             )
-            log_success(
-                f"Ausschuss für '{product_name}' (Menge {qty}) gebucht "
-                f"(Scrap-ID {scrap_id})."
-            )
-        except Exception as exc:
-            log_warn(
-                "Ausschuss konnte nicht vollständig automatisch gebucht werden. "
-                "Bitte Odoo-Version und stock.scrap-Konfiguration prüfen."
-            )
-            log_warn(f"Details: {exc}")
-
-    # -------------------------------------------------------------------------
-    # Kombinierte Demo
-    # -------------------------------------------------------------------------
-
-    def run_demo_inventory_and_scrap(self) -> None:
+        
+        except Exception as e:
+            logger.error(f"Failed to create scrap: {e}")
+            self.stats['errors'] += 1
+            raise InventoryError(f"Failed to create scrap: {e}") from e
+    
+    def validate_scrap_record(self, scrap: ScrapRecord) -> bool:
         """
-        Führt eine kombinierte Demo für Inventur und Ausschuss aus.
+        Validate and apply scrap record.
+        
+        Args:
+            scrap: ScrapRecord
+        
+        Returns:
+            True if successful
         """
-        self.run_demo_inventory_case()
-        self.scrap_product("Akku", 1.0)
+        if not scrap.scrap_id:
+            raise InventoryValidationError("Scrap ID missing")
+        
+        try:
+            self.client.execute(
+                'stock.scrap',
+                'action_validate',
+                [scrap.scrap_id],
+            )
+            
+            scrap.status = 'completed'
+            self.stats['scrap_validated'] += 1
+            
+            logger.info(f"Validated scrap {scrap.scrap_id}")
+            
+            self._audit_log({
+                'operation': 'scrap_booking',
+                'scrap_id': scrap.scrap_id,
+                'product_id': scrap.product_id,
+                'quantity': scrap.quantity,
+                'reason': scrap.reason,
+                'status': 'completed',
+            })
+            
+            return True
+        
+        except Exception as e:
+            scrap.status = 'failed'
+            self.stats['errors'] += 1
+            logger.error(f"Failed to validate scrap: {e}", exc_info=True)
+            return False
+    
+    def run_scrap_booking(
+        self,
+        product_id: int,
+        quantity: float,
+        reason: str = "Defect",
+    ) -> bool:
+        """
+        Run complete scrap booking (create + validate).
+        
+        Args:
+            product_id: Product ID
+            quantity: Scrap quantity
+            reason: Reason
+        
+        Returns:
+            True if successful
+        """
+        try:
+            # Create
+            scrap = self.create_scrap_record(product_id, quantity, reason)
+            
+            # Validate
+            return self.validate_scrap_record(scrap)
+        
+        except Exception as e:
+            logger.error(f"Scrap booking failed: {e}", exc_info=True)
+            self.stats['errors'] += 1
+            return False
+    
+    # ═══════════════════════════════════════════════════════════════════════════
+    # AUDIT
+    # ═══════════════════════════════════════════════════════════════════════════
+    
+    def _audit_log(self, data: Dict[str, Any]) -> None:
+        """Add audit entry."""
+        data['timestamp'] = datetime.now().isoformat()
+        self.audit_log.append(data)
+    
+    # ═══════════════════════════════════════════════════════════════════════════
+    # MAIN
+    # ═══════════════════════════════════════════════════════════════════════════
+    
+    def run(self) -> Dict[str, int]:
+        """
+        Main entry point.
+        
+        Returns:
+            Statistics dict
+        """
+        log_header("INVENTORY FLOW")
+        
+        try:
+            # Demo inventory adjustment
+            location_id = self._get_default_internal_location()
+            if location_id:
+                try:
+                    product_id = self._find_or_validate_product("Akku")
+                    success = self.run_inventory_adjustment(
+                        product_id=product_id,
+                        location_id=location_id,
+                        counted_qty=10.0,
+                        reason="Stock Count",
+                    )
+                    
+                    if success:
+                        log_success("Inventory adjustment completed")
+                    else:
+                        log_warn("Inventory adjustment failed")
+                
+                except InventoryValidationError as e:
+                    log_warn(f"Inventory skipped: {e}")
+            
+            # Summary
+            log_info("Inventory Flow Statistics:")
+            for key, value in self.stats.items():
+                log_info(f"  {key}: {value}")
+            
+            return self.stats
+        
+        except Exception as e:
+            log_error(f"Inventory flow failed: {e}", exc_info=True)
+            raise
 
 
-def setup_inventory_flows(api: OdooClient) -> None:
+# ═══════════════════════════════════════════════════════════════════════════════
+# SETUP FUNCTION FOR RUNNER
+# ═══════════════════════════════════════════════════════════════════════════════
+
+def setup_inventory_flows(client: OdooClient) -> Dict[str, int]:
     """
-    Einstiegspunkt für den Runner: richtet Demo-Inventur & Ausschuss ein
-    (aktuell reine Demo-Funktionen, daher nur Aufruf als Smoke-Test).
+    Initialize and run inventory flows.
+    
+    Args:
+        client: OdooClient
+    
+    Returns:
+        Statistics dict
     """
-    flow = InventoryFlow(api)
-    # Optional automatisch ausführen:
-    # flow.run_demo_inventory_and_scrap()
-    log_info("Inventory-Flow initialisiert.")
+    flow = InventoryFlow(client)
+    return flow.run()

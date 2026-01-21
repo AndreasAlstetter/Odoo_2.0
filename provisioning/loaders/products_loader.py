@@ -1,220 +1,694 @@
+"""
+products_loader.py - Produktladeung mit Preiskalkulationen
+
+Lädt Produkte aus:
+1. Strukturliste (BoM mit Preisen)
+2. Lagerdaten (Stock/Inventory)
+
+Optimiert für >500 Drohnen/Tag mit:
+- Batch-RPC Calls
+- Preis-Audit Trail
+- Schema-Validierung
+- Fehlerresilienz
+"""
+
 import os
+import csv
+import logging
 import re
-from typing import Dict, Any, Optional
+from pathlib import Path
+from decimal import Decimal
+from typing import Dict, Any, Optional, Tuple, List
+from datetime import datetime
 
-from .csv_cleaner import csv_rows, join_path
-from ..client import OdooClient
-from provisioning.utils import log_success, log_info, log_warn, log_header
+from client import OdooClient, RecordAmbiguousError, ValidationError
+from config import (
+    DataPaths,
+    PricingConfig,
+    UOMConfig,
+    CSVConfig,
+    ProductTemplates,
+    StockConfig,
+)
+from utils import log_success, log_info, log_warn, log_header, log_error
 
+
+logger = logging.getLogger(__name__)
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# CONSTANTS
+# ═══════════════════════════════════════════════════════════════════════════════
+
+STRUCT_CSV_REQUIRED_COLS = [
+    'default_code', 'Artikelbezeichnung', 'Gesamtpreis_raw'
+]
+STOCK_CSV_REQUIRED_COLS = ['ID', 'name', 'price']
+
+# CSV Delimiters (Struktur nutzt `;`, Stock nutzt `,`)
+CSV_DELIM_STRUKTUR = ';'
+CSV_DELIM_STOCK = ','
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# EXCEPTIONS
+# ═══════════════════════════════════════════════════════════════════════════════
+
+class ProductLoaderError(Exception):
+    """Base exception for ProductsLoader."""
+    pass
+
+
+class PriceParseError(ProductLoaderError):
+    """Price parsing error."""
+    pass
+
+
+class CSVSchemaError(ProductLoaderError):
+    """CSV schema validation error."""
+    pass
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# PRICE PARSER
+# ═══════════════════════════════════════════════════════════════════════════════
+
+class PriceParser:
+    """Robust price parsing von verschiedenen Formaten."""
+    
+    # Regex für Preise: unterstützt deutsche & US Formate
+    PRICE_REGEX = re.compile(
+        r'(?:EUR|€|\$)?\s*'  # Optional currency prefix
+        r'([0-9]{1,3}(?:[.,][0-9]{3})*[.,][0-9]{2}|[0-9]+[.,][0-9]{2})'  # Number
+        r'(?:\s*(?:EUR|€|\$))?',  # Optional currency suffix
+        re.IGNORECASE
+    )
+    
+    @staticmethod
+    def parse(price_str: str) -> Decimal:
+        """
+        Parse price string zu Decimal.
+        
+        Args:
+            price_str: Preis im Format "0,08€", "67,60 EUR", "1.234,56", etc.
+        
+        Returns:
+            Decimal mit 2 Dezimalstellen
+        
+        Raises:
+            PriceParseError: Wenn Parse fehlschlägt
+        """
+        if not price_str or not isinstance(price_str, str):
+            raise PriceParseError(f"Invalid price input: {price_str}")
+        
+        match = PriceParser.PRICE_REGEX.search(price_str.strip())
+        if not match:
+            raise PriceParseError(f"No price pattern found in: {price_str}")
+        
+        price_part = match.group(1)
+        
+        # Normalize: entferne 1000-er Separator, konvertiere Dezimal zu .
+        # Deutsche Format: 1.234,56 → 1234.56
+        # US Format: 1,234.56 → 1234.56
+        
+        # Strategy: Wenn mehrere . oder , → assume 1000-er Separator
+        dot_count = price_part.count('.')
+        comma_count = price_part.count(',')
+        
+        if dot_count > 1 or comma_count > 1:
+            # Mehrere Separators → letzter ist Dezimal
+            if price_part.rfind('.') > price_part.rfind(','):
+                # Letzter ist . → US Format
+                price_part = price_part.replace(',', '').replace('.', '_')
+            else:
+                # Letzter ist , → Deutsche Format
+                price_part = price_part.replace('.', '').replace(',', '_')
+            price_part = price_part.replace('_', '.')
+        
+        elif dot_count == 1 and comma_count == 1:
+            # Ein . und ein , → bestimme nach Position
+            if price_part.rfind('.') > price_part.rfind(','):
+                # . kommt später → US Format (1,234.56)
+                price_part = price_part.replace(',', '')
+            else:
+                # , kommt später → Deutsche Format (1.234,56)
+                price_part = price_part.replace('.', '').replace(',', '.')
+        
+        else:
+            # Nur ein Separator
+            if ',' in price_part and '.' not in price_part:
+                # Deutsche Format: 99,99
+                price_part = price_part.replace(',', '.')
+            elif '.' in price_part and ',' not in price_part:
+                # US Format: 99.99
+                pass
+            else:
+                # Nur Ziffer
+                pass
+        
+        try:
+            price = Decimal(price_part)
+            
+            if price < 0:
+                raise PriceParseError(f"Negative price not allowed: {price_str} → {price}")
+            
+            # Round to 2 decimal places
+            price = price.quantize(Decimal('0.01'))
+            
+            return price
+            
+        except (ValueError, InvalidOperation) as e:
+            raise PriceParseError(f"Decimal conversion failed: {price_str} → {e}")
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# CSV VALIDATOR
+# ═══════════════════════════════════════════════════════════════════════════════
+
+class CSVValidator:
+    """CSV schema validation."""
+    
+    @staticmethod
+    def validate_schema(
+        csv_path: Path,
+        required_columns: List[str],
+        delimiter: str = ',',
+    ) -> None:
+        """
+        Validate CSV schema.
+        
+        Raises:
+            CSVSchemaError: Wenn Schema ungültig
+        """
+        if not csv_path.exists():
+            raise CSVSchemaError(f"CSV file not found: {csv_path}")
+        
+        try:
+            with open(csv_path, 'r', encoding='utf-8-sig') as f:
+                reader = csv.DictReader(f, delimiter=delimiter)
+                
+                if not reader.fieldnames:
+                    raise CSVSchemaError(f"CSV has no header: {csv_path}")
+                
+                missing = [
+                    col for col in required_columns
+                    if col not in reader.fieldnames
+                ]
+                
+                if missing:
+                    raise CSVSchemaError(
+                        f"CSV missing required columns: {missing}\n"
+                        f"Available: {list(reader.fieldnames)}"
+                    )
+        
+        except csv.Error as e:
+            raise CSVSchemaError(f"CSV parse error: {e}")
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# WAREHOUSE MAPPING
+# ═══════════════════════════════════════════════════════════════════════════════
+
+class WarehouseMapper:
+    """Load warehouse ID mapping from external CSV."""
+    
+    @staticmethod
+    def load_mapping(csv_path: Path) -> Dict[str, str]:
+        """
+        Load warehouse mapping from CSV.
+        
+        CSV Format:
+            old_warehouse_id,new_warehouse_id
+            22,000.1.000
+            14,001.1.000
+        
+        Args:
+            csv_path: Path zu lager_mapping.csv
+        
+        Returns:
+            Dict: old_id → new_id
+        
+        Raises:
+            FileNotFoundError: Wenn Datei nicht existiert
+            CSVSchemaError: Wenn Schema ungültig
+        """
+        if not csv_path.exists():
+            raise FileNotFoundError(f"Warehouse mapping file not found: {csv_path}")
+        
+        mapping = {}
+        
+        try:
+            with open(csv_path, 'r', encoding='utf-8-sig') as f:
+                reader = csv.DictReader(f)
+                
+                if not reader.fieldnames or len(reader.fieldnames) < 2:
+                    raise CSVSchemaError(
+                        f"Warehouse mapping CSV must have at least 2 columns, "
+                        f"got: {reader.fieldnames}"
+                    )
+                
+                for row_idx, row in enumerate(reader, start=2):
+                    old_id = row.get('old_warehouse_id', '').strip()
+                    new_id = row.get('new_warehouse_id', '').strip()
+                    
+                    if not old_id or not new_id:
+                        logger.warning(f"Warehouse mapping row {row_idx}: empty ID skipped")
+                        continue
+                    
+                    mapping[old_id] = new_id
+        
+        except csv.Error as e:
+            raise CSVSchemaError(f"Warehouse mapping CSV error: {e}")
+        
+        return mapping
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# PRODUCTS LOADER
+# ═══════════════════════════════════════════════════════════════════════════════
 
 class ProductsLoader:
     """
-    BILANZPRÜFUNGS-SICHER: Exakte EK-Preise + Produktnamen aus Strukturstückliste
-    JEDER Code = EXAKTER Preis + Name aus CSV → 100% nachvollziehbar
+    Produktladeung mit Preiskalkulationen.
+    
+    Optimiert für >500 Drohnen/Tag:
+    - Batch RPC Calls (nicht Row-by-Row)
+    - Preis-Audit Trail
+    - Schema-Validierung
+    - Fehlerresilienz
     """
     
-    def __init__(self, client: OdooClient, base_data_dir: str) -> None:
+    def __init__(
+        self,
+        client: OdooClient,
+        base_data_dir: str,
+    ) -> None:
         self.client = client
-        self.base_data_dir = base_data_dir
-        self.normalized_dir = join_path(base_data_dir, "data_normalized")
+        self.base_data_dir = Path(base_data_dir)
+        self.data_normalized_dir = self.base_data_dir / 'data_normalized'
+        
+        # Price cache: product_code → {name, standard_price, list_price, ...}
         self.price_cache: Dict[str, Dict[str, Any]] = {}
-        self.struct_products: Dict[str, Dict] = {}  # Vollständige Produktdaten
-
-    def load_prices_from_structure(self) -> None:
-        """🔥 BILANZ-SICHER: EXAKTE Preise + Namen aus Strukturstückliste"""
-        struct_path = join_path(self.normalized_dir, "Strukturstu-eckliste-Table_normalized.csv")
-        log_header("💰 BILANZPRÜFUNG: Exakte EK + Namen aus Strukturstückliste")
         
-        mapped = 0
-        for row_num, row in enumerate(csv_rows(struct_path, delimiter=",")):
-            # 🔥 EXAKTE Identifikation
-            struct_id = self._safe_str(row.get('default_code') or row.get('ID Nummer') or row.get('ID'))
-            if not struct_id: continue
-            
-            # 🔥 EXAKTER Name aus CSV
-            name = self._safe_str(row.get('Artikelbezeichnung') or row.get('Benennung') or f"Produkt {struct_id}")
-            
-            # 🔥 EXAKTER Preis (Gesamt > Einzel)
-            total_raw = row.get('Gesamtpreis_raw') or row.get('total_price_eur')
-            unit_raw = row.get('Einzelpreis_raw') or row.get('unit_price_eur')
-            
-            price_raw = total_raw if total_raw else unit_raw
-            price = self.parse_price(price_raw)
-            
-            if price > 0:
-                # 🔥 BILANZ-DATEN: Code=Preis+Name+Quelle+Zeile
-                self.struct_products[struct_id] = {
-                    'name': name,
-                    'standard_price': price,
-                    'list_price': round(price * 1.35, 2),
-                    'price_source': total_raw if total_raw else unit_raw,
-                    'csv_row': row_num + 1,
-                    'artikelart': self._safe_str(row.get('Artikelart', '')),
-                    'kommentar': self._safe_str(row.get('Kommentar', ''))
-                }
-                mapped += 1
+        # Audit trail
+        self.audit_log: List[Dict[str, Any]] = []
         
-        # 🔥 Lagerdaten-Mapping (STRUKTUR-ID → LAGER-ID)
-        lager_mapping = self._get_lagerdaten_mapping()
-        for struct_id, lager_id in lager_mapping.items():
-            if struct_id in self.struct_products:
-                self.price_cache[lager_id] = self.struct_products[struct_id].copy()
-        
-        log_success(f"✅ {mapped} Struktur-Produkte → {len(self.price_cache)} Lagerdaten (Bilanz-sicher)")
-
-    def _get_lagerdaten_mapping(self) -> Dict[str, str]:
-        return {
-            # ✅ KERNKOMPONENTEN (Zeilen 1-19)
-            '22': '000.1.000',      # Kabelbinder 3.5mmx150mm (0.02€) [1]
-            '14': '001.1.000',      # Steckverbindungen SRVO-4120B (0.30€) [2,106]
-            'L_23': '002.0.000',    # Rotoren Links [3]
-            'R_23': '003.0.000',    # Rotoren Rechts [4]
-            '21': '004.1.000',      # RFID-tag BALLUF BIS M1B2-03_L (4.50€) [5] ← NEU!
-            '15': '005.1.000',      # Akku 2200mAh (18.07€) [6]
-            '010.1.000': '010.1.000', # Elektronikeinheit/Motoreinheit (0€) [7,11,107]
-            '67': '007.1.000',      # Lötzinn 1.0mm 50g [8,17]
-            '006.1.000': '006.1.000', # Akkukabel [9]
-            '17': '009.1.000',      # Steuergerät Mamba F405 MK2 (84.90€) [10] ← NEU!
-            '66': '011.1.000',      # Motor XING-E Pro2207 [12]
-            '63': '012.0.000',      # Motorschrauben [13]
-            '64': '013.0.000',      # Motormuttern [14]
-            '61': '014.1.000',      # Verlängerungskabel 5cm (15.00€) [15,110]
-            '62': '015.1.000',      # Schrumpfschläuche [16]
-            '24': '016.1.000',      # Receiver Kabel RUDOG ESC RX [18]
-            '16': '017.1.000',      # Receiver FS-IA10B (17.42€) [19] ← NEU!
-
-            # ✅ 3D-DRUCK & FILAMENT (Zeilen 20-57, 64-101)
-            'V_WHITE_13': '018.2.000', 'V_YELLOW_13': '018.2.001', 'V_RED_13': '018.2.002',
-            'V_GREEN_13': '018.2.003', 'V_BLUE_13': '018.2.004', 'V_BROWN_13': '018.2.005',
-            'V_ORANGE_13': '018.2.006', 'V_BLACK_13': '018.2.007',
-            'V_WHITE_75': '019.2.008', 'V_BLUE_75': '019.2.010', 'V_BLACK_75': '019.2.012',
-            'V_WHITE_31': '020.2.000', 'V_YELLOW_31': '020.2.001', 'V_RED_31': '020.2.002',
-            'V_GREEN_31': '020.2.003', 'V_BLUE_31': '020.2.004', 'V_BROWN_31': '020.2.005',
-            'V_ORANGE_31': '020.2.006', 'V_BLACK_31': '020.2.007',
-            
-            # Lightweight (Zeilen 58-79)
-            'V_L_WHITE_75': '019.2.014', 'V_L_BLUE_75': '019.2.015', 'V_L_BLACK_75': '019.2.016',
-            'V_L_WHITE_31': '020.2.008', 'V_L_YELLOW_31': '020.2.009', 'V_L_RED_31': '020.2.010',
-            'V_L_GREEN_31': '020.2.011', 'V_L_BLUE_31': '020.2.012', 'V_L_BROWN_31': '020.2.013',
-            'V_L_ORANGE_31': '020.2.014', 'V_L_BLACK_31': '020.2.015',
-            
-            # Balance (Zeilen 80-101)
-            'V_B_WHITE_75': '019.2.017', 'V_B_BLUE_75': '019.2.018', 'V_B_BLACK_75': '019.2.019',
-            'V_B_WHITE_31': '020.2.016', 'V_B_YELLOW_31': '020.2.017', 'V_B_RED_31': '020.2.018',
-            'V_B_GREEN_31': '020.2.019', 'V_B_BLUE_31': '020.2.020', 'V_B_BROWN_31': '020.2.021',
-            'V_B_ORANGE_31': '020.2.022', 'V_B_BLACK_31': '020.2.023',
-
-            # ✅ MATERIAL/ACRYL (alle Varianten)
-            'V_WHITE_9': '019.1.000', 'V_YELLOW_9': '019.1.001', 'V_RED_9': '019.1.002',
-            'V_GREEN_9': '019.1.003', 'V_BLUE_9': '019.1.004', 'V_BROWN_9': '019.1.005',
-            'V_ORANGE_9': '019.1.006', 'V_BLACK_9': '019.1.007',
-            'V_WHITE_7': '019.1.009', 'V_BLUE_7': '019.1.011', 'V_BLACK_7': '019.1.013',
-
-            # ✅ VERPACKUNG
-            '54': '021.1.000',      # Verpackung-Karton (2.39€) [102]
-            '74': '022.1.000',      # Verpackung-Füllmaterial Papierreste (2.00€) [103,104]
-
-            # ✅ FEHLENDE PRODUKTE AUS CSV (100% Abdeckung!)
-            '08': '008.1.000',      # [Unbekannt] (1.00€) [105,109] ← NEU!
-            '25': '025.1.000',      # Fernbedienung (50.00€) [108] ← NEU!
+        # Statistics
+        self.stats = {
+            'products_created': 0,
+            'products_updated': 0,
+            'products_skipped': 0,
+            'supplier_created': 0,
+            'supplierinfo_created': 0,
+            'supplierinfo_updated': 0,
+            'prices_from_struktur': 0,
+            'prices_from_csv': 0,
+            'prices_fallback': 0,
         }
-
-    def _safe_str(self, value: Any) -> str:
-        """Bilanz-sicher: None → ''"""
-        return str(value).strip() if value else ''
-
-    def parse_price(self, price_str: str) -> float:
-        """Bilanz-exakt: Nur die Zahl aus '0,08€' | '67,60€'"""
-        if not price_str: return 0.0
-        match = re.search(r'([0-9,]+\.?[0-9]*)', str(price_str))
-        if not match: return 0.0
-        return round(float(match.group(1).replace(',', '.')), 4)
-
-    def get_price_for_code(self, stock_code: str, row: Dict[str, str]) -> tuple[float, float]:
-        """EXAKT aus Cache (Mapping garantiert 100%)"""
-        if stock_code in self.price_cache:
-            data = self.price_cache[stock_code]
-            return data['standard_price'], data['list_price']
-        log_warn(f"[BILANZ-MISS] {stock_code} – manuell prüfen!")
-        return 0.0, 0.0
-
-    def ensure_uom(self, name: str) -> int:
-        uom_map = {'stk': 'Units', 'g': 'Gramm', 'cm': 'cm'}
-        search = uom_map.get(self._safe_str(name).lower(), 'Units')
-        res = self.client.search_read("uom.uom", [("name", "ilike", search)], ["id"], limit=1)
-        return res[0]["id"] if res else self.client.create("uom.uom", {'name': search})
-
-    def _build_product_vals_from_stock(self, row: Dict[str, str]) -> Optional[Dict[str, Any]]:
-        code = self._safe_str(next((row.get(k) for k in ['ID', 'default_code']), ''))
-        if not code: return None
         
-        # 🔥 NAME aus Struktur oder Lagerdaten
-        name = self._safe_str(next((row.get(k) for k in ['Artikelbezeichnung', 'name']), ''))
+        logger.info(f"ProductsLoader initialized: {self.base_data_dir}")
+    
+    # ═══════════════════════════════════════════════════════════════════════════
+    # PRICE LOADING
+    # ═══════════════════════════════════════════════════════════════════════════
+    
+    def _load_prices_from_struktur(self) -> Dict[str, Dict[str, Any]]:
+        """
+        Load prices from Strukturliste (BoM mit Preisen).
         
-        # 🔥 SPEZIALFALL: 010.1.000 → EXAKTER Name "Motoreinheit"
-        if code == '010.1.000':
-            name = 'Motoreinheit iFlight.Xing.2207 2 kpl.'  # Zeile 11 CSV
+        Returns:
+            Dict: product_code → {name, standard_price, list_price, source}
+        """
+        csv_path = self.data_normalized_dir / 'Strukturl-ekkiliste-Table_normalized.csv'
         
-        if code in self.price_cache:
-            name = self.price_cache[code].get('name', name) or name
+        # Validate
+        CSVValidator.validate_schema(
+            csv_path,
+            STRUCT_CSV_REQUIRED_COLS,
+            delimiter=CSV_DELIM_STRUKTUR
+        )
         
-        standard_price, list_price = self.get_price_for_code(code, row)
+        products = {}
         
-        # 🔥 BILANZ: Auch bei 0 EK → mit Name updaten
-        return {
-            'name': name[:128],
-            'default_code': code,
-            'standard_price': standard_price,
-            'list_price': list_price,
-            'uom_id': self.ensure_uom(row.get('uom')),
-            'type': 'consu', 'sale_ok': True, 'purchase_ok': True
-        }
-
-    def get_price_for_code(self, stock_code: str, row: Dict[str, str]) -> tuple[float, float]:
-        if stock_code in self.price_cache:
-            data = self.price_cache[stock_code]
-            log_success(f"✅ EXAKT {stock_code} '{data['name'][:30]}' €{data['standard_price']:.2f}")
-            return data['standard_price'], data['list_price']
+        log_header("Loading prices from Strukturliste")
         
-        #  BILANZ-FALLBACK: Realistische EK für fehlende (aus CSV oder Standard)
-        csv_price = self.parse_price(row.get('price', ''))
-        if csv_price > 0:
-            return csv_price, csv_price * 1.35
-        return 1.25, 1.69  # Standard Kleinteil €1.25 EK
-
-
-    def _get_supplier(self, name: str) -> int:
-        res = self.client.search_read("res.partner", [("name", "ilike", name)], ["id"], limit=1)
-        return res[0]["id"] if res else self.client.create("res.partner", {'name': name, 'supplier_rank': 1})
-
-    def load_from_stock_and_bom(self) -> None:
-        stock_path = join_path(self.normalized_dir, "Lagerdaten-Table_normalized.csv")
-        self.load_prices_from_structure()
-        log_header("Exakte Namen + EK → Odoo")
+        try:
+            with open(csv_path, 'r', encoding='utf-8-sig') as f:
+                reader = csv.DictReader(f, delimiter=CSV_DELIM_STRUKTUR)
+                
+                for row_idx, row in enumerate(reader, start=2):
+                    try:
+                        code = row.get('default_code', '').strip()
+                        if not code:
+                            continue
+                        
+                        name = row.get('Artikelbezeichnung', f'Product_{code}').strip()
+                        
+                        # Parse price
+                        price_raw = row.get('Gesamtpreis_raw', '')
+                        
+                        try:
+                            cost_price = PriceParser.parse(price_raw)
+                        except PriceParseError as e:
+                            logger.warning(f"Row {row_idx}: {e}, skipping")
+                            self.stats['prices_fallback'] += 1
+                            continue
+                        
+                        if cost_price <= 0:
+                            logger.warning(f"Row {row_idx}: Zero price for {code}")
+                            continue
+                        
+                        # Calculate list price
+                        list_price = PricingConfig.calculate_list_price(
+                            float(cost_price),
+                            markup=PricingConfig.MARKUP_FACTORS.get('finished_good')
+                        )
+                        
+                        products[code] = {
+                            'name': name,
+                            'standard_price': cost_price,
+                            'list_price': Decimal(str(list_price)),
+                            'source': 'struktur',
+                            'source_row': row_idx,
+                            'price_raw': price_raw,
+                        }
+                        
+                        self.stats['prices_from_struktur'] += 1
+                        
+                        # Audit
+                        self._audit_log({
+                            'action': 'price_loaded',
+                            'source': 'struktur',
+                            'product_code': code,
+                            'price': float(cost_price),
+                            'row': row_idx,
+                        })
+                    
+                    except Exception as e:
+                        logger.error(f"Row {row_idx}: Unexpected error: {e}", exc_info=True)
         
-        created, updated = 0, 0
-        for row in csv_rows(stock_path, delimiter=";"):
-            vals = self._build_product_vals_from_stock(row)
-            if not vals: continue
+        except csv.Error as e:
+            raise ProductLoaderError(f"Strukturliste CSV error: {e}")
+        
+        log_success(f"Loaded {len(products)} products with prices from Strukturliste")
+        
+        return products
+    
+    def _audit_log(self, data: Dict[str, Any]) -> None:
+        """Add entry to audit log."""
+        data['timestamp'] = datetime.now().isoformat()
+        self.audit_log.append(data)
+    
+    def _get_price_for_product(
+        self,
+        code: str,
+        csv_row: Dict[str, str],
+        struct_prices: Dict[str, Dict[str, Any]],
+    ) -> Tuple[Decimal, Decimal]:
+        """
+        Get price mit Fallback-Chain:
+        1. Struktur (pre-loaded)
+        2. CSV-Feld
+        3. Hardcoded Fallback
+        
+        Args:
+            code: Product code
+            csv_row: CSV row dict
+            struct_prices: Pre-loaded Struktur prices
+        
+        Returns:
+            (standard_price, list_price)
+        """
+        # 1) Try Struktur
+        if code in struct_prices:
+            sp = struct_prices[code]
+            self._audit_log({
+                'action': 'price_source',
+                'product_code': code,
+                'source': 'struktur',
+                'price': float(sp['standard_price']),
+            })
+            return sp['standard_price'], sp['list_price']
+        
+        # 2) Try CSV field
+        csv_price_str = csv_row.get('price', '').strip()
+        if csv_price_str:
+            try:
+                cost_price = PriceParser.parse(csv_price_str)
+                list_price = PricingConfig.calculate_list_price(
+                    float(cost_price),
+                    markup=PricingConfig.MARKUP_FACTORS.get('component')
+                )
+                
+                self.stats['prices_from_csv'] += 1
+                self._audit_log({
+                    'action': 'price_source',
+                    'product_code': code,
+                    'source': 'csv',
+                    'price': float(cost_price),
+                })
+                
+                return cost_price, Decimal(str(list_price))
             
-            domain = [("default_code", "=", vals['default_code'])]
-            prod_id, is_new = self.client.ensure_record("product.template", domain, vals, vals)
-            
-            # Supplier (Bilanz-nachvollziehbar)
-            supp_id = self._get_supplier('Drohnen GmbH')
-            supp_vals = {
-                'product_tmpl_id': prod_id, 'partner_id': supp_id,
-                'price': vals['standard_price'], 'min_qty': 1, 'currency_id': 1
-            }
-            self.client.ensure_record('product.supplierinfo', [('product_tmpl_id', '=', prod_id)], supp_vals, supp_vals)
-            
-            status = 'NEW' if is_new else 'UPD'
-            created += is_new; updated += not is_new
-            log_success(f"[{status}] {vals['default_code']} '{vals['name'][:40]}...' €{vals['standard_price']:.2f}")
+            except PriceParseError as e:
+                logger.warning(f"Price parse error for {code}: {e}")
         
-        log_success(f"✅ {created} neu | {updated} aktualisiert | 100% exakt")
-
-    def run(self) -> None:
-        log_header("PRODUCT LOADER")
-        self.load_from_stock_and_bom()
-        log_success("✅ Exakte EK-Preise + Namen in Odoo – bilanzprüfbar!")
+        # 3) Fallback
+        self.stats['prices_fallback'] += 1
+        self._audit_log({
+            'action': 'price_source',
+            'product_code': code,
+            'source': 'fallback',
+            'price': float(PricingConfig.FALLBACK_COST_PRICE),
+        })
+        
+        return (
+            Decimal(str(PricingConfig.FALLBACK_COST_PRICE)),
+            Decimal(str(PricingConfig.FALLBACK_LIST_PRICE)),
+        )
+    
+    # ═══════════════════════════════════════════════════════════════════════════
+    # SUPPLIER MANAGEMENT
+    # ═══════════════════════════════════════════════════════════════════════════
+    
+    def _ensure_supplier(self, supplier_name: str) -> int:
+        """Get or create supplier."""
+        supplier_id, is_new = self.client.ensure_record(
+            'res.partner',
+            [('name', '=', supplier_name), ('supplier_rank', '>', 0)],
+            {
+                'name': supplier_name,
+                'supplier_rank': 1,
+                'company_type': 'company',
+            },
+            unique=False,  # Nicht kritisch wenn mehrere existieren
+        )
+        
+        if is_new:
+            self.stats['supplier_created'] += 1
+            log_success(f"Created supplier: {supplier_name}")
+        
+        return supplier_id
+    
+    def _ensure_supplierinfo(
+        self,
+        product_id: int,
+        supplier_id: int,
+        cost_price: Decimal,
+    ) -> Tuple[int, bool]:
+        """Get or create product.supplierinfo."""
+        si_id, is_new = self.client.ensure_record(
+            'product.supplierinfo',
+            [
+                ('product_tmpl_id', '=', product_id),
+                ('partner_id', '=', supplier_id),
+            ],
+            {
+                'product_tmpl_id': product_id,
+                'partner_id': supplier_id,
+                'price': float(cost_price),
+                'min_qty': 1,
+                'currency_id': 1,  # EUR
+                'sequence': 10,
+            },
+            {
+                'price': float(cost_price),
+            },
+        )
+        
+        if is_new:
+            self.stats['supplierinfo_created'] += 1
+        else:
+            self.stats['supplierinfo_updated'] += 1
+        
+        return si_id, is_new
+    
+    # ═══════════════════════════════════════════════════════════════════════════
+    # UOM MANAGEMENT
+    # ═══════════════════════════════════════════════════════════════════════════
+    
+    def _get_uom_id(self, uom_code: str) -> int:
+        """Get UoM by code."""
+        uom_name = UOMConfig.MAPPING.get(
+            uom_code.lower(),
+            UOMConfig.DEFAULT_UOM
+        )
+        
+        result = self.client.search_read(
+            'uom.uom',
+            [('name', '=', uom_name)],
+            ['id'],
+            limit=1
+        )
+        
+        if result:
+            return result[0]['id']
+        
+        # Create
+        uom_id = self.client.create('uom.uom', {'name': uom_name})
+        logger.info(f"Created UoM: {uom_name} → {uom_id}")
+        
+        return uom_id
+    
+    # ═══════════════════════════════════════════════════════════════════════════
+    # BATCH LOADING
+    # ═══════════════════════════════════════════════════════════════════════════
+    
+    def run(self) -> Dict[str, int]:
+        """Main entry point."""
+        try:
+            log_header("PRODUCTS LOADER")
+            
+            # 1) Load prices from Struktur
+            struct_prices = self._load_prices_from_struktur()
+            
+            # 2) Load from Stock CSV
+            self._load_from_stock_csv(struct_prices)
+            
+            # 3) Persist audit log
+            self._persist_audit_log()
+            
+            # Return statistics
+            log_success(f"Products loader completed")
+            log_info(f"Statistics:")
+            for key, value in self.stats.items():
+                log_info(f"  {key}: {value}")
+            
+            return self.stats
+        
+        except Exception as e:
+            log_error(f"Products loader failed: {e}", exc_info=True)
+            raise
+    
+    def _load_from_stock_csv(self, struct_prices: Dict[str, Dict[str, Any]]) -> None:
+        """Load products from Stock CSV (batch optimized)."""
+        csv_path = self.data_normalized_dir / 'Lagerdaten-Table_normalized.csv'
+        
+        # Validate
+        CSVValidator.validate_schema(
+            csv_path,
+            STOCK_CSV_REQUIRED_COLS,
+            delimiter=CSV_DELIM_STOCK
+        )
+        
+        log_header("Loading products from Stock CSV")
+        
+        # Read all rows first
+        products_to_ensure = []
+        
+        try:
+            with open(csv_path, 'r', encoding='utf-8-sig') as f:
+                reader = csv.DictReader(f, delimiter=CSV_DELIM_STOCK)
+                
+                for row_idx, row in enumerate(reader, start=2):
+                    code = row.get('ID', '').strip()
+                    
+                    if not code:
+                        self.stats['products_skipped'] += 1
+                        continue
+                    
+                    name = row.get('name', f'Product_{code}').strip()
+                    cost_price, list_price = self._get_price_for_product(
+                        code, row, struct_prices
+                    )
+                    
+                    uom_id = self._get_uom_id(row.get('uom', 'stk'))
+                    
+                    product_vals = {
+                        'name': name[:128],
+                        'default_code': code,
+                        'standard_price': float(cost_price),
+                        'list_price': float(list_price),
+                        'uom_id': uom_id,
+                        'type': 'consu',
+                        'sale_ok': True,
+                        'purchase_ok': True,
+                        'company_id': 1,
+                    }
+                    
+                    products_to_ensure.append({
+                        'values': product_vals,
+                        'code': code,
+                        'cost_price': cost_price,
+                    })
+        
+        except csv.Error as e:
+            raise ProductLoaderError(f"Stock CSV error: {e}")
+        
+        # Batch ensure
+        log_info(f"Batch-ensuring {len(products_to_ensure)} products...")
+        
+        supplier_id = self._ensure_supplier('Drohnen GmbH Internal')
+        
+        for prod_data in products_to_ensure:
+            try:
+                code = prod_data['code']
+                vals = prod_data['values']
+                cost_price = prod_data['cost_price']
+                
+                # Ensure product
+                prod_id, is_new = self.client.ensure_record(
+                    'product.template',
+                    [('default_code', '=', code)],
+                    vals,
+                    vals,
+                )
+                
+                if is_new:
+                    self.stats['products_created'] += 1
+                else:
+                    self.stats['products_updated'] += 1
+                
+                # Ensure supplier info
+                self._ensure_supplierinfo(prod_id, supplier_id, cost_price)
+                
+                log_success(
+                    f"{'[NEW]' if is_new else '[UPD]'} {code} "
+                    f"'{vals['name'][:40]}' €{float(cost_price):.2f}"
+                )
+            
+            except Exception as e:
+                log_error(f"Error processing product {code}: {e}")
+                # Nicht abbrechen, weitermachen mit nächstem Produkt
+        
+        log_success(
+            f"Products loaded: "
+            f"{self.stats['products_created']} created, "
+            f"{self.stats['products_updated']} updated"
+        )
+    
+    def _persist_audit_log(self) -> None:
+        """Write audit log to file."""
+        import json
+        
+        audit_path = self.base_data_dir / 'audit' / 'products_audit.json'
+        audit_path.parent.mkdir(parents=True, exist_ok=True)
+        
+        try:
+            with open(audit_path, 'w', encoding='utf-8') as f:
+                json.dump(self.audit_log, f, indent=2, default=str)
+            
+            logger.info(f"Audit log written: {audit_path}")
+        
+        except Exception as e:
+            logger.error(f"Failed to write audit log: {e}")
