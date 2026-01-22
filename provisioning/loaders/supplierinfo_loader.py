@@ -14,9 +14,9 @@ from pathlib import Path
 from typing import Dict, Any, List, Optional, Tuple
 from datetime import datetime
 
-from client import OdooClient, RecordAmbiguousError
-from config import DataPaths
-from utils import log_header, log_info, log_success, log_warn, log_error
+from provisioning.client import OdooClient, RecordAmbiguousError
+from provisioning.config import DataPaths
+from provisioning.utils import log_header, log_info, log_success, log_warn, log_error
 
 
 logger = logging.getLogger(__name__)

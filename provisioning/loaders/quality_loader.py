@@ -16,9 +16,9 @@ from typing import Dict, Any, Optional, List, Tuple
 from decimal import Decimal
 from datetime import datetime
 
-from client import OdooClient, RecordAmbiguousError
-from config import QUALITY_CONFIG, BATCH_SIZE
-from utils import log_header, log_info, log_success, log_warn, log_error
+from provisioning.client import OdooClient, RecordAmbiguousError
+from provisioning.config import QUALITY_CONFIG, BATCH_SIZE
+from provisioning.utils import log_header, log_info, log_success, log_warn, log_error
 
 
 logger = logging.getLogger(__name__)

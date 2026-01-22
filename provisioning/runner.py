@@ -1,4 +1,4 @@
-Hergestellt mit Perplexity
+
 """
 runner.py - Orchestrierung für Odoo ERP Provisioning
 
@@ -10,7 +10,7 @@ Usage:
     python -m provisioning.runner --kpi-only
     python -m provisioning.runner --full
 
-FIXED VERSION: All imports use absolute 'provisioning.' prefix
+FIXED VERSION: All imports use absolute 'provisioning.' prefix + run() compatibility + DataPaths.DATA_DIR fix
 """
 
 import os
@@ -91,6 +91,19 @@ def _setup_logging(level: str = LoggingConfig.LEVEL) -> None:
         file_handler.setLevel(logging.DEBUG)
         file_handler.setFormatter(formatter)
         root_logger.addHandler(file_handler)
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# DEFAULT DATA PATH (FIX FÜR DataPaths.DATA_DIR)
+# ═══════════════════════════════════════════════════════════════════════════════
+
+def _get_default_data_dir() -> str:
+    """Get default data directory (relative to project root)."""
+    # Assuming: odoo-provisioning/provisioning/runner.py
+    # Project root is: odoo-provisioning/
+    project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    default_path = os.path.join(project_root, 'data')
+    return os.path.abspath(default_path)
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -514,7 +527,6 @@ def run_provisioning(
             loader = step.loader_class(
                 client=client,
                 base_data_dir=base_data_dir,
-                **step.loader_kwargs
             )
 
             # Execute
@@ -571,21 +583,22 @@ def run_provisioning(
         else:
             error = result.get('error', 'unknown')
             log_error(f"  ✗ {step_name:30} ({error[:50]})")
+     
+        # KPI Extraction
+        report = {}
+        if not skip_kpi:
+            try:
+                log_header("[PROVISIONING] Extracting KPIs")
+                extractor = KPIExtractor(
+                    client=client,  # ✅ FIX: client statt self.client
+                    base_data_dir=base_data_dir
+                )
+                report = extractor.generate_report()
+                log_success("[PROVISIONING] KPI report generated")
+            except Exception as e:
+                log_error(f"[PROVISIONING] KPI extraction failed: {e}", exc_info=True)
+                # KPI failure ist non-critical
 
-    # KPI Extraction
-    report = {}
-    if not skip_kpi:
-        try:
-            log_header("[PROVISIONING] Extracting KPIs")
-            extractor = KPIExtractor(
-                api=client,
-                base_data_dir=base_data_dir
-            )
-            report = extractor.generate_report()
-            log_success("[PROVISIONING] KPI report generated")
-        except Exception as e:
-            log_error(f"[PROVISIONING] KPI extraction failed: {e}", exc_info=True)
-            # KPI failure ist non-critical
 
     # Final status
     if failed_steps:
@@ -612,11 +625,11 @@ def run_kpi_only(
 ) -> Dict:
     """
     Run only KPI extraction (no provisioning).
-
+    
     Args:
         client: Initialized OdooClient
         base_data_dir: Path to data directory
-
+    
     Returns:
         KPI report dict
     """
@@ -624,7 +637,7 @@ def run_kpi_only(
         log_header("[KPI] Running KPI-only extraction")
 
         extractor = KPIExtractor(
-            api=client,
+            client=client,  # ✅ FIX: client statt self.client
             base_data_dir=base_data_dir
         )
 
@@ -639,12 +652,13 @@ def run_kpi_only(
         raise
 
 
+
 # ═══════════════════════════════════════════════════════════════════════════════
-# CLI & MAIN
+# CLI & MAIN (MIT **kwargs FIX + DataPaths.DATA_DIR FIX)
 # ═══════════════════════════════════════════════════════════════════════════════
 
-def main():
-    """Main entry point."""
+def main(**kwargs):
+    """Main entry point - mit **kwargs für Kompatibilität."""
     parser = argparse.ArgumentParser(
         description='Odoo ERP Provisioning for Drone Manufacturing',
         formatter_class=argparse.RawDescriptionHelpFormatter,
@@ -692,12 +706,15 @@ def main():
     log_info(f"[MAIN] Log level: {args.log_level}")
 
     try:
-        # Validate data directory
-        base_data_dir = args.data_dir or DataPaths.DATA_DIR
-        if not os.path.isdir(base_data_dir):
-            raise RuntimeError(f"Data directory not found: {base_data_dir}")
-
+        # Validate data directory (FIX: Use _get_default_data_dir instead of DataPaths.DATA_DIR)
+        default_data_dir = _get_default_data_dir()
+        base_data_dir = args.data_dir or default_data_dir
+        base_data_dir = os.path.abspath(base_data_dir)
+        
         log_info(f"[MAIN] Using data directory: {base_data_dir}")
+        
+        if not os.path.isdir(base_data_dir):
+            log_warn(f"[MAIN] Data directory not found: {base_data_dir}")
 
         # Build client
         client = _build_client_from_env()
@@ -727,6 +744,18 @@ def main():
     except Exception as e:
         log_error(f"[MAIN] Fatal error: {e}", exc_info=True)
         return 1
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# COMPATIBILITY EXPORT (für scripts/run_provisioning.py)
+# ═══════════════════════════════════════════════════════════════════════════════
+
+def run(**kwargs):
+    """Alias für main() - Kompatibilität mit scripts/run_provisioning.py."""
+    return main(**kwargs)
+
+print("✓ provisioning.runner.run() & main(**kwargs) verfügbar")
+print("✓ DataPaths.DATA_DIR fix integriert")
 
 
 if __name__ == '__main__':

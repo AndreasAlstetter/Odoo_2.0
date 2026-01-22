@@ -1,0 +1,625 @@
+[
+  {
+    "action": "update_new_code",
+    "warehouse_id": "000.1.000",
+    "product_id": 85,
+    "cost_price": 0.08,
+    "timestamp": "2026-01-22T18:13:54.769724"
+  },
+  {
+    "action": "update_new_code",
+    "warehouse_id": "001.1.000",
+    "product_id": 158,
+    "cost_price": 2.1,
+    "timestamp": "2026-01-22T18:13:55.196749"
+  },
+  {
+    "action": "update_new_code",
+    "warehouse_id": "002.0.000",
+    "product_id": 87,
+    "cost_price": 1.72,
+    "timestamp": "2026-01-22T18:13:55.638480"
+  },
+  {
+    "action": "update_new_code",
+    "warehouse_id": "003.0.000",
+    "product_id": 88,
+    "cost_price": 1.72,
+    "timestamp": "2026-01-22T18:13:56.044812"
+  },
+  {
+    "action": "update_new_code",
+    "warehouse_id": "004.1.000",
+    "product_id": 90,
+    "cost_price": 4.5,
+    "timestamp": "2026-01-22T18:13:56.472853"
+  },
+  {
+    "action": "update_new_code",
+    "warehouse_id": "005.1.000",
+    "product_id": 91,
+    "cost_price": 18.07,
+    "timestamp": "2026-01-22T18:13:56.941925"
+  },
+  {
+    "action": "update_new_code",
+    "warehouse_id": "007.1.000",
+    "product_id": 148,
+    "cost_price": 0.42,
+    "timestamp": "2026-01-22T18:13:57.354010"
+  },
+  {
+    "action": "update_new_code",
+    "warehouse_id": "006.1.000",
+    "product_id": 92,
+    "cost_price": 0.95,
+    "timestamp": "2026-01-22T18:13:57.825318"
+  },
+  {
+    "action": "update_new_code",
+    "warehouse_id": "009.1.000",
+    "product_id": 93,
+    "cost_price": 84.9,
+    "timestamp": "2026-01-22T18:13:58.260839"
+  },
+  {
+    "action": "update_new_code",
+    "warehouse_id": "011.1.000",
+    "product_id": 94,
+    "cost_price": 67.6,
+    "timestamp": "2026-01-22T18:13:59.250234"
+  },
+  {
+    "action": "update_new_code",
+    "warehouse_id": "012.0.000",
+    "product_id": 102,
+    "cost_price": 0.64,
+    "timestamp": "2026-01-22T18:13:59.681121"
+  },
+  {
+    "action": "update_new_code",
+    "warehouse_id": "013.0.000",
+    "product_id": 103,
+    "cost_price": 0.2,
+    "timestamp": "2026-01-22T18:14:00.137764"
+  },
+  {
+    "action": "update_new_code",
+    "warehouse_id": "014.1.000",
+    "product_id": 96,
+    "cost_price": 15.0,
+    "timestamp": "2026-01-22T18:14:00.522492"
+  },
+  {
+    "action": "update_new_code",
+    "warehouse_id": "015.1.000",
+    "product_id": 97,
+    "cost_price": 0.14,
+    "timestamp": "2026-01-22T18:14:00.978314"
+  },
+  {
+    "action": "update_new_code",
+    "warehouse_id": "016.1.000",
+    "product_id": 98,
+    "cost_price": 3.99,
+    "timestamp": "2026-01-22T18:14:01.408076"
+  },
+  {
+    "action": "update_new_code",
+    "warehouse_id": "017.1.000",
+    "product_id": 99,
+    "cost_price": 17.42,
+    "timestamp": "2026-01-22T18:14:01.864725"
+  },
+  {
+    "action": "update_new_code",
+    "warehouse_id": "018.2.000",
+    "product_id": 104,
+    "cost_price": 4.69,
+    "timestamp": "2026-01-22T18:14:02.292073"
+  },
+  {
+    "action": "update_new_code",
+    "warehouse_id": "019.1.000",
+    "product_id": 149,
+    "cost_price": 3.04,
+    "timestamp": "2026-01-22T18:14:02.746047"
+  },
+  {
+    "action": "update_new_code",
+    "warehouse_id": "018.2.001",
+    "product_id": 105,
+    "cost_price": 4.69,
+    "timestamp": "2026-01-22T18:14:03.147625"
+  },
+  {
+    "action": "update_new_code",
+    "warehouse_id": "019.1.001",
+    "product_id": 150,
+    "cost_price": 3.04,
+    "timestamp": "2026-01-22T18:14:03.530570"
+  },
+  {
+    "action": "update_new_code",
+    "warehouse_id": "018.2.002",
+    "product_id": 106,
+    "cost_price": 4.69,
+    "timestamp": "2026-01-22T18:14:03.971132"
+  },
+  {
+    "action": "update_new_code",
+    "warehouse_id": "019.1.002",
+    "product_id": 151,
+    "cost_price": 3.04,
+    "timestamp": "2026-01-22T18:14:04.406113"
+  },
+  {
+    "action": "update_new_code",
+    "warehouse_id": "018.2.003",
+    "product_id": 107,
+    "cost_price": 4.69,
+    "timestamp": "2026-01-22T18:14:04.827924"
+  },
+  {
+    "action": "update_new_code",
+    "warehouse_id": "019.1.003",
+    "product_id": 152,
+    "cost_price": 3.04,
+    "timestamp": "2026-01-22T18:14:05.270472"
+  },
+  {
+    "action": "update_new_code",
+    "warehouse_id": "018.2.004",
+    "product_id": 108,
+    "cost_price": 4.69,
+    "timestamp": "2026-01-22T18:14:05.740648"
+  },
+  {
+    "action": "update_new_code",
+    "warehouse_id": "019.1.004",
+    "product_id": 153,
+    "cost_price": 3.04,
+    "timestamp": "2026-01-22T18:14:06.188028"
+  },
+  {
+    "action": "update_new_code",
+    "warehouse_id": "018.2.005",
+    "product_id": 109,
+    "cost_price": 4.69,
+    "timestamp": "2026-01-22T18:14:06.606112"
+  },
+  {
+    "action": "update_new_code",
+    "warehouse_id": "019.1.005",
+    "product_id": 154,
+    "cost_price": 3.04,
+    "timestamp": "2026-01-22T18:14:07.036454"
+  },
+  {
+    "action": "update_new_code",
+    "warehouse_id": "018.2.006",
+    "product_id": 110,
+    "cost_price": 4.69,
+    "timestamp": "2026-01-22T18:14:07.463030"
+  },
+  {
+    "action": "update_new_code",
+    "warehouse_id": "019.1.006",
+    "product_id": 155,
+    "cost_price": 3.04,
+    "timestamp": "2026-01-22T18:14:07.896115"
+  },
+  {
+    "action": "update_new_code",
+    "warehouse_id": "018.2.007",
+    "product_id": 111,
+    "cost_price": 4.69,
+    "timestamp": "2026-01-22T18:14:08.318151"
+  },
+  {
+    "action": "update_new_code",
+    "warehouse_id": "019.1.007",
+    "product_id": 156,
+    "cost_price": 3.04,
+    "timestamp": "2026-01-22T18:14:08.739969"
+  },
+  {
+    "action": "update_new_code",
+    "warehouse_id": "019.2.008",
+    "product_id": 112,
+    "cost_price": 6.48,
+    "timestamp": "2026-01-22T18:14:09.202040"
+  },
+  {
+    "action": "update_new_code",
+    "warehouse_id": "019.1.009",
+    "product_id": 145,
+    "cost_price": 3.72,
+    "timestamp": "2026-01-22T18:14:09.846643"
+  },
+  {
+    "action": "update_new_code",
+    "warehouse_id": "019.2.010",
+    "product_id": 113,
+    "cost_price": 6.48,
+    "timestamp": "2026-01-22T18:14:10.279843"
+  },
+  {
+    "action": "update_new_code",
+    "warehouse_id": "019.1.011",
+    "product_id": 146,
+    "cost_price": 3.72,
+    "timestamp": "2026-01-22T18:14:10.923859"
+  },
+  {
+    "action": "update_new_code",
+    "warehouse_id": "019.2.012",
+    "product_id": 114,
+    "cost_price": 6.48,
+    "timestamp": "2026-01-22T18:14:11.406131"
+  },
+  {
+    "action": "update_new_code",
+    "warehouse_id": "019.1.013",
+    "product_id": 147,
+    "cost_price": 3.72,
+    "timestamp": "2026-01-22T18:14:11.853025"
+  },
+  {
+    "action": "update_new_code",
+    "warehouse_id": "020.2.000",
+    "product_id": 115,
+    "cost_price": 1.62,
+    "timestamp": "2026-01-22T18:14:12.249814"
+  },
+  {
+    "action": "update_new_code",
+    "warehouse_id": "020.2.001",
+    "product_id": 116,
+    "cost_price": 1.62,
+    "timestamp": "2026-01-22T18:14:12.881071"
+  },
+  {
+    "action": "update_new_code",
+    "warehouse_id": "020.2.002",
+    "product_id": 117,
+    "cost_price": 1.62,
+    "timestamp": "2026-01-22T18:14:13.519157"
+  },
+  {
+    "action": "update_new_code",
+    "warehouse_id": "020.2.003",
+    "product_id": 118,
+    "cost_price": 1.62,
+    "timestamp": "2026-01-22T18:14:13.956276"
+  },
+  {
+    "action": "update_new_code",
+    "warehouse_id": "020.2.004",
+    "product_id": 119,
+    "cost_price": 1.62,
+    "timestamp": "2026-01-22T18:14:14.371214"
+  },
+  {
+    "action": "update_new_code",
+    "warehouse_id": "020.2.005",
+    "product_id": 120,
+    "cost_price": 1.62,
+    "timestamp": "2026-01-22T18:14:14.788181"
+  },
+  {
+    "action": "update_new_code",
+    "warehouse_id": "020.2.006",
+    "product_id": 121,
+    "cost_price": 1.62,
+    "timestamp": "2026-01-22T18:14:15.239198"
+  },
+  {
+    "action": "update_new_code",
+    "warehouse_id": "020.2.007",
+    "product_id": 122,
+    "cost_price": 1.62,
+    "timestamp": "2026-01-22T18:14:15.711483"
+  },
+  {
+    "action": "update_new_code",
+    "warehouse_id": "019.2.014",
+    "product_id": 123,
+    "cost_price": 6.48,
+    "timestamp": "2026-01-22T18:14:16.170856"
+  },
+  {
+    "action": "update_new_code",
+    "warehouse_id": "019.2.015",
+    "product_id": 124,
+    "cost_price": 6.48,
+    "timestamp": "2026-01-22T18:14:16.604313"
+  },
+  {
+    "action": "update_new_code",
+    "warehouse_id": "019.2.016",
+    "product_id": 125,
+    "cost_price": 6.48,
+    "timestamp": "2026-01-22T18:14:17.102015"
+  },
+  {
+    "action": "update_new_code",
+    "warehouse_id": "020.2.008",
+    "product_id": 126,
+    "cost_price": 1.37,
+    "timestamp": "2026-01-22T18:14:17.508282"
+  },
+  {
+    "action": "update_new_code",
+    "warehouse_id": "020.2.009",
+    "product_id": 127,
+    "cost_price": 1.37,
+    "timestamp": "2026-01-22T18:14:17.972512"
+  },
+  {
+    "action": "update_new_code",
+    "warehouse_id": "020.2.010",
+    "product_id": 128,
+    "cost_price": 1.37,
+    "timestamp": "2026-01-22T18:14:18.408349"
+  },
+  {
+    "action": "update_new_code",
+    "warehouse_id": "020.2.011",
+    "product_id": 129,
+    "cost_price": 1.37,
+    "timestamp": "2026-01-22T18:14:18.822067"
+  },
+  {
+    "action": "update_new_code",
+    "warehouse_id": "020.2.012",
+    "product_id": 130,
+    "cost_price": 1.37,
+    "timestamp": "2026-01-22T18:14:19.256181"
+  },
+  {
+    "action": "update_new_code",
+    "warehouse_id": "020.2.013",
+    "product_id": 131,
+    "cost_price": 1.37,
+    "timestamp": "2026-01-22T18:14:19.676106"
+  },
+  {
+    "action": "update_new_code",
+    "warehouse_id": "020.2.014",
+    "product_id": 132,
+    "cost_price": 1.37,
+    "timestamp": "2026-01-22T18:14:20.085238"
+  },
+  {
+    "action": "update_new_code",
+    "warehouse_id": "020.2.015",
+    "product_id": 133,
+    "cost_price": 1.37,
+    "timestamp": "2026-01-22T18:14:20.505491"
+  },
+  {
+    "action": "update_new_code",
+    "warehouse_id": "019.2.017",
+    "product_id": 134,
+    "cost_price": 6.48,
+    "timestamp": "2026-01-22T18:14:20.963907"
+  },
+  {
+    "action": "update_new_code",
+    "warehouse_id": "019.2.018",
+    "product_id": 135,
+    "cost_price": 6.48,
+    "timestamp": "2026-01-22T18:14:21.405995"
+  },
+  {
+    "action": "update_new_code",
+    "warehouse_id": "019.2.019",
+    "product_id": 136,
+    "cost_price": 6.48,
+    "timestamp": "2026-01-22T18:14:21.863386"
+  },
+  {
+    "action": "update_new_code",
+    "warehouse_id": "020.2.016",
+    "product_id": 137,
+    "cost_price": 1.48,
+    "timestamp": "2026-01-22T18:14:22.264138"
+  },
+  {
+    "action": "update_new_code",
+    "warehouse_id": "020.2.017",
+    "product_id": 138,
+    "cost_price": 1.48,
+    "timestamp": "2026-01-22T18:14:22.730150"
+  },
+  {
+    "action": "update_new_code",
+    "warehouse_id": "020.2.018",
+    "product_id": 139,
+    "cost_price": 1.48,
+    "timestamp": "2026-01-22T18:14:23.179672"
+  },
+  {
+    "action": "update_new_code",
+    "warehouse_id": "020.2.019",
+    "product_id": 140,
+    "cost_price": 1.48,
+    "timestamp": "2026-01-22T18:14:23.578393"
+  },
+  {
+    "action": "update_new_code",
+    "warehouse_id": "020.2.020",
+    "product_id": 141,
+    "cost_price": 1.48,
+    "timestamp": "2026-01-22T18:14:24.052578"
+  },
+  {
+    "action": "update_new_code",
+    "warehouse_id": "020.2.021",
+    "product_id": 142,
+    "cost_price": 1.48,
+    "timestamp": "2026-01-22T18:14:24.446342"
+  },
+  {
+    "action": "update_new_code",
+    "warehouse_id": "020.2.022",
+    "product_id": 143,
+    "cost_price": 1.48,
+    "timestamp": "2026-01-22T18:14:24.856274"
+  },
+  {
+    "action": "update_new_code",
+    "warehouse_id": "020.2.023",
+    "product_id": 144,
+    "cost_price": 1.48,
+    "timestamp": "2026-01-22T18:14:25.262566"
+  },
+  {
+    "action": "update_new_code",
+    "warehouse_id": "021.1.000",
+    "product_id": 100,
+    "cost_price": 2.39,
+    "timestamp": "2026-01-22T18:14:25.680642"
+  },
+  {
+    "action": "update_new_code",
+    "warehouse_id": "022.1.000",
+    "product_id": 101,
+    "cost_price": 2.0,
+    "timestamp": "2026-01-22T18:14:26.181726"
+  },
+  {
+    "action": "update_new_code",
+    "warehouse_id": "008.1.000",
+    "product_id": 89,
+    "cost_price": 1.0,
+    "timestamp": "2026-01-22T18:14:26.672057"
+  },
+  {
+    "action": "update_new_code",
+    "warehouse_id": "025.1.000",
+    "product_id": 157,
+    "cost_price": 50.0,
+    "timestamp": "2026-01-22T18:14:27.146100"
+  },
+  {
+    "action": "archive_old_code",
+    "old_code": "22",
+    "product_name": "Kabelbinder 3.5mmx150mm",
+    "new_code_exists": true,
+    "timestamp": "2026-01-22T18:14:27.821816"
+  },
+  {
+    "action": "archive_old_code",
+    "old_code": "67",
+    "product_name": "L\u00f6tzinn 1.0mm 50g",
+    "new_code_exists": true,
+    "timestamp": "2026-01-22T18:14:29.220376"
+  },
+  {
+    "action": "archive_old_code",
+    "old_code": "74",
+    "product_name": "Papierreste",
+    "new_code_exists": true,
+    "timestamp": "2026-01-22T18:14:30.097711"
+  },
+  {
+    "action": "archive_old_code",
+    "old_code": "21",
+    "product_name": "BALLUF BIS M1B2-03_L",
+    "new_code_exists": true,
+    "timestamp": "2026-01-22T18:14:30.762208"
+  },
+  {
+    "action": "archive_old_code",
+    "old_code": "17",
+    "product_name": "Mamba F405 MK2 kpl.",
+    "new_code_exists": true,
+    "timestamp": "2026-01-22T18:14:31.989692"
+  },
+  {
+    "action": "archive_old_code",
+    "old_code": "25",
+    "product_name": "Anstecker an Akku (zweipolig)",
+    "new_code_exists": true,
+    "timestamp": "2026-01-22T18:14:32.625653"
+  },
+  {
+    "action": "archive_old_code",
+    "old_code": "24",
+    "product_name": "RUDOG ESC RX Cable Black 60mm)",
+    "new_code_exists": true,
+    "timestamp": "2026-01-22T18:14:33.514820"
+  },
+  {
+    "action": "archive_old_code",
+    "old_code": "62",
+    "product_name": "Schrumpfschlauch",
+    "new_code_exists": true,
+    "timestamp": "2026-01-22T18:14:34.152365"
+  },
+  {
+    "action": "archive_old_code",
+    "old_code": "63",
+    "product_name": "Motorschrauben f\u00fcr iFlight.Xing.2207 2",
+    "new_code_exists": true,
+    "timestamp": "2026-01-22T18:14:35.129886"
+  },
+  {
+    "action": "archive_old_code",
+    "old_code": "64",
+    "product_name": "Motormuttern f\u00fcr iFlight.Xing.2207 2",
+    "new_code_exists": true,
+    "timestamp": "2026-01-22T18:14:36.034397"
+  },
+  {
+    "action": "archive_old_code",
+    "old_code": "66",
+    "product_name": "XING-E Pro2207 2750kv",
+    "new_code_exists": true,
+    "timestamp": "2026-01-22T18:14:36.762308"
+  },
+  {
+    "action": "archive_old_code",
+    "old_code": "54",
+    "product_name": "KARTONAGE 130MM",
+    "new_code_exists": true,
+    "timestamp": "2026-01-22T18:14:37.388478"
+  },
+  {
+    "action": "archive_old_code",
+    "old_code": "L_23",
+    "product_name": "HQ Durable Prop 5X4.3X3V1S Links",
+    "new_code_exists": true,
+    "timestamp": "2026-01-22T18:14:39.285415"
+  },
+  {
+    "action": "archive_old_code",
+    "old_code": "R_23",
+    "product_name": "HQ Durable Prop 5X4.3X3V1S Rechts",
+    "new_code_exists": true,
+    "timestamp": "2026-01-22T18:14:40.329668"
+  },
+  {
+    "action": "archive_old_code",
+    "old_code": "V_WHITE_13",
+    "product_name": "Haube EVO2 weiss",
+    "new_code_exists": true,
+    "timestamp": "2026-01-22T18:14:41.251522"
+  },
+  {
+    "action": "archive_old_code",
+    "old_code": "V_BLUE_31",
+    "product_name": "Fu\u00df 35mm Spartan blau",
+    "new_code_exists": true,
+    "timestamp": "2026-01-22T18:14:42.335486"
+  },
+  {
+    "action": "archive_old_code",
+    "old_code": "V_BLACK_75",
+    "product_name": "Grundplatte EVO 2 Spartan schwarz",
+    "new_code_exists": true,
+    "timestamp": "2026-01-22T18:14:43.475314"
+  }
+]

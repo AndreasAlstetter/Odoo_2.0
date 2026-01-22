@@ -16,12 +16,43 @@ import json
 from datetime import datetime
 from typing import Any, Dict, List, Optional, Tuple, Union
 import xmlrpc.client
+import http.client
 
-from config import (
+from provisioning.config import (
     OdooRPCConfig, 
     get_odoo_config,
     LoggingConfig,
 )
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# CUSTOM TRANSPORT FÜR TIMEOUT (FIX)
+# ═══════════════════════════════════════════════════════════════════════════════
+
+class TimeoutHTTPConnection(http.client.HTTPConnection):
+    """HTTP Connection mit Timeout."""
+    def __init__(self, *args, timeout=60, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.timeout = timeout
+
+
+class TimeoutHTTPSConnection(http.client.HTTPSConnection):
+    """HTTPS Connection mit Timeout."""
+    def __init__(self, *args, timeout=60, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.timeout = timeout
+
+
+class TimeoutTransport(xmlrpc.client.Transport):
+    """XML-RPC Transport mit Timeout support."""
+    def __init__(self, timeout=60, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.timeout = timeout
+    
+    def make_connection(self, host):
+        """Create HTTPS connection mit Timeout."""
+        conn = TimeoutHTTPSConnection(host, timeout=self.timeout)
+        return conn
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -128,18 +159,21 @@ class OdooClient:
         self._authenticated_at: Optional[datetime] = None
         self._auth_timeout: int = 3600  # 1 Stunde Token-Gültigkeit (Odoo-abhängig)
         
-        # RPC Server Proxies
+        # RPC Server Proxies mit TimeoutTransport (✅ FIX)
         try:
             common_url = f"{self.config.url}{self.config.rpc_endpoints['common']}"
             object_url = f"{self.config.url}{self.config.rpc_endpoints['object']}"
             
+            # Erstelle Transport mit Timeout
+            transport = TimeoutTransport(timeout=self.config.timeout)
+            
             self.common = xmlrpc.client.ServerProxy(
                 common_url,
-                timeout=self.config.timeout,
+                transport=transport,  # ✅ KORREKT!
             )
             self.models = xmlrpc.client.ServerProxy(
                 object_url,
-                timeout=self.config.timeout,
+                transport=transport,  # ✅ KORREKT!
             )
             
             self.logger.info(

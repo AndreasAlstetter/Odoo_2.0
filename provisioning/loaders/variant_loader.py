@@ -14,9 +14,9 @@ from pathlib import Path
 from typing import Dict, Any, Optional
 from datetime import datetime
 
-from client import OdooClient
-from variant_logic import VariantGenerator
-from utils import log_header, log_success, log_warn, log_error
+from provisioning.client import OdooClient
+from provisioning.variant_logic import VariantGenerator
+from provisioning.utils import log_header, log_success, log_warn, log_error
 
 
 logger = logging.getLogger(__name__)

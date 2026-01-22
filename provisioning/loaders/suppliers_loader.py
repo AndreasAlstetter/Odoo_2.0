@@ -1,23 +1,27 @@
-"""
-suppliers_loader.py - Supplier (Vendor) Master Data Loader
 
-Lädt Lieferanten aus CSV mit:
+"""
+suppliers_loader.py - FINAL FIXED Version
+
+Supplier (Vendor) Master Data Loader mit:
+- AUTO-Delimiter Detection (Komma vs. Semikolon)
+- Korrekter COLUMN_MAPPING für normalized CSV
 - Schema-Validierung
 - Email/Phone/Address Validierung
-- Selektives Update (nicht alles überschreiben)
+- Selektives Update
 - Deduplication
 - Fehlerresilienz
 """
 
 import logging
+import csv
+import json
 from pathlib import Path
 from typing import Dict, Any, List, Optional, Set
 from datetime import datetime
 
-from client import OdooClient, RecordAmbiguousError
-from config import DataPaths
-from utils import log_header, log_info, log_success, log_warn, log_error
-
+from provisioning.client import OdooClient, RecordAmbiguousError
+from provisioning.config import DataPaths
+from provisioning.utils import log_header, log_info, log_success, log_warn, log_error
 
 logger = logging.getLogger(__name__)
 
@@ -109,11 +113,12 @@ class ColumnMapper:
     """Map CSV columns to Odoo partner fields."""
     
     # Possible column names (in priority order)
+    # ✅ FIXED: 'name', 'email', 'phone' ZUERST (für normalized CSV)
     COLUMN_MAPPING = {
-        'name': ['Lieferant', 'Supplier Name', 'name', 'supplier_name'],
-        'email': ['Email', 'E-Mail', 'email', 'EmailAddress'],
-        'phone': ['Telefon', 'Phone', 'phone', 'Phone Number'],
-        'address': ['Adresse', 'Street', 'address', 'Street Address', 'Strasse'],
+        'name': ['name', 'Lieferant', 'Supplier Name', 'supplier_name'],
+        'email': ['email', 'email_norm', 'Email', 'E-Mail', 'EmailAddress'],
+        'phone': ['phone', 'phone_raw', 'Telefon', 'Phone', 'Phone Number'],
+        'address': ['address_raw', 'Adresse', 'Street', 'address', 'Street Address', 'Strasse'],
         'city': ['Stadt', 'City', 'city'],
         'country': ['Land', 'Country', 'country'],
     }
@@ -145,23 +150,22 @@ class ColumnMapper:
     @staticmethod
     def validate_schema(first_row: Dict[str, str]) -> None:
         """
-        Validate CSV schema.
+        Validate CSV schema - check if supplier name column exists.
+        
+        Args:
+            first_row: First row of CSV (header values)
         
         Raises:
-            SupplierValidationError: Wenn Schema ungültig
+            SupplierValidationError: If required name column is missing
         """
-        if not first_row:
-            raise SupplierValidationError("CSV is empty")
+        name_cols = ['name', 'Lieferant', 'Supplier Name', 'supplier_name']
         
-        # At least one name column must exist
-        name_cols = ColumnMapper.COLUMN_MAPPING['name']
-        actual_cols = set(first_row.keys())
-        
-        if not any(col in actual_cols for col in name_cols):
+        # Check if ANY name column exists
+        if not any(col in first_row.keys() for col in name_cols):
             raise SupplierValidationError(
                 f"CSV missing supplier name column. "
-                f"Expected one of: {name_cols}, "
-                f"got: {list(actual_cols)}"
+                f"Expected one of {name_cols}, "
+                f"got {list(first_row.keys())}"
             )
 
 
@@ -191,11 +195,11 @@ class SuppliersLoader:
         logger.info(f"SuppliersLoader initialized: {self.base_data_dir}")
     
     # ═══════════════════════════════════════════════════════════════════════════
-    # CSV READING
+    # CSV READING - ✅ FIXED: Auto-Delimiter Detection
     # ═══════════════════════════════════════════════════════════════════════════
     
     def _read_suppliers_csv(self) -> List[Dict[str, str]]:
-        """Read suppliers CSV with multiple path fallbacks."""
+        """Read suppliers CSV with automatic delimiter detection."""
         possible_paths = [
             self.data_normalized_dir / 'Lieferanten-Table_normalized.csv',
             self.data_normalized_dir / 'Lieferanten-Table.normalized.csv',
@@ -206,17 +210,28 @@ class SuppliersLoader:
             if csv_path.exists():
                 logger.info(f"Reading suppliers from: {csv_path}")
                 
-                import csv
                 rows = []
                 
                 for encoding in ['utf-8-sig', 'utf-8', 'latin-1']:
                     try:
                         with open(csv_path, 'r', encoding=encoding) as f:
-                            reader = csv.DictReader(f, delimiter=';')
+                            # Auto-detect delimiter
+                            sample = f.read(1024)
+                            f.seek(0)
+                            
+                            # Try comma first, then semicolon
+                            delimiter = ',' if ',' in sample else ';'
+                            logger.info(f"Detected delimiter: '{delimiter}' (encoding: {encoding})")
+                            
+                            reader = csv.DictReader(f, delimiter=delimiter)
                             rows = list(reader)
                         
-                        logger.info(f"Read {len(rows)} rows (encoding: {encoding})")
-                        return rows
+                        if rows:
+                            logger.info(f"Read {len(rows)} rows")
+                            return rows
+                        else:
+                            logger.warning(f"No rows read from {csv_path}")
+                            continue
                     
                     except UnicodeDecodeError:
                         continue
@@ -409,8 +424,6 @@ class SuppliersLoader:
     
     def _persist_audit_log(self) -> None:
         """Write audit log to file."""
-        import json
-        
         audit_path = self.base_data_dir / 'audit' / 'suppliers_audit.json'
         audit_path.parent.mkdir(parents=True, exist_ok=True)
         
@@ -425,7 +438,7 @@ class SuppliersLoader:
     # MAIN
     # ═══════════════════════════════════════════════════════════════════════════
     
-    def run(self) -> Dict[str, int]:
+    def run(self) -> Dict[str, Any]:
         """Main entry point."""
         try:
             log_header("SUPPLIERS LOADER")

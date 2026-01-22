@@ -50,8 +50,8 @@ class DataPaths:
     """Zentralisierte Datei-Pfade für alle Loader."""
     
     # CSV Strukturdaten (Typos korrigiert!)
-    STRUKTUR_CSV = os.path.join(DATA_NORMALIZED_DIR, "Strukturl-ekkiliste-Table_normalized.csv")
-    MATERIALBEDARF_CSV = os.path.join(DATA_NORMALIZED_DIR, "Materialbedarfsplanung-Table_normalized.csv")
+    STRUKTUR_CSV = os.path.join(DATA_NORMALIZED_DIR, "Strukturstu-eckliste-Table_normalized.csv")
+    MATERIALBEDARF_CSV = os.path.join(DATA_NORMALIZED_DIR, "Materialbedarfplanung-Table_normalized.csv")
     LAGERDATEN_CSV = os.path.join(DATA_NORMALIZED_DIR, "Lagerdaten-Table_normalized.csv")
     LIEFERANTEN_CSV = os.path.join(DATA_NORMALIZED_DIR, "Lieferanten-Table_normalized.csv")
     FERTIGUNGSKOSTEN_CSV = os.path.join(DATA_NORMALIZED_DIR, "Fertigungskosten-Table_normalized.csv")
@@ -67,7 +67,7 @@ class DataPaths:
     ROUTING_WORKCENTERS = os.path.join(ROUTING_DIR, "workcenter.csv")
     
     # Produktionsdaten
-    WORKCENTER_DATA = os.path.join(PRODUCTION_DATA_DIR, "workcenter.csv")
+    WORKCENTER_DATA = os.path.join(ROUTING_DIR, "workcenter.csv")
     LAGERPLAETZE_DATA = os.path.join(PRODUCTION_DATA_DIR, "Lagerplätze.csv")
     PRODUCT_PRICES = os.path.join(PRODUCTION_DATA_DIR, "Produktpreise.csv")
     PRODUCT_SUPPLIERINFO = os.path.join(PRODUCTION_DATA_DIR, "product_supplierinfo.csv")
@@ -91,31 +91,36 @@ class DataPaths:
 # ═══════════════════════════════════════════════════════════════════════════════
 
 class ProductTemplates:
-    """Produktkopf-Templates für die 3 Drohnen-Varianten."""
+    """Produktkopf-Templates für die 3 Drohnen-Varianten.
+    
+    Struktur:
+    - default_code: Technische ID (z.B. 029.3.000) - konsistent mit Odoo
+    - name: Sprechender Name für UI (z.B. "Spartan")
+    """
     
     SPARTAN = {
-        'code': 'EVO 029.3.000',
-        'name': 'EVO 029.3.000 - Spartan',
-        'list_price': 499.00,  # EUR
+        'code': '029.3.000',  # Internal reference - NO EVO prefix
+        'name': 'Spartan',     # Human-readable name
+        'list_price': 499.00,
         'variant': 'Spartan',
     }
     
     LIGHTWEIGHT = {
-        'code': 'EVO 029.3.001',
-        'name': 'EVO 029.3.001 - Lightweight',
+        'code': '029.3.001',
+        'name': 'Lightweight',
         'list_price': 599.00,
         'variant': 'Lightweight',
     }
     
     BALANCE = {
-        'code': 'EVO 029.3.002',
-        'name': 'EVO 029.3.002 - Balance',
+        'code': '029.3.002',
+        'name': 'Balance',
         'list_price': 699.00,
         'variant': 'Balance',
     }
     
     ALL_CODES = [SPARTAN['code'], LIGHTWEIGHT['code'], BALANCE['code']]
-    
+   
     @classmethod
     def get_by_code(cls, code: str) -> Dict[str, Any]:
         """Hole Template by Produktcode."""
@@ -592,3 +597,53 @@ if os.getenv('SKIP_CONFIG_VALIDATION', 'false').lower() != 'true':
         print(f"WARNUNG: {e}")
 
 
+# ═══════════════════════════════════════════════════════════════════════════════
+# LOADER-KONFIGURATIONEN - KOMPLETT (ALLE Loaders)
+# ═══════════════════════════════════════════════════════════════════════════════
+
+# Batch-Größen
+BATCH_SIZE = 500
+BATCH_SIZE_SMALL = 100
+BATCH_SIZE_LARGE = 1000
+
+# BOM Loader
+BOM_CONFIG = {
+    'filename': DataPaths.BOM_DEFAULT,
+    'delimiter': ',',
+    'encoding': 'utf-8',
+}
+
+# Quality Loader  
+QUALITY_CONFIG = {
+    'inspection_points': QualityConfig.INSPECTION_POINTS,
+    'batch_size': BATCH_SIZE,
+}
+
+# Products Loader
+PRODUCT_CONFIG = {
+    'templates': ProductTemplates.ALL_CODES,
+    'batch_size': BATCH_SIZE,
+}
+
+# Routing Loader
+ROUTING_CONFIG = {
+    'operations_file': DataPaths.ROUTING_OPERATIONS,
+    'workcenter_file': DataPaths.ROUTING_WORKCENTERS,
+}
+
+# Suppliers Loader
+SUPPLIER_CONFIG = {
+    'filename': DataPaths.LIEFERANTEN_CSV,
+    'batch_size': BATCH_SIZE_SMALL,
+}
+
+# MailServer Loader ← JETZT!
+MAIL_CONFIG = MailConfig()
+
+# Stock Loader
+STOCK_CONFIG = {
+    'filename': DataPaths.LAGERDATEN_CSV,
+    'categories': StockConfig.CATEGORIES,
+}
+
+print("✓ ALLE Loader-Konfigurationen geladen")

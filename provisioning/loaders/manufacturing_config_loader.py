@@ -14,9 +14,9 @@ from pathlib import Path
 from typing import Dict, Any, List, Optional, Tuple
 from datetime import datetime
 
-from client import OdooClient, ValidationError
-from config import ManufacturingConfig, get_odoo_config
-from utils import log_header, log_success, log_info, log_warn, log_error
+from provisioning.client import OdooClient, ValidationError
+from provisioning.config import ManufacturingConfig, get_odoo_config
+from provisioning.utils import log_header, log_success, log_info, log_warn, log_error
 
 
 logger = logging.getLogger(__name__)
@@ -173,7 +173,9 @@ class PickingTypeManager:
             PickingTypeError: Wenn Setup fehlschlägt
         """
         try:
-            picking_type_code = ManufacturingConfig.MRP_PICKING_CODE
+           # Odoo 19 Standard MRP Picking Code
+            picking_type_code = "mrp_operation"
+
             
             # Get or create warehouse (required for picking types)
             warehouse_id = self._ensure_warehouse()
@@ -264,8 +266,9 @@ class PickingTypeManager:
                 logger.info(f"Updated {name} with sequence {sequence_id}")
             
             return pt['id']
-        
-        # Create if missing
+       
+        sequence_code = f"{code.upper()}-{warehouse_id}-{picking_type_code[:3].upper()}"
+
         pt_id = self.client.create(
             'stock.picking.type',
             {
@@ -273,6 +276,7 @@ class PickingTypeManager:
                 'code': picking_type_code,
                 'warehouse_id': warehouse_id,
                 'sequence_id': sequence_id,
+                'sequence_code': sequence_code,  # Unique identifier
                 'company_id': self.company_id,
             }
         )

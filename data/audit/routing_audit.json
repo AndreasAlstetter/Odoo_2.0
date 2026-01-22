@@ -1,0 +1,65 @@
+[
+  {
+    "action": "workcenter_updated",
+    "workcenter_name": "3D-Drucker",
+    "workcenter_id": 1,
+    "costs_hour": 25.0,
+    "timestamp": "2026-01-22T14:07:43.834911"
+  },
+  {
+    "action": "workcenter_updated",
+    "workcenter_name": "Lasercutter",
+    "workcenter_id": 2,
+    "costs_hour": 35.0,
+    "timestamp": "2026-01-22T14:07:44.050836"
+  },
+  {
+    "action": "workcenter_updated",
+    "workcenter_name": "Nacharbeit",
+    "workcenter_id": 3,
+    "costs_hour": 45.0,
+    "timestamp": "2026-01-22T14:07:44.250765"
+  },
+  {
+    "action": "workcenter_updated",
+    "workcenter_name": "WT best\u00fccken",
+    "workcenter_id": 15,
+    "costs_hour": 55.0,
+    "timestamp": "2026-01-22T14:07:44.465481"
+  },
+  {
+    "action": "workcenter_updated",
+    "workcenter_name": "L\u00f6ten Elektronik",
+    "workcenter_id": 16,
+    "costs_hour": 65.0,
+    "timestamp": "2026-01-22T14:07:44.651986"
+  },
+  {
+    "action": "workcenter_updated",
+    "workcenter_name": "Montage Elektronik",
+    "workcenter_id": 7,
+    "costs_hour": 75.0,
+    "timestamp": "2026-01-22T14:07:44.852279"
+  },
+  {
+    "action": "workcenter_updated",
+    "workcenter_name": "Flashen Flugcontroller",
+    "workcenter_id": 17,
+    "costs_hour": 85.0,
+    "timestamp": "2026-01-22T14:07:45.066637"
+  },
+  {
+    "action": "workcenter_updated",
+    "workcenter_name": "Montage Geh\u00e4use Rotoren",
+    "workcenter_id": 18,
+    "costs_hour": 95.0,
+    "timestamp": "2026-01-22T14:07:45.260335"
+  },
+  {
+    "action": "workcenter_updated",
+    "workcenter_name": "End-Qualit\u00e4tskontrolle",
+    "workcenter_id": 10,
+    "costs_hour": 105.0,
+    "timestamp": "2026-01-22T14:07:45.469306"
+  }
+]

@@ -17,9 +17,9 @@ from typing import Dict, List, Optional, Tuple, Any
 from dataclasses import dataclass
 from datetime import datetime
 
-from client import OdooClient
-from config import VARIANT_CONFIG  # Aus config.py
-from utils import log_header, log_success, log_info, log_warn, log_error
+from provisioning.client import OdooClient
+from provisioning.config import VARIANT_CONFIG  # Aus config.py
+from provisioning.utils import log_header, log_success, log_info, log_warn, log_error
 
 
 logger = logging.getLogger(__name__)

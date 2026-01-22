@@ -23,9 +23,9 @@ from typing import Dict, Any, Optional, List, Tuple
 from email.mime.text import MIMEText
 from datetime import datetime
 
-from client import OdooClient, RecordAmbiguousError
-from config import MAIL_CONFIG
-from utils import log_header, log_success, log_info, log_warn, log_error
+from provisioning.client import OdooClient, RecordAmbiguousError
+from provisioning.config import MAIL_CONFIG
+from provisioning.utils import log_header, log_success, log_info, log_warn, log_error
 
 
 logger = logging.getLogger(__name__)
@@ -423,8 +423,8 @@ class MailServerLoader:
             log_header("MAIL SERVER LOADER")
             
             # Get mail config
-            mail_servers = MAIL_CONFIG.get('servers', [])
-            mail_params = MAIL_CONFIG.get('parameters', {})
+            mail_params = getattr(MAIL_CONFIG, 'parameters', {})
+            mail_servers = getattr(MAIL_CONFIG, 'servers', [])
             
             if not mail_servers and not mail_params:
                 log_warn("No mail configuration found")

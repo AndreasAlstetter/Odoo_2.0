@@ -17,9 +17,9 @@ from typing import Dict, Optional, Any
 from datetime import datetime
 from dataclasses import dataclass
 
-from client import OdooClient
-from validation import safe_float, FormatValidator, ValidationError
-from utils import log_header, log_info, log_success, log_warn, log_error, timed_operation
+from provisioning.client import OdooClient
+from provisioning.core.validation import safe_float, FormatValidator, ValidationError
+from provisioning.utils import log_header, log_info, log_success, log_warn, log_error, timed_operation
 
 
 logger = logging.getLogger(__name__)

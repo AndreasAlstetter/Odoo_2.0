@@ -8,27 +8,73 @@ Konfiguriert:
 4. Material Flow Test (End-to-End)
 
 Optimiert für >500 Drohnen/Tag mit korrekter Hierarchie & Fehlerbehandlung
+
+FIXES APPLIED (2026-01-22):
+- FIX #1: XML-RPC None marshaling (conditional location_id)
+- FIX #2: Windows Unicode encoding (UTF-8 wrapper + ASCII arrows)
+- FIX #3: Multi-pass parent location resolution (robust hierarchy)
 """
 
 import csv
+import io
 import logging
+import os
+import sys
 import time
 from pathlib import Path
 from typing import Dict, Any, List, Optional, Tuple
 from decimal import Decimal
 from datetime import datetime
 
-from client import OdooClient, RecordAmbiguousError
-from config import DataPaths, StockConfig
-from utils import log_header, log_success, log_info, log_warn, log_error
-
+from provisioning.client import OdooClient, RecordAmbiguousError
+from provisioning.config import DataPaths, StockConfig
+from provisioning.utils import log_header, log_success, log_info, log_warn, log_error
 
 logger = logging.getLogger(__name__)
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
+# FIX #2: WINDOWS UTF-8 ENCODING SETUP
+# ═══════════════════════════════════════════════════════════════════════════════
+
+def _setup_utf8_encoding() -> None:
+    """
+    Fix Windows console encoding for Unicode output.
+    
+    Windows terminals default to cp1252 encoding which cannot handle Unicode
+    characters like arrows (→). This function wraps stdout/stderr in UTF-8.
+    """
+    if sys.platform == 'win32':
+        try:
+            if sys.stdout and sys.stdout.encoding not in ('utf-8', 'utf-8-sig'):
+                sys.stdout = io.TextIOWrapper(
+                    sys.stdout.buffer,
+                    encoding='utf-8',
+                    errors='replace',
+                    line_buffering=True
+                )
+            
+            if sys.stderr and sys.stderr.encoding not in ('utf-8', 'utf-8-sig'):
+                sys.stderr = io.TextIOWrapper(
+                    sys.stderr.buffer,
+                    encoding='utf-8',
+                    errors='replace',
+                    line_buffering=True
+                )
+            
+            logger.debug("UTF-8 encoding enabled for Windows console")
+        except Exception as e:
+            logger.warning(f"Failed to set UTF-8 encoding: {e}")
+
+
+# Call on module load
+_setup_utf8_encoding()
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
 # EXCEPTIONS
 # ═══════════════════════════════════════════════════════════════════════════════
+
 
 class StockStructureError(Exception):
     """Base exception for stock structure operations."""
@@ -48,6 +94,7 @@ class KanbanError(StockStructureError):
 # ═══════════════════════════════════════════════════════════════════════════════
 # CSV UTILITIES
 # ═══════════════════════════════════════════════════════════════════════════════
+
 
 class CSVReader:
     """Safe CSV reading with encoding fallback."""
@@ -85,7 +132,9 @@ class CSVReader:
                     reader = csv.DictReader(f, delimiter=delimiter)
                     rows = list(reader)
                 
-                logger.info(f"Read {len(rows)} rows from {filepath} (encoding: {encoding})")
+                logger.info(
+                    f"Read {len(rows)} rows from {filepath} (encoding: {encoding})"
+                )
                 return rows
             
             except UnicodeDecodeError:
@@ -93,12 +142,15 @@ class CSVReader:
             except csv.Error as e:
                 raise ValueError(f"CSV parse error: {e}")
         
-        raise ValueError(f"Failed to read {filepath} with encodings: {encoding_list}")
+        raise ValueError(
+            f"Failed to read {filepath} with encodings: {encoding_list}"
+        )
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
 # LOCATION MANAGER
 # ═══════════════════════════════════════════════════════════════════════════════
+
 
 class LocationManager:
     """Manage stock locations with hierarchy."""
@@ -106,51 +158,86 @@ class LocationManager:
     def __init__(self, client: OdooClient, company_id: int):
         self.client = client
         self.company_id = company_id
-        self.locations: Dict[str, int] = {}  # name → location_id
+        self.locations: Dict[str, int] = {}  # name -> location_id
     
     def load_locations_from_csv(self, csv_path: Path) -> Dict[str, int]:
         """
-        Load locations from CSV and create hierarchy.
+        Load locations from CSV and create hierarchy with multi-pass resolution.
         
         CSV Format:
-            name,parent_name,usage,barcode
-            WH,,-,WH-001
-            WH/Stock,WH,internal,WH-STOCK-001
-            WH/Stock/Platten,WH/Stock,internal,WH-PLATTEN-001
+            name;parent_name;usage;barcode
+            WH;;-;WH-001
+            WH/Stock;WH;internal;WH-STOCK-001
+            WH/Stock/Platten;WH/Stock;internal;WH-PLATTEN-001
+        
+        Uses FIX #3: Multi-pass approach handles parent locations in any order
         
         Args:
             csv_path: Path to locations CSV
         
         Returns:
-            Dict: location_name → location_id
+            Dict: location_name -> location_id
+        
+        Raises:
+            LocationError: If CSV reading or creation fails
         """
         try:
-            rows = CSVReader.read_rows(csv_path, delimiter=';')
+            all_rows = CSVReader.read_rows(csv_path, delimiter=';')
         except Exception as e:
             raise LocationError(f"Failed to read locations CSV: {e}")
         
+        if not all_rows:
+            log_warn("Locations CSV is empty")
+            return {}
+        
         log_header("Loading Warehouse Locations")
         
-        # Multi-pass approach for hierarchical setup
-        # Pass 1: Create root locations (no parent)
-        # Pass 2: Create child locations
+        # FIX #3: Multi-pass approach
+        # Keep retrying failed rows until parents are available or max passes reached
+        failed_rows = all_rows[:]
+        max_passes = 3
+        pass_num = 0
         
-        root_rows = [r for r in rows if not r.get('parent_name', '').strip()]
-        child_rows = [r for r in rows if r.get('parent_name', '').strip()]
+        while failed_rows and pass_num < max_passes:
+            pass_num += 1
+            remaining_failed = []
+            
+            for row in failed_rows:
+                try:
+                    self._create_or_update_location(row)
+                except LocationError as e:
+                    # If parent not found, save for next pass
+                    if 'parent' in str(e).lower() or 'not found' in str(e).lower():
+                        remaining_failed.append(row)
+                        logger.debug(
+                            f"Deferring {row.get('name')} - waiting for parent"
+                        )
+                    else:
+                        # Non-recoverable error, don't retry
+                        logger.error(
+                            f"Non-recoverable error for {row.get('name')}: {e}"
+                        )
+                except Exception as e:
+                    logger.error(f"Unexpected error for {row.get('name')}: {e}")
+                    remaining_failed.append(row)
+            
+            failed_rows = remaining_failed
+            
+            if failed_rows:
+                log_info(
+                    f"Pass {pass_num}: {len(failed_rows)} locations awaiting parents..."
+                )
+                time.sleep(0.1)  # Brief pause for Odoo to process
         
-        # Pass 1: Roots
-        for row in root_rows:
-            try:
-                self._create_or_update_location(row, parent_id=None)
-            except Exception as e:
-                logger.error(f"Failed to create root location {row.get('name')}: {e}")
-        
-        # Pass 2: Children (with parent lookup)
-        for row in child_rows:
-            try:
-                self._create_or_update_location(row)
-            except Exception as e:
-                logger.error(f"Failed to create location {row.get('name')}: {e}")
+        # Report any remaining failures
+        if failed_rows:
+            log_error(
+                f"Failed to create {len(failed_rows)} locations after {max_passes} passes:"
+            )
+            for row in failed_rows:
+                log_error(
+                    f"  - {row.get('name')} (parent: {row.get('parent_name')})"
+                )
         
         log_success(f"Loaded {len(self.locations)} locations")
         return self.locations
@@ -160,7 +247,21 @@ class LocationManager:
         row: Dict[str, str],
         parent_id: Optional[int] = None,
     ) -> int:
-        """Create or update single location."""
+        """
+        Create or update single location.
+        
+        Uses FIX #1: Conditional location_id include (avoids None marshaling error)
+        
+        Args:
+            row: CSV row with name, parent_name, usage, barcode
+            parent_id: Optional parent location ID (overrides CSV)
+        
+        Returns:
+            int: Created or updated location ID
+        
+        Raises:
+            LocationError: If parent not found or creation fails
+        """
         name = row.get('name', '').strip()
         if not name:
             raise ValueError("Location name required")
@@ -174,48 +275,66 @@ class LocationManager:
                 
                 # Then try Odoo (in case it exists already)
                 if not parent_id:
-                    parents = self.client.search_read(
-                        'stock.location',
-                        [('name', '=', parent_name)],
-                        ['id'],
-                        limit=1
-                    )
-                    if parents:
-                        parent_id = parents[0]['id']
-                        self.locations[parent_name] = parent_id
-                    else:
-                        logger.warning(f"Parent location not found: {parent_name}")
-                        parent_id = None
+                    try:
+                        parents = self.client.search_read(
+                            'stock.location',
+                            [('name', '=', parent_name)],
+                            ['id'],
+                            limit=1
+                        )
+                        if parents:
+                            parent_id = parents[0]['id']
+                            self.locations[parent_name] = parent_id
+                        else:
+                            raise LocationError(
+                                f"Parent location not found: {parent_name}"
+                            )
+                    except Exception as e:
+                        raise LocationError(
+                            f"Failed to lookup parent '{parent_name}': {e}"
+                        )
         
         # Build values
+        # FIX #1: Only include location_id if parent_id is not None
+        # This avoids XML-RPC marshaling error: "cannot marshal None"
         barcode_raw = row.get('barcode', '').strip()
-        # Company-unique barcode
         barcode = f"C{self.company_id}-{barcode_raw}" if barcode_raw else False
         
         vals = {
             'name': name,
-            'location_id': parent_id,
             'usage': row.get('usage', 'internal').strip(),
             'barcode': barcode,
         }
         
-        # Ensure (global unique by name)
+        # FIX #1: Conditionally add parent (avoids None marshaling error)
+        if parent_id:
+            vals['location_id'] = parent_id
+        
+        # Ensure (globally unique by name)
         domain = [('name', '=', name)]
         
-        loc_id, is_new = self.client.ensure_record(
-            'stock.location',
-            domain,
-            vals,
-            vals,
-        )
+        try:
+            loc_id, is_new = self.client.ensure_record(
+                'stock.location',
+                domain,
+                vals,
+                vals,
+            )
+            
+            self.locations[name] = loc_id
+            
+            status = "NEW" if is_new else "UPD"
+            parent_str = f"(parent: {parent_id})" if parent_id else "(root)"
+            barcode_str = f"(barcode: {barcode})" if barcode else ""
+            
+            log_success(f"[LOCATION:{status}] {name} {parent_str} -> {loc_id} {barcode_str}")
+            
+            return loc_id
         
-        self.locations[name] = loc_id
-        
-        status = "NEW" if is_new else "UPD"
-        barcode_str = f"(barcode: {barcode})" if barcode else ""
-        log_success(f"[LOCATION:{status}] {name} → {loc_id} {barcode_str}")
-        
-        return loc_id
+        except Exception as e:
+            raise LocationError(
+                f"Failed to create/update location '{name}': {e}"
+            )
     
     def get_or_create_warehouse(self) -> int:
         """Get or create warehouse for company."""
@@ -247,6 +366,7 @@ class LocationManager:
 # ROUTE MANAGER
 # ═══════════════════════════════════════════════════════════════════════════════
 
+
 class RouteManager:
     """Manage stock routes and transfers."""
     
@@ -266,8 +386,10 @@ class RouteManager:
         """
         Create stock transfer routes.
         
+        Uses FIX #2: ASCII arrows instead of Unicode for Windows compatibility
+        
         Args:
-            locations: Dict of location_name → location_id
+            locations: Dict of location_name -> location_id
             transfers: List of (name, from_location, to_location)
         """
         log_header("Creating Stock Transfer Routes")
@@ -293,7 +415,11 @@ class RouteManager:
             return
         
         product_id = test_product['id']
-        uom_id = test_product.get('uom_id', [1])[0] if isinstance(test_product.get('uom_id'), list) else 1
+        uom_id = (
+            test_product.get('uom_id', [1])[0]
+            if isinstance(test_product.get('uom_id'), list)
+            else 1
+        )
         
         # Create transfers
         for transfer_name, from_loc_name, to_loc_name in transfers:
@@ -302,6 +428,7 @@ class RouteManager:
                 to_loc_id = locations.get(to_loc_name)
                 
                 if not from_loc_id or not to_loc_id:
+                    # FIX #2: Use ASCII arrow instead of Unicode
                     logger.warning(
                         f"Transfer '{transfer_name}': missing location "
                         f"({from_loc_name}={from_loc_id}, {to_loc_name}={to_loc_id})"
@@ -328,7 +455,7 @@ class RouteManager:
                 picking_id = self.client.create('stock.picking', picking_vals)
                 
                 self.stats['transfers_created'] += 1
-                log_success(f"[TRANSFER] {transfer_name} → {picking_id}")
+                log_success(f"[TRANSFER] {transfer_name} -> {picking_id}")
             
             except Exception as e:
                 logger.error(f"Failed to create transfer '{transfer_name}': {e}")
@@ -366,6 +493,7 @@ class RouteManager:
 # KANBAN MANAGER
 # ═══════════════════════════════════════════════════════════════════════════════
 
+
 class KanbanManager:
     """Manage kanban replenishment rules."""
     
@@ -386,7 +514,7 @@ class KanbanManager:
         Setup Kanban replenishment rules.
         
         Args:
-            locations: Dict of location_name → location_id
+            locations: Dict of location_name -> location_id
             buffers: List of (name, product_pattern, location_name, min_qty, max_qty)
         """
         log_header("Setting up Kanban Replenishment Rules")
@@ -395,7 +523,9 @@ class KanbanManager:
             try:
                 loc_id = locations.get(location_name)
                 if not loc_id:
-                    logger.warning(f"Location not found for kanban: {location_name}")
+                    logger.warning(
+                        f"Location not found for kanban: {location_name}"
+                    )
                     continue
                 
                 # Find products matching pattern
@@ -430,10 +560,12 @@ class KanbanManager:
                         else:
                             self.stats['kanban_rules_updated'] += 1
                         
-                        log_success(f"[KANBAN] {product['default_code']} → {loc_id}")
+                        log_success(f"[KANBAN] {product['default_code']} -> {loc_id}")
                     
                     except Exception as e:
-                        logger.error(f"Failed for product {product['default_code']}: {e}")
+                        logger.error(
+                            f"Failed for product {product['default_code']}: {e}"
+                        )
                         self.stats['errors'] += 1
             
             except Exception as e:
@@ -444,6 +576,7 @@ class KanbanManager:
 # ═══════════════════════════════════════════════════════════════════════════════
 # STOCK STRUCTURE LOADER
 # ═══════════════════════════════════════════════════════════════════════════════
+
 
 class StockStructureLoader:
     """Complete warehouse and stock structure setup."""
@@ -469,7 +602,9 @@ class StockStructureLoader:
             'errors': 0,
         }
         
-        logger.info(f"StockStructureLoader initialized (company_id={self.company_id})")
+        logger.info(
+            f"StockStructureLoader initialized (company_id={self.company_id})"
+        )
     
     def run(self) -> Dict[str, int]:
         """Main orchestration."""
@@ -477,7 +612,9 @@ class StockStructureLoader:
             log_header("STOCK STRUCTURE LOADER")
             
             # 1) Load locations
-            locations_csv = self.base_data_dir / 'production_data' / 'Lagerplätze.csv'
+            locations_csv = (
+                self.base_data_dir / 'production_data' / 'Lagerplatze.csv'
+            )
             if not locations_csv.exists():
                 log_warn(f"Locations CSV missing: {locations_csv}")
                 return {'skipped': True}
@@ -485,16 +622,18 @@ class StockStructureLoader:
             locations = self.location_mgr.load_locations_from_csv(locations_csv)
             self.stats['locations_created'] = len(locations)
             
-            # 2) Create transfer routes
+            # 2) Create transfer routes (FIX #2: ASCII arrows)
             transfers = [
-                ("Stock → Production", "WH/Stock", "WH/Production"),
-                ("Production → 3D Printer", "WH/Production", "WH/3D-Drucker"),
-                ("Stock → Buffer Plates", "WH/Stock", "WH/Puffer/Platten"),
-                ("Production → Scrap", "WH/Production", "WH/Scrap"),
+                ("Stock -> Production", "WH/Stock", "WH/Production"),
+                ("Production -> 3D Printer", "WH/Production", "WH/3D-Drucker"),
+                ("Stock -> Buffer Plates", "WH/Stock", "WH/Puffer/Platten"),
+                ("Production -> Scrap", "WH/Production", "WH/Scrap"),
             ]
             
             self.route_mgr.create_transfer_routes(locations, transfers)
-            self.stats['transfers_created'] = self.route_mgr.stats['transfers_created']
+            self.stats['transfers_created'] = (
+                self.route_mgr.stats['transfers_created']
+            )
             
             # 3) Setup kanban rules
             buffers = [
@@ -504,7 +643,9 @@ class StockStructureLoader:
             ]
             
             self.kanban_mgr.setup_kanban_rules(locations, buffers)
-            self.stats['kanban_rules_created'] = self.kanban_mgr.stats['kanban_rules_created']
+            self.stats['kanban_rules_created'] = (
+                self.kanban_mgr.stats['kanban_rules_created']
+            )
             
             # 4) Test material flow
             self._test_material_flow(locations)
@@ -594,7 +735,9 @@ class StockStructureLoader:
             
             mo_id = self.client.create('mrp.production', mo_vals)
             
-            log_success(f"[TEST:MO] Created test MO '{mo_name}' → {mo_id}")
+            log_success(
+                f"[TEST:MO] Created test MO '{mo_name}' -> {mo_id}"
+            )
             log_success("Material flow test completed successfully!")
         
         except Exception as e:
