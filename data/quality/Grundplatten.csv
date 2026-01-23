@@ -1,0 +1,10 @@
+qp_id,title,product_default_code,operation_name,control_type,test_type,testing_percentage,tolerance_min,tolerance_max
+qp_gp_spartan_white,Maß Grundplatte Spartan weiß,019.2.008,Nacharbeit Grundplatte,measure,measure,100,-2,2
+qp_gp_spartan_blue,Maß Grundplatte Spartan blau,019.2.010,Nacharbeit Grundplatte,measure,measure,100,-2,2
+qp_gp_spartan_black,Maß Grundplatte Spartan schwarz,019.2.012,Nacharbeit Grundplatte,measure,measure,100,-2,2
+qp_gp_lw_white,Maß Grundplatte Lightweight weiß,019.2.014,Nacharbeit Grundplatte,measure,measure,100,-2,2
+qp_gp_lw_blue,Maß Grundplatte Lightweight blau,019.2.015,Nacharbeit Grundplatte,measure,measure,100,-2,2
+qp_gp_lw_black,Maß Grundplatte Lightweight schwarz,019.2.016,Nacharbeit Grundplatte,measure,measure,100,-2,2
+qp_gp_bal_white,Maß Grundplatte Balance weiß,019.2.017,Nacharbeit Grundplatte,measure,measure,100,-2,2
+qp_gp_bal_blue,Maß Grundplatte Balance blau,019.2.018,Nacharbeit Grundplatte,measure,measure,100,-2,2
+qp_gp_bal_black,Maß Grundplatte Balance schwarz,019.2.019,Nacharbeit Grundplatte,measure,measure,100,-2,2

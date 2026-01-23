@@ -1,0 +1,74 @@
+ID;Artikel;Lagerplatz Regal
+000.1.000;Kabelbinder;101B-3-D
+001.1.000;Steckverbindungen;101C-3-D
+002.0.000;Rotorren Links;101C-4-D
+003.0.000;Rotoren Rechts;101C-4-D
+008.1.000;Fernbedienung;101B-0-A
+004.1.000;RFID-tag;101B-4-D
+005.1.000;Akku;101B-4-B
+006.1.000;Akkukabel;101B-3-C
+009.1.000;Steuergerät;101B-3-B
+011.1.000;Motor;101C-5-D
+010.1.000;Motoreinheit;101B-4-A
+014.1.000;Verlängerungskalbel;101B-3-C
+015.1.000;Schrumpfschlauche;101D-5-D
+016.1.000;Resiver Kabel;101B-3-A
+017.1.000;Reciver;101B-4-C
+021.1.000;Verpackung-Karton;101D-1
+022.1.000;Verpackung-Füllmaterial;101D-0
+012.0.000;Motorschrauben;101D-5-A
+013.0.000;Motormuttern;101D-5-B
+018.2.000;Haube EVO2 weiss;101B-1-D
+018.2.001;HAUBE EVO2 gelb;101B-1-C
+018.2.002;HAUBE EVO2 rot;101B-1-A
+018.2.003;HAUBE EVO2 grün;101B-2-D
+018.2.004;HAUBE EVO2 blau;101B-2-C
+018.2.005;HAUBE EVO2 braun;101B-2-B
+018.2.006;HAUBE EVO2 orange;101B-1-B
+018.2.007;HAUBE EVO2 schwarz;101B-2-A
+019.2.008;Grundplatte EVO 2 Spartan weiss;101C-4-A
+019.2.010;Grundplatte EVO 2 Spartan blau;101C-4-B
+019.2.012;Grundplatte EVO 2 Spartan schwarz;101C-4-C
+020.2.000;Fuß EVO2 Spartan weiss;101A-0-A
+020.2.001;Fuß EVO2 Spartan gelb;101A-0-B
+020.2.002;Fuß EVO2 Spartan rot;101A-0-C
+020.2.003;Fuß EVO2 Spartan grün;101A-0-D
+020.2.004;Fuß EVO2 Spartan blau;101A-1-A
+020.2.005;Fuß EVO2 Spartan braun;101A-1-B
+020.2.006;Fuß EVO2 Spartan orange;101A-1-C
+020.2.007;Fuß EVO2 Spartan schwarz;101A-1-D
+019.2.014;Grundplatte EVO 2 Lightweight weiss;101C-5-A
+019.2.015;Grundplatte EVO 2 Lightweight blau;101C-5-B
+019.2.016;Grundplatte EVO 2 Lightweight schwarz;101C-5-C
+020.2.008;Fuß EVO2 Lightweight weiss;101A-2-A
+020.2.009;Fuß EVO2 Lightweight gelb;101A-2-B
+020.2.010;Fuß EVO2 Lightweight rot;101A-2-C
+020.2.011;Fuß EVO2 Lightweight grün;101A-2-D
+020.2.012;Fuß EVO2 Lightweight blau;101A-3-A
+020.2.013;Fuß EVO2 Lightweight braun;101A-3-B
+020.2.014;Fuß EVO2 Lightweight orange;101A-3-C
+020.2.015;Fuß EVO2 Lightweight schwarz;101A-3-D
+019.2.017;Grundplatte EVO 2 Balance weiss;101C-3-A
+019.2.018;Grundplatte EVO 2 Balance blau;101C-3-B
+019.2.019;Grundplatte EVO 2 Balance schwarz;101C-3-C
+020.2.016;Fuß EVO2 Balance weiss;101A-4-A
+020.2.017;Fuß EVO2 Balance gelb;101A-4-B
+020.2.018;Fuß EVO2 Balance rot;101A-4-C
+020.2.019;Fuß EVO2 Balance grün;101A-4-D
+020.2.020;Fuß EVO2 Balance blau;101A-5-A
+020.2.021;Fuß EVO2 Balance braun;101A-5-B
+020.2.022;Fuß EVO2 Balance orange;101A-5-C
+020.2.023;Fuß EVO2 Balance schwarz;101A-5-D
+019.1.009;Acryl Glasplatte - weiß;101D-2
+019.1.011;Acryl Glasplatte - blau;101D-3
+019.1.013;Acryl Glasplatte - schwarz;101D-4
+007.1.000;Lötzinn;101D-4-C
+019.1.000;PLA Filament - Weiß;101C-2-B
+019.1.001;PLA Filament - Gelb;101C-2-C
+019.1.002;PLA Filament - Rot;101C-1-A
+019.1.003;PLA Filament - Grün;101C-2-D
+019.1.004;PLA Filament - Blau;101C-1-B
+019.1.005;PLA Filament - Braun;101C-2-A
+019.1.006;PLA Filament - Orange;101C-1-C
+019.1.007;PLA Filament - Schwarz;101C-1-D
+025.1.000;Fernbedienung;101B-0-A

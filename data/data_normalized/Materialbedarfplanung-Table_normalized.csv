@@ -1,0 +1,57 @@
+row_id,item_type,item_name,item_description,qty_spartan,qty_lightweight,qty_balance,default_code_raw,default_code,unit_price_raw,total_price_raw,planning_id,planning_item_name,gross_demand,net_demand,lot_size,unit,warehouse_id
+8,Kaufartikel,Steuergerät,Mamba F405 MK2 kpl.,1 stk.,1 stk.,1 stk.,17,17,84,90€/stk.,84,90€,57,Steuergerät,520,517,25,Stk,009.1.000
+9,Kaufartikel,Motor,XING-E Pro2207 2750kv,4 stk.,4 stk.,4 stk.,66,66,16,90€/stk.,67,60€,66,Motor,2080,2052,90,Stk,011.1.000
+6,Kaufartikel,Akku,2200mAh 50C 11. 1V 24.52Wh Zeee,1 stk.,1 stk.,1 stk.,15,15,18,07€/stk.,18,07€,91,Akku,520,504,25,Stk,005.1.000
+13,Kaufartikel,Reciver,FS-IA10B Resiver,1 stk.,1 stk.,1 stk.,16,16,17,42€/stk.,17,42€,91,Reciver,520,517,,Stk,017.1.000
+10,Kaufartikel,Verlängerungskalbel,Kabelverlängerung Motor (5cm),30,00 cm,30,00 cm,30,00 cm,61,61,0,50€/cm,15,00€,92,Verlängerungskalbel,6240,6231,50,cm,014.1.000
+63,Kaufartikel,Acryl Glasplatte - schwarz,Acryl Glasplatte - Weiß 1000mm*330mm*5mm (3300 cm^2),1.063,00 cm^2,1.063,00 cm^2,1.063,00 cm^2,V_BLACK_7,V_BLACK_7,11,56€/3300cm^2,,94,RFID-tag,520,517,50,Stk,019.1.013
+62,Kaufartikel,Acryl Glasplatte - blau,Acryl Glasplatte - Weiß 1000mm*330mm*5mm (3300 cm^2),1.063,00 cm^2,1.063,00 cm^2,1.063,00 cm^2,V_BLUE_7,V_BLUE_7,11,56€/3300cm^2,,94,Resiver Kabel,520,517,50,cm,019.1.011
+61,Kaufartikel,Acryl Glasplatte - weiß,Acryl Glasplatte - Weiß 1000mm*330mm*5mm (3300 cm^2),1.063,00 cm^2,1.063,00 cm^2,1.063,00 cm^2,V_WHITE_7,V_WHITE_7,11,56€/3300cm^2,,94,Verpackung-Karton,520,517,,Stk,019.1.009
+50,Eigenfertigung,Grundplatte EVO 2 Balance schwarz,Grundplatte EVO 2 Balance schwarz,,,V_B_BLACK_75,V_B_BLACK_75,6,48€/stk.,6,48€,97,Verpackung-Karton,520,517,,Stk,019.2.019
+49,Eigenfertigung,Grundplatte EVO 2 Balance blau,Grundplatte EVO 2 Balance blau,,,V_B_BLUE_75,V_B_BLUE_75,6,48€/stk.,6,48€,97,Steckverbindungen,2080,2052,,Stk,019.2.018
+48,Eigenfertigung,Grundplatte EVO 2 Balance weiss,Grundplatte EVO 2 Balance weiss,,,V_B_WHITE_75,V_B_WHITE_75,6,48€/stk.,6,48€,97,Verpackung-Füllmaterial,520,517,,g,019.2.017
+39,Eigenfertigung,Grundplatte EVO 2 Lightweight schwarz,Grundplatte EVO 2 Lightweight schwarz,,1 stk.,V_L_BLACK_75,V_L_BLACK_75,6,48€/stk.,6,48€,97,Verpackung-Füllmaterial,520,517,,g,019.2.016
+38,Eigenfertigung,Grundplatte EVO 2 Lightweight blau,Grundplatte EVO 2 Lightweight blau,,1 stk.,V_L_BLUE_75,V_L_BLUE_75,6,48€/stk.,6,48€,97,Rotoren Rechts,1040,941,,Stk,019.2.015
+37,Eigenfertigung,Grundplatte EVO 2 Lightweight weiss,Grundplatte EVO 2 Lightweight weiss,,1 stk.,V_L_WHITE_75,V_L_WHITE_75,6,48€/stk.,6,48€,97,Rotorren Links,1040,941,,Stk,019.2.014
+28,Eigenfertigung,Grundplatte EVO 2 Spartan schwarz,Grundplatte EVO 2 Spartan schwarz,1 stk.,,V_BLACK_75,V_BLACK_75,6,48€/stk.,6,48€,97,Akkukabel,520,470,50,cm,019.2.012
+27,Eigenfertigung,Grundplatte EVO 2 Spartan blau,Grundplatte EVO 2 Spartan blau,1 stk.,,V_BLUE_75,V_BLUE_75,6,48€/stk.,6,48€,97,Motormuttern,2080,2068,,Stk,019.2.010
+26,Eigenfertigung,Grundplatte EVO 2 Spartan weiss,Grundplatte EVO 2 Spartan weiss,1 stk.,,V_WHITE_75,V_WHITE_75,6,48€/stk.,6,48€,97,Motorschrauben,8320,8187,,Stk,019.2.008
+5,Kaufartikel,RFID-tag,BALLUF BIS M1B2-03_L,1 stk.,1 stk.,1 stk.,21,21,4,50€/stk.,4,50€,98,Lötzinn,4420,3420,,g,004.1.000
+25,Eigenfertigung,HAUBE EVO2 schwarz,HAUBE EVO2 schwarz,1 stk.,1 stk.,1 stk.,V_BLACK_13,V_BLACK_13,4,69€/gram,4,69€,98,Schrumpfschlauche,520,517,,Stk,018.2.007
+24,Eigenfertigung,HAUBE EVO2 orange,HAUBE EVO2 orange,1 stk.,1 stk.,1 stk.,V_ORANGE_13,V_ORANGE_13,4,69€/gram,4,69€,98,Kabelbinder,2080,2068,,Stk,018.2.006
+23,Eigenfertigung,HAUBE EVO2 braun,HAUBE EVO2 braun,1 stk.,1 stk.,1 stk.,V_BROWN_13,V_BROWN_13,4,69€/gram,4,69€,98,Acryl Glasplatte - schwarz,520,517,,cm²,018.2.005
+22,Eigenfertigung,HAUBE EVO2 blau,HAUBE EVO2 blau,1 stk.,1 stk.,1 stk.,V_BLUE_13,V_BLUE_13,4,69€/gram,4,69€,98,Acryl Glasplatte - blau,520,517,,cm²,018.2.004
+21,Eigenfertigung,HAUBE EVO2 grün,HAUBE EVO2 grün,1 stk.,1 stk.,1 stk.,V_GREEN_13,V_GREEN_13,4,69€/gram,4,69€,98,Acryl Glasplatte - weiß,520,517,,cm²,018.2.003
+20,Eigenfertigung,HAUBE EVO2 rot,HAUBE EVO2 rot,1 stk.,1 stk.,1 stk.,V_RED_13,V_RED_13,4,69€/gram,4,69€,98,HAUBE EVO2 schwarz,520,517,,Stk,018.2.002
+19,Eigenfertigung,HAUBE EVO2 gelb,HAUBE EVO2 gelb,1 stk.,1 stk.,1 stk.,V_YELLOW_13,V_YELLOW_13,4,69€/gram,4,69€,98,HAUBE EVO2 orange,520,517,,Stk,018.2.001
+18,Eigenfertigung,Haube EVO2 weiss,Haube EVO2 weiss,1 stk.,1 stk.,1 stk.,V_WHITE_13,V_WHITE_13,4,69€/gram,4,69€,98,HAUBE EVO2 braun,520,517,,Stk,018.2.000
+12,Kaufartikel,Resiver Kabel,RUDOG ESC RX Cable Black 60mm),1 stk.,1 stk.,1 stk.,24,24,3,99€/stk.,3,99€,98,HAUBE EVO2 blau,520,517,,Stk,016.1.000
+59,Eigenfertigung,Verpackung-Karton,KARTONAGE 130MM,1 stk.,1 stk.,1 stk.,54,54,2,39€/stk.,2,39€,99,HAUBE EVO2 grün,520,517,,Stk,021.1.000
+14,Kaufartikel,Verpackung-Karton,KARTONAGE 130MM,1 stk.,1 stk.,1 stk.,54,54,2,39€/stk.,2,39€,99,HAUBE EVO2 rot,520,517,,Stk,021.1.000
+2,Kaufartikel,Steckverbindungen,SRVO-4120B,7 stk.,7 stk.,7 stk.,14,14,0,30€/stk.,2,10€,99,HAUBE EVO2 gelb,520,517,,Stk,001.1.000
+60,Eigenfertigung,Verpackung-Füllmaterial,Papierreste,10,00 g,10,00 g,10,00 g,74,74,0,20€/gram,2,00€,99,Haube EVO2 weiss,520,517,,Stk,022.1.000
+15,Kaufartikel,Verpackung-Füllmaterial,Papierreste,10,00 g,10,00 g,10,00 g,74,74,0,20€/gram,2,00€,99,PLA Filament - Schwarz,58,5,50,,g,022.1.000
+4,Kaufartikel,Rotoren Rechts,HQ Durable Prop 5X4.3X3V1S Rechts,2 stk.,2 stk.,2 stk.,R_23,R_23,0,86€/stk.,1,72€,99,PLA Filament - Orange,58,5,50,,g,003.0.000
+3,Kaufartikel,Rotorren Links,HQ Durable Prop 5X4.3X3V1S Links,2 stk.,2 stk.,2 stk.,L_23,L_23,0,86€/stk.,1,72€,99,PLA Filament - Braun,58,5,50,,g,002.0.000
+36,Eigenfertigung,Fuß EVO2 Spartan schwarz,Fuß 35mm Spartan schwarz,4 stk.,4 stk.,4 stk.,V_BLACK_31,V_BLACK_31,0,21€/stk.,1,62€,99,PLA Filament - Blau,58,5,50,,g,020.2.007
+35,Eigenfertigung,Fuß EVO2 Spartan orange,Fuß 35mm Spartan orange,4 stk.,4 stk.,4 stk.,V_ORANGE_31,V_ORANGE_31,0,21€/stk.,1,62€,99,PLA Filament - Grün,58,5,50,,g,020.2.006
+34,Eigenfertigung,Fuß EVO2 Spartan braun,Fuß 35mm Spartan braun,4 stk.,4 stk.,4 stk.,V_BROWN_31,V_BROWN_31,0,21€/stk.,1,62€,99,PLA Filament - Rot,58,5,50,,g,020.2.005
+33,Eigenfertigung,Fuß EVO2 Spartan blau,Fuß 35mm Spartan blau,4 stk.,4 stk.,4 stk.,V_BLUE_31,V_BLUE_31,0,21€/stk.,1,62€,99,PLA Filament - Gelb,58,5,50,,g,020.2.004
+32,Eigenfertigung,Fuß EVO2 Spartan grün,Fuß 35mm Spartan grün,4 stk.,4 stk.,4 stk.,V_GREEN_31,V_GREEN_31,0,21€/stk.,1,62€,99,PLA Filament - Weiß,58,5,50,,g,020.2.003
+31,Eigenfertigung,Fuß EVO2 Spartan rot,Fuß 35mm Spartan rot,4 stk.,4 stk.,4 stk.,V_RED_31,V_RED_31,0,21€/stk.,1,62€,99,Grundplatte EVO 2 Balance schwarz,173,3,170,3,,Stk,020.2.002
+30,Eigenfertigung,Fuß EVO2 Spartan gelb,Fuß 35mm Spartan gelb,4 stk.,4 stk.,4 stk.,V_YELLOW_31,V_YELLOW_31,0,21€/stk.,1,62€,99,Grundplatte EVO 2 Balance blau,173,3,170,3,,Stk,020.2.001
+29,Eigenfertigung,Fuß EVO2 Spartan weiss,Fuß 35mm Spartan weiss,4 stk.,4 stk.,4 stk.,V_WHITE_31,V_WHITE_31,0,21€/stk.,1,62€,99,Grundplatte EVO 2 Balance weiss,173,3,170,3,,Stk,020.2.000
+58,Eigenfertigung,Fuß EVO2 Balance schwarz,Fuß 35mm Balance schwarz,4 stk.,4 stk.,4 stk.,V_B_BLACK_31,V_B_BLACK_31,0,13€/stk.,1,48€,99,Grundplatte EVO 2 Lightweight schwarz,173,3,170,3,,Stk,020.2.023
+57,Eigenfertigung,Fuß EVO2 Balance orange,Fuß 35mm Balance orange,4 stk.,4 stk.,4 stk.,V_B_ORANGE_31,V_B_ORANGE_31,0,13€/stk.,1,48€,99,Grundplatte EVO 2 Lightweight blau,173,3,170,3,,Stk,020.2.022
+56,Eigenfertigung,Fuß EVO2 Balance braun,Fuß 35mm Balance braun,4 stk.,4 stk.,4 stk.,V_B_BROWN_31,V_B_BROWN_31,0,13€/stk.,1,48€,99,Grundplatte EVO 2 Lightweight weiss,173,3,170,3,,Stk,020.2.021
+55,Eigenfertigung,Fuß EVO2 Balance blau,Fuß 35mm Balance blau,4 stk.,4 stk.,4 stk.,V_B_BLUE_31,V_B_BLUE_31,0,13€/stk.,1,48€,99,Grundplatte EVO 2 Spartan schwarz,173,3,170,3,,Stk,020.2.020
+54,Eigenfertigung,Fuß EVO2 Balance grün,Fuß 35mm Balance grün,4 stk.,4 stk.,4 stk.,V_B_GREEN_31,V_B_GREEN_31,0,13€/stk.,1,48€,99,Grundplatte EVO 2 Spartan blau,173,3,170,3,,Stk,020.2.019
+53,Eigenfertigung,Fuß EVO2 Balance rot,Fuß 35mm Balance rot,4 stk.,4 stk.,4 stk.,V_B_RED_31,V_B_RED_31,0,13€/stk.,1,48€,99,Grundplatte EVO 2 Spartan weiss,173,3,170,3,,Stk,020.2.018
+52,Eigenfertigung,Fuß EVO2 Balance gelb,Fuß 35mm Balance gelb,4 stk.,4 stk.,4 stk.,V_B_YELLOW_31,V_B_YELLOW_31,0,13€/stk.,1,48€,99,Fuß EVO2 Spartan schwarz,2080,1763,,Stk,020.2.017
+51,Eigenfertigung,Fuß EVO2 Balance weiss,Fuß 35mm Balance weiss,4 stk.,4 stk.,4 stk.,V_B_WHITE_31,V_B_WHITE_31,0,13€/stk.,1,48€,99,Fuß EVO2 Spartan orange,2080,1763,,Stk,020.2.016
+47,Eigenfertigung,Fuß EVO2 Lightweight schwarz,Fuß 35mm Lightweight schwarz,4 stk.,4 stk.,4 stk.,V_L_BLACK_31,V_L_BLACK_31,0,11€/stk.,1,37€,99,Fuß EVO2 Spartan braun,2080,1763,,Stk,020.2.015
+46,Eigenfertigung,Fuß EVO2 Lightweight orange,Fuß 35mm Lightweight orange,4 stk.,4 stk.,4 stk.,V_L_ORANGE_31,V_L_ORANGE_31,0,11€/stk.,1,37€,99,Fuß EVO2 Spartan blau,2080,1763,,Stk,020.2.014
+45,Eigenfertigung,Fuß EVO2 Lightweight braun,Fuß 35mm Lightweight braun,4 stk.,4 stk.,4 stk.,V_L_BROWN_31,V_L_BROWN_31,0,11€/stk.,1,37€,99,Fuß EVO2 Spartan grün,2080,1763,,Stk,020.2.013
+44,Eigenfertigung,Fuß EVO2 Lightweight blau,Fuß 35mm Lightweight blau,4 stk.,4 stk.,4 stk.,V_L_BLUE_31,V_L_BLUE_31,0,11€/stk.,1,37€,99,Fuß EVO2 Spartan rot,2080,1763,,Stk,020.2.012
+43,Eigenfertigung,Fuß EVO2 Lightweight grün,Fuß 35mm Lightweight grün,4 stk.,4 stk.,4 stk.,V_L_GREEN_31,V_L_GREEN_31,0,11€/stk.,1,37€,99,Fuß EVO2 Spartan gelb,2080,1763,,Stk,020.2.011
+42,Eigenfertigung,Fuß EVO2 Lightweight rot,Fuß 35mm Lightweight rot,4 stk.,4 stk.,4 stk.,V_L_RED_31,V_L_RED_31,0,11€/stk.,1,37€,99,Fuß EVO2 Spartan weiss,2080,1763,,Stk,020.2.010

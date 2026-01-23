@@ -1,0 +1,37 @@
+item_name,max_qty_in_stock,qty_per_drone,possible_drones_by_stock,required_qty_for_batch,qty_to_order,warehouse_id
+Füße lightweight,43,4,10.75,36,0,
+Füße Spartan,26,4,6.5,36,10,
+Füße Balance,53,4,13.25,36,0,
+Grundplatte lightweight,0,1,0,9,9,
+Grundplatte spartan,0,1,0,9,9,
+Grundplatte Ballance,3,1,3,9,6,
+Haube,10,1,10,9,0,
+Kabelbinder,1000,4,250,36,0,000.1.000
+Steckverbindungen,0,4,0,36,36,001.1.000
+Rotoren Links,99,2,49.5,18,0,002.0.000
+Rotoren Rechts,99,2,49.5,18,0,003.0.000
+RFID-tag,12,1,12,9,0,004.1.000
+Akku,16,1,16,9,0,005.1.000
+Akkukabel,58,1,58,9,0,
+Steuergerät,10,1,10,9,0,009.1.000
+Motor,57,4,14.25,36,0,011.1.000
+Verlängerungskalbel,49,0.4,122.5,3.6,0,014.1.000
+Schrumpfschlauche,1,0.12,8.33333333333333,1.08,0.08,015.1.000
+Resiver Kabel,8,1,8,9,1,016.1.000
+Reciver,10,1,10,9,0,017.1.000
+Verpackung-Karton,0,?,? ,?,? ,021.1.000
+Verpackung-Füllmaterial,0,?,? ,?,? ,022.1.000
+Motorschrauben,0,16,0,144,144,012.0.000
+Motormuttern,0,4,0,36,36,013.0.000
+Acryl Glasplatte - weiß,,,,,,019.1.009
+Acryl Glasplatte - blau,,,,,,019.1.011
+Acryl Glasplatte - schwarz,,,,,,019.1.013
+Lötzinn,,,,,,007.1.000
+PLA Filament - Weiß,,,,,,019.1.000
+PLA Filament - Gelb,,,,,,019.1.001
+PLA Filament - Rot,,,,,,019.1.002
+PLA Filament - Grün,,,,,,019.1.003
+PLA Filament - Blau,,,,,,019.1.004
+PLA Filament - Braun,,,,,,019.1.005
+PLA Filament - Orange,,,,,,019.1.006
+PLA Filament - Schwarz,,,,,,019.1.007

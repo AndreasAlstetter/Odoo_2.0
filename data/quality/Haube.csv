@@ -1,0 +1,9 @@
+qp_id,title,product_default_code,operation_name,control_type,test_type,testing_percentage,tolerance_min,tolerance_max
+qp_haube_white,Maßkontrolle Haube weiß,018.2.000,Nacharbeit Haube,measure,measure,100,-2,2
+qp_haube_yellow,Maßkontrolle Haube gelb,018.2.001,Nacharbeit Haube,measure,measure,100,-2,2
+qp_haube_red,Maßkontrolle Haube rot,018.2.002,Nacharbeit Haube,measure,measure,100,-2,2
+qp_haube_green,Maßkontrolle Haube grün,018.2.003,Nacharbeit Haube,measure,measure,100,-2,2
+qp_haube_blue,Maßkontrolle Haube blau,018.2.004,Nacharbeit Haube,measure,measure,100,-2,2
+qp_haube_brown,Maßkontrolle Haube braun,018.2.005,Nacharbeit Haube,measure,measure,100,-2,2
+qp_haube_orange,Maßkontrolle Haube orange,018.2.006,Nacharbeit Haube,measure,measure,100,-2,2
+qp_haube_black,Maßkontrolle Haube schwarz,018.2.007,Nacharbeit Haube,measure,measure,100,-2,2

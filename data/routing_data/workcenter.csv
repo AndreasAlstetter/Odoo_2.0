@@ -1,0 +1,10 @@
+name,cost_per_hour,code,blocking_method,capacity,location_id,time_efficiency,alternative_workcenter_id
+3D-Drucker,25.0,mrp_wc_3dprinter,confirmed_wo,1.0,Zwischenlager 3D,0.95,
+Lasercutter,35.0,mrp_wc_laser,confirmed_wo,1.0,Zwischenlager Laser,0.90,
+Nacharbeit,45.0,mrp_wc_rework,confirmed_wo,2.0,Zwischenlager Nacharbeit,0.85,
+WT bestücken,55.0,mrp_wc_wt_bestuecken,no,1.0,Produktion,0.98,
+Löten Elektronik,65.0,mrp_wc_loeten,confirmed_wo,1.0,Zwischenlager Löten,0.92,mrp_wc_electronics
+Montage Elektronik,75.0,mrp_wc_electronics,no,2.0,Produktion,0.97,
+Flashen Flugcontroller,85.0,mrp_wc_flash,confirmed_wo,1.0,Zwischenlager Flash,0.99,
+Montage Gehäuse Rotoren,95.0,mrp_wc_assembly,no,1.0,Produktion,0.96,
+End-Qualitätskontrolle,105.0,mrp_wc_quality,confirmed_wo,1.0,Qualitätskontrolle,1.00,

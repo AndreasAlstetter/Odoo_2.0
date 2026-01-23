@@ -1,0 +1,27 @@
+qp_id,title,product_default_code,operation_name,control_type,test_type,testing_percentage,tolerance_min,tolerance_max
+qp_fuss_spartan_white,Maß Füße Spartan weiß,020.2.000,Nacharbeit Füße,measure,measure,100,-2,2
+qp_fuss_spartan_yellow,Maß Füße Spartan gelb,020.2.001,Nacharbeit Füße,measure,measure,100,-2,2
+qp_fuss_spartan_red,Maß Füße Spartan rot,020.2.002,Nacharbeit Füße,measure,measure,100,-2,2
+qp_fuss_spartan_green,Maß Füße Spartan grün,020.2.003,Nacharbeit Füße,measure,measure,100,-2,2
+qp_fuss_spartan_blue,Maß Füße Spartan blau,020.2.004,Nacharbeit Füße,measure,measure,100,-2,2
+qp_fuss_spartan_brown,Maß Füße Spartan braun,020.2.005,Nacharbeit Füße,measure,measure,100,-2,2
+qp_fuss_spartan_orange,Maß Füße Spartan orange,020.2.006,Nacharbeit Füße,measure,measure,100,-2,2
+qp_fuss_spartan_black,Maß Füße Spartan schwarz,020.2.007,Nacharbeit Füße,measure,measure,100,-2,2
+
+qp_fuss_lw_white,Maß Füße Lightweight weiß,020.2.008,Nacharbeit Füße,measure,measure,100,-2,2
+qp_fuss_lw_yellow,Maß Füße Lightweight gelb,020.2.009,Nacharbeit Füße,measure,measure,100,-2,2
+qp_fuss_lw_red,Maß Füße Lightweight rot,020.2.010,Nacharbeit Füße,measure,measure,100,-2,2
+qp_fuss_lw_green,Maß Füße Lightweight grün,020.2.011,Nacharbeit Füße,measure,measure,100,-2,2
+qp_fuss_lw_blue,Maß Füße Lightweight blau,020.2.012,Nacharbeit Füße,measure,measure,100,-2,2
+qp_fuss_lw_brown,Maß Füße Lightweight braun,020.2.013,Nacharbeit Füße,measure,measure,100,-2,2
+qp_fuss_lw_orange,Maß Füße Lightweight orange,020.2.014,Nacharbeit Füße,measure,measure,100,-2,2
+qp_fuss_lw_black,Maß Füße Lightweight schwarz,020.2.015,Nacharbeit Füße,measure,measure,100,-2,2
+
+qp_fuss_bal_white,Maß Füße Balance weiß,020.2.016,Nacharbeit Füße,measure,measure,100,-2,2
+qp_fuss_bal_yellow,Maß Füße Balance gelb,020.2.017,Nacharbeit Füße,measure,measure,100,-2,2
+qp_fuss_bal_red,Maß Füße Balance rot,020.2.018,Nacharbeit Füße,measure,measure,100,-2,2
+qp_fuss_bal_green,Maß Füße Balance grün,020.2.019,Nacharbeit Füße,measure,measure,100,-2,2
+qp_fuss_bal_blue,Maß Füße Balance blau,020.2.020,Nacharbeit Füße,measure,measure,100,-2,2
+qp_fuss_bal_brown,Maß Füße Balance braun,020.2.021,Nacharbeit Füße,measure,measure,100,-2,2
+qp_fuss_bal_orange,Maß Füße Balance orange,020.2.022,Nacharbeit Füße,measure,measure,100,-2,2
+qp_fuss_bal_black,Maß Füße Balance schwarz,020.2.023,Nacharbeit Füße,measure,measure,100,-2,2
