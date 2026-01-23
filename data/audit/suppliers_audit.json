@@ -4,69 +4,69 @@
     "supplier_id": 13,
     "supplier_name": "Amazon",
     "csv_row": 2,
-    "timestamp": "2026-01-22T18:14:45.954187"
+    "timestamp": "2026-01-23T19:46:06.462272"
   },
   {
     "action": "updated",
     "supplier_id": 14,
     "supplier_name": "Mouser Electronics Inc.",
     "csv_row": 3,
-    "timestamp": "2026-01-22T18:14:46.194012"
+    "timestamp": "2026-01-23T19:46:06.709588"
   },
   {
     "action": "updated",
     "supplier_id": 15,
     "supplier_name": "meilon GmbH",
     "csv_row": 4,
-    "timestamp": "2026-01-22T18:14:46.500150"
+    "timestamp": "2026-01-23T19:46:06.992450"
   },
   {
     "action": "updated",
     "supplier_id": 16,
     "supplier_name": "UWC",
     "csv_row": 6,
-    "timestamp": "2026-01-22T18:14:46.724453"
+    "timestamp": "2026-01-23T19:46:07.273616"
   },
   {
     "action": "updated",
     "supplier_id": 17,
     "supplier_name": "n-Factory",
     "csv_row": 9,
-    "timestamp": "2026-01-22T18:14:46.934112"
+    "timestamp": "2026-01-23T19:46:07.497226"
   },
   {
     "action": "updated",
     "supplier_id": 18,
     "supplier_name": "RCTech",
     "csv_row": 10,
-    "timestamp": "2026-01-22T18:14:47.159895"
+    "timestamp": "2026-01-23T19:46:07.732374"
   },
   {
     "action": "updated",
     "supplier_id": 19,
     "supplier_name": "Wecando",
     "csv_row": 13,
-    "timestamp": "2026-01-22T18:14:47.359997"
+    "timestamp": "2026-01-23T19:46:07.976749"
   },
   {
     "action": "updated",
     "supplier_id": 20,
     "supplier_name": "Sebastian Meusch",
     "csv_row": 15,
-    "timestamp": "2026-01-22T18:14:47.560610"
+    "timestamp": "2026-01-23T19:46:08.231661"
   },
   {
     "action": "updated",
     "supplier_id": 21,
     "supplier_name": "IPS Karton",
     "csv_row": 16,
-    "timestamp": "2026-01-22T18:14:47.771591"
+    "timestamp": "2026-01-23T19:46:08.446667"
   },
   {
     "action": "updated",
     "supplier_id": 22,
     "supplier_name": "Bossard",
     "csv_row": 17,
-    "timestamp": "2026-01-22T18:14:48.005859"
+    "timestamp": "2026-01-23T19:46:08.698763"
   }
 ]
