@@ -1,0 +1,300 @@
+[
+  {
+    "action": "update_component",
+    "category": "KAEUFER",
+    "warehouse_id": "000.1.000",
+    "product_id": 1,
+    "cost_price": 0.08,
+    "type": "consu",
+    "routing_hint": null,
+    "variant_count": 1,
+    "variant_names": [
+      "Kabelbinder 3.5mmx150mm"
+    ],
+    "timestamp": "2026-01-24 08:50:05.132531"
+  },
+  {
+    "action": "update_component",
+    "category": "KAEUFER",
+    "warehouse_id": "001.1.000",
+    "product_id": 2,
+    "cost_price": 2.1,
+    "type": "consu",
+    "routing_hint": null,
+    "variant_count": 2,
+    "variant_names": [
+      "SRVO-4120B",
+      "Steckverbindungen"
+    ],
+    "timestamp": "2026-01-24 08:50:05.356620"
+  },
+  {
+    "action": "update_component",
+    "category": "KAEUFER",
+    "warehouse_id": "002.0.000",
+    "product_id": 3,
+    "cost_price": 1.72,
+    "type": "consu",
+    "routing_hint": null,
+    "variant_count": 1,
+    "variant_names": [
+      "HQ Durable Prop 5X4.3X3V1S Links"
+    ],
+    "timestamp": "2026-01-24 08:50:05.577007"
+  },
+  {
+    "action": "update_component",
+    "category": "KAEUFER",
+    "warehouse_id": "003.0.000",
+    "product_id": 4,
+    "cost_price": 1.72,
+    "type": "consu",
+    "routing_hint": null,
+    "variant_count": 1,
+    "variant_names": [
+      "HQ Durable Prop 5X4.3X3V1S Rechts"
+    ],
+    "timestamp": "2026-01-24 08:50:05.800338"
+  },
+  {
+    "action": "update_component",
+    "category": "KAEUFER",
+    "warehouse_id": "004.1.000",
+    "product_id": 5,
+    "cost_price": 4.5,
+    "type": "consu",
+    "routing_hint": null,
+    "variant_count": 1,
+    "variant_names": [
+      "BALLUF BIS M1B2-03_L"
+    ],
+    "timestamp": "2026-01-24 08:50:06.021747"
+  },
+  {
+    "action": "update_component",
+    "category": "KAEUFER",
+    "warehouse_id": "005.1.000",
+    "product_id": 6,
+    "cost_price": 18.07,
+    "type": "consu",
+    "routing_hint": null,
+    "variant_count": 1,
+    "variant_names": [
+      "2200mAh 50C 11.1V 24.52Wh Zeee"
+    ],
+    "timestamp": "2026-01-24 08:50:06.258796"
+  },
+  {
+    "action": "update_component",
+    "category": "KAEUFER",
+    "warehouse_id": "007.1.000",
+    "product_id": 7,
+    "cost_price": 0.42,
+    "type": "consu",
+    "routing_hint": null,
+    "variant_count": 2,
+    "variant_names": [
+      "L\u00f6tzinn 1.0mm 50g",
+      "L\u00f6tzinn 1.0mm 50g"
+    ],
+    "timestamp": "2026-01-24 08:50:06.470507"
+  },
+  {
+    "action": "update_component",
+    "category": "KAEUFER",
+    "warehouse_id": "006.1.000",
+    "product_id": 8,
+    "cost_price": 0.95,
+    "type": "consu",
+    "routing_hint": null,
+    "variant_count": 1,
+    "variant_names": [
+      "Anstecker an Akku (zweipolig)"
+    ],
+    "timestamp": "2026-01-24 08:50:06.703907"
+  },
+  {
+    "action": "update_component",
+    "category": "KAEUFER",
+    "warehouse_id": "009.1.000",
+    "product_id": 9,
+    "cost_price": 84.9,
+    "type": "consu",
+    "routing_hint": null,
+    "variant_count": 1,
+    "variant_names": [
+      "Mamba F405 MK2 kpl."
+    ],
+    "timestamp": "2026-01-24 08:50:06.953628"
+  },
+  {
+    "action": "update_component",
+    "category": "KAEUFER",
+    "warehouse_id": "011.1.000",
+    "product_id": 10,
+    "cost_price": 67.6,
+    "type": "consu",
+    "routing_hint": null,
+    "variant_count": 1,
+    "variant_names": [
+      "XING-E Pro2207 2750kv"
+    ],
+    "timestamp": "2026-01-24 08:50:07.177050"
+  },
+  {
+    "action": "update_component",
+    "category": "KAEUFER",
+    "warehouse_id": "012.0.000",
+    "product_id": 11,
+    "cost_price": 0.64,
+    "type": "consu",
+    "routing_hint": null,
+    "variant_count": 1,
+    "variant_names": [
+      "Motorschrauben f\u00fcr iFlight.Xing.2207 2"
+    ],
+    "timestamp": "2026-01-24 08:50:07.414891"
+  },
+  {
+    "action": "update_component",
+    "category": "KAEUFER",
+    "warehouse_id": "013.0.000",
+    "product_id": 12,
+    "cost_price": 0.2,
+    "type": "consu",
+    "routing_hint": null,
+    "variant_count": 1,
+    "variant_names": [
+      "Motormuttern f\u00fcr iFlight.Xing.2207 2"
+    ],
+    "timestamp": "2026-01-24 08:50:07.646868"
+  },
+  {
+    "action": "update_component",
+    "category": "KAEUFER",
+    "warehouse_id": "014.1.000",
+    "product_id": 13,
+    "cost_price": 15.0,
+    "type": "consu",
+    "routing_hint": null,
+    "variant_count": 2,
+    "variant_names": [
+      "Kabelverl\u00e4ngerung Motor (5cm)",
+      "Verl\u00e4ngerungskabel"
+    ],
+    "timestamp": "2026-01-24 08:50:07.873903"
+  },
+  {
+    "action": "update_component",
+    "category": "KAEUFER",
+    "warehouse_id": "015.1.000",
+    "product_id": 14,
+    "cost_price": 0.14,
+    "type": "consu",
+    "routing_hint": null,
+    "variant_count": 1,
+    "variant_names": [
+      "Schrumpfschlauch"
+    ],
+    "timestamp": "2026-01-24 08:50:08.086790"
+  },
+  {
+    "action": "update_component",
+    "category": "KAEUFER",
+    "warehouse_id": "016.1.000",
+    "product_id": 15,
+    "cost_price": 3.99,
+    "type": "consu",
+    "routing_hint": null,
+    "variant_count": 1,
+    "variant_names": [
+      "RUDOG ESC RX Cable Black 60mm)"
+    ],
+    "timestamp": "2026-01-24 08:50:08.329449"
+  },
+  {
+    "action": "update_component",
+    "category": "KAEUFER",
+    "warehouse_id": "017.1.000",
+    "product_id": 16,
+    "cost_price": 17.42,
+    "type": "consu",
+    "routing_hint": null,
+    "variant_count": 1,
+    "variant_names": [
+      "FS-IA10B Receiver"
+    ],
+    "timestamp": "2026-01-24 08:50:08.557377"
+  },
+  {
+    "action": "update_component",
+    "category": "KAEUFER",
+    "warehouse_id": "021.1.000",
+    "product_id": 17,
+    "cost_price": 2.39,
+    "type": "consu",
+    "routing_hint": "VERPACKUNG_KAUFARTIKEL",
+    "variant_count": 1,
+    "variant_names": [
+      "KARTONAGE 130MM"
+    ],
+    "timestamp": "2026-01-24 08:50:14.529153"
+  },
+  {
+    "action": "update_component",
+    "category": "KAEUFER",
+    "warehouse_id": "022.1.000",
+    "product_id": 18,
+    "cost_price": 2.0,
+    "type": "consu",
+    "routing_hint": "FUELLMATERIAL_KAUFARTIKEL",
+    "variant_count": 2,
+    "variant_names": [
+      "Papierreste",
+      "Papierreste"
+    ],
+    "timestamp": "2026-01-24 08:50:14.758083"
+  },
+  {
+    "action": "update_component",
+    "category": "KAEUFER",
+    "warehouse_id": "008.1.000",
+    "product_id": 19,
+    "cost_price": 1.0,
+    "type": "consu",
+    "routing_hint": null,
+    "variant_count": 1,
+    "variant_names": [
+      "[Unbekannt]"
+    ],
+    "timestamp": "2026-01-24 08:50:14.970273"
+  },
+  {
+    "action": "update_component",
+    "category": "KAEUFER",
+    "warehouse_id": "025.1.000",
+    "product_id": 20,
+    "cost_price": 50.0,
+    "type": "consu",
+    "routing_hint": null,
+    "variant_count": 1,
+    "variant_names": [
+      "Fernbedienung"
+    ],
+    "timestamp": "2026-01-24 08:50:15.207918"
+  },
+  {
+    "action": "update_component",
+    "category": "KAEUFER",
+    "warehouse_id": "008.1.00",
+    "product_id": 21,
+    "cost_price": 1.0,
+    "type": "consu",
+    "routing_hint": null,
+    "variant_count": 1,
+    "variant_names": [
+      "[Unbekannt]"
+    ],
+    "timestamp": "2026-01-24 08:50:15.432479"
+  }
+]

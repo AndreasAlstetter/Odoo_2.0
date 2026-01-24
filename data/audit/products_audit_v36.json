@@ -1,0 +1,212 @@
+[
+  {
+    "action": "update_component",
+    "category": "KAEUFER",
+    "warehouse_id": "000.1.000",
+    "product_id": 1,
+    "cost_price": 0.08,
+    "routing_hint": null,
+    "variant_count": 1,
+    "source": "CSV"
+  },
+  {
+    "action": "update_component",
+    "category": "KAEUFER",
+    "warehouse_id": "001.1.000",
+    "product_id": 2,
+    "cost_price": 2.1,
+    "routing_hint": null,
+    "variant_count": 2,
+    "source": "CSV"
+  },
+  {
+    "action": "update_component",
+    "category": "KAEUFER",
+    "warehouse_id": "002.0.000",
+    "product_id": 3,
+    "cost_price": 1.72,
+    "routing_hint": null,
+    "variant_count": 1,
+    "source": "CSV"
+  },
+  {
+    "action": "update_component",
+    "category": "KAEUFER",
+    "warehouse_id": "003.0.000",
+    "product_id": 4,
+    "cost_price": 1.72,
+    "routing_hint": null,
+    "variant_count": 1,
+    "source": "CSV"
+  },
+  {
+    "action": "update_component",
+    "category": "KAEUFER",
+    "warehouse_id": "004.1.000",
+    "product_id": 5,
+    "cost_price": 4.5,
+    "routing_hint": null,
+    "variant_count": 1,
+    "source": "CSV"
+  },
+  {
+    "action": "update_component",
+    "category": "KAEUFER",
+    "warehouse_id": "005.1.000",
+    "product_id": 6,
+    "cost_price": 18.07,
+    "routing_hint": null,
+    "variant_count": 1,
+    "source": "CSV"
+  },
+  {
+    "action": "update_component",
+    "category": "KAEUFER",
+    "warehouse_id": "007.1.000",
+    "product_id": 7,
+    "cost_price": 0.42,
+    "routing_hint": null,
+    "variant_count": 2,
+    "source": "CSV"
+  },
+  {
+    "action": "update_component",
+    "category": "KAEUFER",
+    "warehouse_id": "006.1.000",
+    "product_id": 8,
+    "cost_price": 0.95,
+    "routing_hint": null,
+    "variant_count": 1,
+    "source": "CSV"
+  },
+  {
+    "action": "update_component",
+    "category": "KAEUFER",
+    "warehouse_id": "009.1.000",
+    "product_id": 9,
+    "cost_price": 84.9,
+    "routing_hint": null,
+    "variant_count": 1,
+    "source": "CSV"
+  },
+  {
+    "action": "update_component",
+    "category": "KAEUFER",
+    "warehouse_id": "011.1.000",
+    "product_id": 10,
+    "cost_price": 67.6,
+    "routing_hint": null,
+    "variant_count": 1,
+    "source": "CSV"
+  },
+  {
+    "action": "update_component",
+    "category": "KAEUFER",
+    "warehouse_id": "012.0.000",
+    "product_id": 11,
+    "cost_price": 0.64,
+    "routing_hint": null,
+    "variant_count": 1,
+    "source": "CSV"
+  },
+  {
+    "action": "update_component",
+    "category": "KAEUFER",
+    "warehouse_id": "013.0.000",
+    "product_id": 12,
+    "cost_price": 0.2,
+    "routing_hint": null,
+    "variant_count": 1,
+    "source": "CSV"
+  },
+  {
+    "action": "update_component",
+    "category": "KAEUFER",
+    "warehouse_id": "014.1.000",
+    "product_id": 13,
+    "cost_price": 15.0,
+    "routing_hint": null,
+    "variant_count": 2,
+    "source": "CSV"
+  },
+  {
+    "action": "update_component",
+    "category": "KAEUFER",
+    "warehouse_id": "015.1.000",
+    "product_id": 14,
+    "cost_price": 0.14,
+    "routing_hint": null,
+    "variant_count": 1,
+    "source": "CSV"
+  },
+  {
+    "action": "update_component",
+    "category": "KAEUFER",
+    "warehouse_id": "016.1.000",
+    "product_id": 15,
+    "cost_price": 3.99,
+    "routing_hint": null,
+    "variant_count": 1,
+    "source": "CSV"
+  },
+  {
+    "action": "update_component",
+    "category": "KAEUFER",
+    "warehouse_id": "017.1.000",
+    "product_id": 16,
+    "cost_price": 17.42,
+    "routing_hint": null,
+    "variant_count": 1,
+    "source": "CSV"
+  },
+  {
+    "action": "update_component",
+    "category": "KAEUFER",
+    "warehouse_id": "021.1.000",
+    "product_id": 17,
+    "cost_price": 2.39,
+    "routing_hint": "VERPACKUNG_KAUFARTIKEL",
+    "variant_count": 1,
+    "source": "CSV"
+  },
+  {
+    "action": "update_component",
+    "category": "KAEUFER",
+    "warehouse_id": "022.1.000",
+    "product_id": 18,
+    "cost_price": 2.0,
+    "routing_hint": "FUELLMATERIAL_KAUFARTIKEL",
+    "variant_count": 2,
+    "source": "CSV"
+  },
+  {
+    "action": "update_component",
+    "category": "KAEUFER",
+    "warehouse_id": "008.1.000",
+    "product_id": 19,
+    "cost_price": 1.0,
+    "routing_hint": null,
+    "variant_count": 1,
+    "source": "CSV"
+  },
+  {
+    "action": "update_component",
+    "category": "KAEUFER",
+    "warehouse_id": "025.1.000",
+    "product_id": 20,
+    "cost_price": 50.0,
+    "routing_hint": null,
+    "variant_count": 1,
+    "source": "CSV"
+  },
+  {
+    "action": "update_component",
+    "category": "KAEUFER",
+    "warehouse_id": "008.1.00",
+    "product_id": 21,
+    "cost_price": 1.0,
+    "routing_hint": null,
+    "variant_count": 1,
+    "source": "CSV"
+  }
+]

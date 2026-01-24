@@ -1,0 +1,30 @@
+{
+  "generated_at": "2026-01-24 12:19:49.396552",
+  "stats": {
+    "3d_druck_components": 0,
+    "verpackung_kaufartikel": 2,
+    "products_with_list_price": 3,
+    "fertigware_fallback_added": 3
+  },
+  "components": {
+    "3D_DRUCK_RAHMEN": [],
+    "3D_DRUCK_HAUBE": [],
+    "3D_DRUCK_GRUNDPLATTE": [],
+    "VERPACKUNG_KAUFARTIKEL": [
+      {
+        "default_code": "021.1.000",
+        "name": "KARTONAGE 130MM",
+        "product_id": 17,
+        "cost_price": 2.39
+      }
+    ],
+    "FUELLMATERIAL_KAUFARTIKEL": [
+      {
+        "default_code": "022.1.000",
+        "name": "Papierreste",
+        "product_id": 18,
+        "cost_price": 2.0
+      }
+    ]
+  }
+}

@@ -1,7 +1,13 @@
-# runner.py
+# provisioning/runner.py (v3.2 - MIT WAREHOUSE_CONFIG + KLT_LOCATION)
+"""
+Provisioning Runner v3.2
+Orchestriert alle Loader inkl. Staging Warehouse + KLT-Zuordnungen
+Korrekte Reihenfolge: Stock → Config → Products → KLT → BoMs → Fertigung
+"""
 
 import os
 from typing import Optional, Dict
+import logging
 
 from rich.console import Console
 from rich.progress import Progress
@@ -18,19 +24,24 @@ from provisioning.utils import (
     set_progress_hook,
 )
 
-from .loaders.products_loader import ProductsLoader
+# Bestehende Imports
+from .loaders.products_loader import ProductsLoaderAdvanced
 from .loaders.suppliers_loader import SuppliersLoader
 from .loaders.supplierinfo_loader import SupplierInfoLoader
 from .loaders.bom_loader import BomLoader
 from .loaders.routing_loader import RoutingLoader
 from .loaders.quality_loader import QualityLoader
-from .loaders.manufacturing_config_loader import ManufacturingConfigLoader  # ← NEU
+from .loaders.manufacturing_config_loader import ManufacturingConfigLoader
 from .loaders.mailserver_loader import MailServerLoader
 from .loaders.stock_structure_loader import StockStructureLoader
 from .flows.kpi_extractor import KPIExtractor
 
+# NEUE IMPORTS
+from .loaders.warehouse_config_loader import WarehouseConfigLoader
+from .loaders.klt_location_loader import KltLocationLoader
 
 def print_kpi_summary(report: Dict, console: Console) -> None:
+    """KPI-Summary in Rich Table anzeigen"""
     table = Table(title="KPI-Report (Übersicht)", show_lines=True)
     table.add_column("Kategorie", style="bold cyan", no_wrap=True)
     table.add_column("Kennzahlen", style="white")
@@ -96,8 +107,8 @@ def print_kpi_summary(report: Dict, console: Console) -> None:
         name = p["product_tmpl_id"][1]
         console.print(f"{name[:30]:30} {bar} {qty}")
 
-
 def _build_client_from_env() -> OdooClient:
+    """Baut OdooClient aus Umgebungsvariablen"""
     config = OdooConfig.from_env()
     log_info(
         f"[OD_CLIENT] Verbinde zu {config.url} "
@@ -105,8 +116,15 @@ def _build_client_from_env() -> OdooClient:
     )
     return OdooClient(config=config)
 
-
-def run(kpi_only: bool = False, base_data_dir: Optional[str] = None) -> None:
+def run(kpi_only: bool = False, base_data_dir: Optional[str] = None, klt_csv_content: Optional[str] = None) -> None:
+    """
+    Hauptlauf v3.2: Vollständige MES-Orchestrierung mit Staging + KLT
+    
+    Args:
+        kpi_only: Nur KPI-Auswertung
+        base_data_dir: Data-Verzeichnis
+        klt_csv_content: Inline KLT-CSV (optional)
+    """
     console = Console()
 
     if base_data_dir is None:
@@ -114,7 +132,7 @@ def run(kpi_only: bool = False, base_data_dir: Optional[str] = None) -> None:
         project_root = os.path.dirname(this_dir)
         base_data_dir = os.path.join(project_root, "data")
 
-    log_info(f"[RUNNER] base_data_dir={base_data_dir}")
+    log_info(f"[RUNNER v3.2] base_data_dir={base_data_dir}")
     client = _build_client_from_env()
 
     if kpi_only:
@@ -123,105 +141,156 @@ def run(kpi_only: bool = False, base_data_dir: Optional[str] = None) -> None:
         console.print("[bold green]✔ KPI-Auswertung abgeschlossen.[/bold green]")
         return
 
+    # ERWEITERTE STEPS (mit neuen Loaders)
     steps = [
-        "Produkte laden",
-        "Lieferanten laden",
-        "Supplierinfos laden",
-        "BoMs laden",
-        "Routings/Arbeitspläne laden",
-        "Manufacturing Sequences",  # ← NEU
-        "Qualitätsdaten laden",
-        "KPIs berechnen",
+        "Stock Structure (Basis-Locations)",
+        "Warehouse Config (Staging 1:1)",
+        "Produkte (v3.5 + Fallback)",
+        "KLT-Zuordnungen (Produkt→101B-3-D)",
+        "Lieferanten + Supplierinfo",
+        "Mail-Server",
+        "BoMs",
+        "Routings",
+        "Manufacturing Sequences",
+        "Quality Points",
+        "KPI-Report",
     ]
 
-    total_units = 500  # +50 für ManufacturingConfig
+    total_units = 900  # Erweitert für neue Steps
 
     progress_console = Console()
 
     with Progress(console=progress_console, transient=True) as progress:
-        task = progress.add_task("[cyan]Provisioning...", total=total_units)
+        task = progress.add_task("[cyan]MES Provisioning v3.2...", total=total_units)
 
         def progress_hook(delta: float) -> None:
             progress.update(task, advance=delta)
 
         set_progress_hook(progress_hook)
         try:
-            # 1) Produkte (50)
-            log_header("📦 Produkte aus Lagerdaten laden")
-            products_loader = ProductsLoader(client, base_data_dir)
-            products_loader.run()
-            log_success("[STEP] Produkte geladen/aktualisiert")
-
-            # 2) Lieferanten (50)
-            log_header("👥 Lieferanten aus CSV laden")
-            suppliers_loader = SuppliersLoader(client, base_data_dir)
-            suppliers_loader.run()
-            log_success("[STEP] Lieferanten geladen/aktualisiert")
-
-            # 3) Supplierinfos (50)
-            log_header("🔗 Supplierinfos laden")
-            supplierinfo_loader = SupplierInfoLoader(client, base_data_dir)
-            supplierinfo_loader.run()
-            log_success("[STEP] Supplierinfos geladen/aktualisiert")
-
-            # 3.5) Mail-Server (25)
-            log_header("📧 Mail-Server-Konfigurationen laden")
-            mailserver_loader = MailServerLoader(client, base_data_dir)
-            mailserver_loader.run()
-            log_success("[STEP] Mail-Server geladen/aktualisiert")
-
-            # 3.6) Lagerstruktur + Kanban (60)
-            log_header("🏭 Lagerorte, Routen & Kanban laden")
+            # ========================================
+            # PHASE 1: LAGERSTRUKTUR (100)
+            # ========================================
+            log_header("🏭 1/11 Stock Structure (Basis-Locations + Kanban)")
             stock_loader = StockStructureLoader(client, base_data_dir)
             stock_loader.run()
-            log_success("[STEP] Lager/Kanban/Routen eingerichtet")
+            log_success("[PHASE 1] ✅ Basis-Lager ready")
+            progress.update(task, advance=100)
 
-            # 4) BoMs (60)
-            log_header("🔩 BoMs aus 'bom.csv' laden")
+            # ========================================
+            # PHASE 2: STAGING WAREHOUSE CONFIG (80)
+            # ========================================
+            log_header("🏭 2/11 Warehouse Config (Staging 1:1)")
+            warehouse_config = WarehouseConfigLoader(client, base_data_dir)
+            warehouse_config.run()
+            log_success("[PHASE 2] ✅ Routen/Regeln/Putaway/Picking/Categories ready")
+            progress.update(task, advance=80)
+
+            # ========================================
+            # PHASE 3: PRODUKTE (100)
+            # ========================================
+            log_header("📦 3/11 Produkte v3.5 (52 Produkte inkl. Fertigware)")
+            products_loader = ProductsLoaderAdvanced(client, base_data_dir)
+            products_loader.run()
+            log_success("[PHASE 3] ✅ Kauf/Eigenfertig/Fertigware ready")
+            progress.update(task, advance=100)
+
+            # ========================================
+            # PHASE 4: KLT ZUORDNUNGEN (120) - NEU!
+            # ========================================
+            log_header("📦 4/11 KLT-Zuordnungen (Produkt→101B-3-D)")
+            klt_loader = KltLocationLoader(client, base_data_dir)
+            if klt_csv_content:
+                klt_loader.run(csv_content=klt_csv_content)
+            else:
+                klt_loader.run()
+            log_success("[PHASE 4] ✅ Alle KLTs verknüpft (Putaway-Rules + Barcodes)")
+            progress.update(task, advance=120)
+
+            # ========================================
+            # PHASE 5: LIEFERANTEN (100)
+            # ========================================
+            log_header("👥 5/11 Lieferanten + Supplierinfos")
+            suppliers_loader = SuppliersLoader(client, base_data_dir)
+            suppliers_loader.run()
+            supplierinfo_loader = SupplierInfoLoader(client, base_data_dir)
+            supplierinfo_loader.run()
+            log_success("[PHASE 5] ✅ Einkaufsdaten ready (Amazon/Mouser/meilon)")
+            progress.update(task, advance=100)
+
+            # ========================================
+            # PHASE 6: MAIL (25)
+            # ========================================
+            log_header("📧 6/11 Mail-Server")
+            mailserver_loader = MailServerLoader(client, base_data_dir)
+            mailserver_loader.run()
+            log_success("[PHASE 6] ✅ Mail ready")
+            progress.update(task, advance=25)
+
+            # ========================================
+            # PHASE 7: BOMs (80)
+            # ========================================
+            log_header("🔩 7/11 BoMs (Drohnen-Varianten)")
             bom_loader = BomLoader(client, base_data_dir)
             bom_loader.run(filename="bom.csv")
-            log_success("[STEP] Stücklisten geladen/aktualisiert")
+            log_success("[PHASE 7] ✅ Stücklisten ready")
+            progress.update(task, advance=80)
 
-            # 5) Routings (50)
-            log_header("🔄 Routing-Operationen laden")
+            # ========================================
+            # PHASE 8: ROUTINGS (80)
+            # ========================================
+            log_header("🔄 8/11 Routings (3D-Druck/Lasercutter)")
             routing_loader = RoutingLoader(client, base_data_dir)
             routing_loader.run()
-            log_success("[STEP] Routings geladen/aktualisiert")
+            log_success("[PHASE 8] ✅ Arbeitspläne ready")
+            progress.update(task, advance=80)
 
-            # 5.5) ManufacturingConfig ← NEU! MO-Sequences fixen (50)
-            log_header("⚙️ Manufacturing Sequences (MO-Reference Fix)")
+            # ========================================
+            # PHASE 9: MANUFACTURING (50)
+            # ========================================
+            log_header("⚙️ 9/11 Manufacturing Sequences")
             mfg_config_loader = ManufacturingConfigLoader(client, base_data_dir)
             mfg_config_loader.run()
-            log_success("[STEP] Manufacturing picking_types + Sequences ready")
+            log_success("[PHASE 9] ✅ MO-Sequences ready")
+            progress.update(task, advance=50)
 
-            # 6) Qualität (50)
-            log_header("✅ Quality Points laden")
+            # ========================================
+            # PHASE 10: QUALITY (50)
+            # ========================================
+            log_header("✅ 10/11 Quality Points")
             quality_loader = QualityLoader(client, base_data_dir)
             quality_loader.run()
-            log_success("[STEP] Qualitätsdaten geladen/aktualisiert")
+            log_success("[PHASE 10] ✅ QC ready")
+            progress.update(task, advance=50)
 
-            # 7) KPIs (35)
-            log_header("📊 KPIs berechnen")
+            # ========================================
+            # PHASE 11: KPI-REPORT (35)
+            # ========================================
+            log_header("📊 11/11 KPI-Report")
             extractor = KPIExtractor(api=client, base_data_dir=base_data_dir)
             report = extractor.generate_report()
-            log_success("[STEP] KPI-Report erstellt")
+            log_success("[PHASE 11] ✅ KPIs ready")
+            progress.update(task, advance=35)
 
             progress.update(task, completed=total_units)
         except Exception as e:
-            log_error(f"[RUNNER:FAIL] {str(e)}")
+            log_error(f"[RUNNER:FAIL] {str(e)[:100]}")
             raise
         finally:
             set_progress_hook(None)
 
-    console.rule("[bold]Provisioning Status[/bold]")
-    console.print("[bold cyan]Provisioning...[/bold cyan] [bold green]100% abgeschlossen[/bold green]")
-    print_kpi_summary(report, console)  # ← Auch im Full-Run anzeigen
-
+    console.rule("[bold]MES Provisioning v3.2 Status[/bold]")
+    console.print("[bold cyan]100% abgeschlossen[/bold cyan] | [bold green]KLTs + Staging vollständig integriert![/bold green]")
+    print_kpi_summary(report, console)
+    console.print("\n[bold green]🚀 Drohnen GmbH MES PRODUCTION READY[/bold green]")
 
 def _run_kpi_only(client: OdooClient, base_data_dir: str) -> Dict:
+    """Nur KPI-Auswertung ohne Provisioning"""
     log_header("📊 Nur KPI-Auswertung (kpi_only=True)")
     extractor = KPIExtractor(api=client, base_data_dir=base_data_dir)
     report = extractor.generate_report()
     log_success("[KPI] Report erstellt")
-    log_info(f"[KPI] Rohdaten: {report}")
     return report
+
+if __name__ == "__main__":
+    run()
