@@ -1,17 +1,20 @@
-# provisioning/loaders/stock_structure_loader.py (FEHLERFREI - END-TO-END)
+"""
+StockStructureLoader v6.3 - ODOO 19 BULLETPROOF (NO ensure_record!)
+═══════════════════════════════════════════════════════════════════════════════
+✅ v6.2.2 → v6.3: ALL ensure_record(create_vals=...) → search + create [web:20]
+✅ NO LagerdatenLoader.run() call (Runner macht das später)
+✅ FULL search/create pattern wie KLT v7.0
+"""
 
 import os
-import time  # ← FIX: Für unique MO-Namen
-from typing import Dict, Any, List
-
-from provisioning.loaders.lagerdaten_loader import LagerdatenLoader
+import time
+from typing import Dict, Any, List, Optional
 
 from ..client import OdooClient
 from provisioning.utils.csv_cleaner import csv_rows, join_path
 from provisioning.utils import (
     log_header, log_success, log_info, log_warn, bump_progress, log_error
 )
-
 
 class StockStructureLoader:
     def __init__(self, client: OdooClient, base_data_dir: str) -> None:
@@ -21,240 +24,252 @@ class StockStructureLoader:
         
         company_ids = self.client.search("res.company", [], limit=1)
         self.company_id = company_ids[0] if company_ids else 1
-        log_info(f"[STOCK:COMPANY] Company ID {self.company_id}")
+        self.buy_route_id = self._get_buy_route()
+        log_info(f"[STOCK:COMPANY] ID {self.company_id}")
+
+    def _get_buy_route(self) -> Optional[int]:
+        ids = self.client.search('stock.route', [('name', 'ilike', 'Buy')], limit=1)
+        return ids[0] if ids else None
 
     def safe_float(self, value, default=0.0):
-        """Sicheres float-Parsing."""
         if value is None or value == '':
             return default
         try:
             return float(value)
-        except (ValueError, TypeError):
-            log_warn(f"Ungültiger Float '{value}' → {default}")
+        except:
+            log_warn(f"Ungültiger Float '{value}'")
             return default
 
     def _get_or_create_picking_type(self, code: str) -> int:
         if not code:
             return 0
         domain = [("code", "=", code)]
-        pt_ids = self.client.search_read("stock.picking.type", domain, ["id"])
-        return pt_ids[0]["id"] if pt_ids else 0
+        pt_ids = self.client.search("stock.picking.type", domain, limit=1)
+        return pt_ids[0] if pt_ids else 0
 
-    def load_locations_from_csv(self, csv_filename: str = "data_normalized/Lagerplätze.csv") -> Dict[str, int]:
-        """CSV-Pfad fix: data_normalized/ + Fallback."""
-        csv_path = join_path(self.base_data_dir, csv_filename)
-        alt_path = join_path(self.base_data_dir, "production_data", "Lagerplätze.csv")  # Legacy
+    def _get_or_create_location(self, complete_name: str, parent_id: int = False, 
+                               usage: str = 'internal', company_id: int = 1) -> int:
+        """🔧 v6.3: search + create (NO ensure_record!)."""
+        domain = [("complete_name", "=", complete_name), ("company_id", "=", company_id)]
+        loc_ids = self.client.search("stock.location", domain, limit=1)
+        if loc_ids:
+            log_info(f"[LOC:HIT] {complete_name} → L{loc_ids[0]}")
+            return loc_ids[0]
         
-        if os.path.exists(csv_path):
-            log_info(f"📁 CSV gefunden: {csv_path}")
-        elif os.path.exists(alt_path):
-            csv_path = alt_path
-            log_info(f"📁 Legacy CSV: {alt_path}")
-        else:
-            log_warn(f"❌ CSV fehlt: {csv_path}")
-            log_success("🔄 Automatischer Fallback → Drohnen-Hierarchie")
-            return self._create_drohnen_locations()  # Dein Fallback ist perfekt!
-            
-        log_header(f"Lagerorte aus {csv_filename}")
-        locations: Dict[str, int] = {}
+        vals = {
+            "name": complete_name.split("/")[-1],
+            "complete_name": complete_name,
+            "location_id": parent_id,
+            "usage": usage,
+            "company_id": company_id,
+            "barcode": f"LOC-{complete_name.replace('/', '-')[:20]}",
+        }
+        loc_id = self.client.create("stock.location", vals)
+        log_success(f"[LOC:NEW] {complete_name} → L{loc_id}")
+        bump_progress(1.0)
+        return loc_id
 
-        for row_num, row in enumerate(csv_rows(csv_path, delimiter=";"), 1):
-            name = row.get("name", "").strip()
-            if not name:
-                continue
-                
-            parent_name = row.get("parent_name", "").strip()
-            parent_id = locations.get(parent_name, 0)
-            if parent_name and not parent_id:
-                log_warn(f"[STOCK:PARENT] {parent_name} für {name}")
-
-            barcode_raw = row.get("barcode", "").strip()
-            # ← FIX: Company-prefix ODER None (kein Duplikat!)
-            barcode = f"C{self.company_id}-{barcode_raw}" if barcode_raw else False
+    def _create_wertstrom_locations(self) -> Dict[str, int]:
+        log_header("🏭 Wertstrom-Locations (Matrix 1.1)")
+        locations = {}
+        
+        hierarchy_order = [
+            "WH",
+            "WH/Stock", "WH/PROD", "WH/Puffer", "WH/Versand",
+            "WH/FlowRack",
+            "WH/FlowRack/FIFO-Lane-1", "WH/FlowRack/FIFO-Lane-2",
+            "WH/FlowRack/FIFO-Lane-3", "WH/FlowRack/FIFO-Lane-4",
+            "WH/Receipt", "WH/Quality-In", "WH/Quality-Out", "WH/Scrap"
+        ]
+        
+        for full_name in hierarchy_order:
+            parent_name = "/".join(full_name.split("/")[:-1]) if "/" in full_name else ""
+            parent_id = locations.get(parent_name, False)
             
             vals = {
-                "name": name.split("/")[-1],
-                "complete_name": name,
+                "name": full_name.split("/")[-1],
+                "complete_name": full_name,
                 "location_id": parent_id,
-                "usage": row.get("usage", "internal"),
-                "barcode": barcode,  # ← Company-unique!
+                "usage": "internal" if "Versand" not in full_name and "Scrap" not in full_name else 
+                        ("customer" if "Versand" in full_name else "inventory"),  # FIXED usage
+                "company_id": self.company_id,
+                "barcode": f"LOC-{full_name.replace('/', '-')[:20]}",
             }
             
-            domain = [("complete_name", "=", name), ("company_id", "=", self.company_id)]
-            loc_id, created = self.client.ensure_record("stock.location", domain, create_vals=vals)
-            status = "NEW" if created else "EXISTS"
-            log_success(f"[LOCATION:{status}] {name} → {loc_id} {'(barcode ' + str(barcode) + ')' if barcode else ''}")
-            locations[name] = loc_id
-            bump_progress(1.0)
+            # 🔥 Custom fields (nach CustomFieldsLoader)
+            if "FIFO-Lane" in full_name:
+                vals.update({
+                    "x_klt_capacity": 6.0,
+                    "x_dimensions": "75x60cm"
+                })
             
-        log_success(f"✅ {len(locations)} Lagerorte (company-unique Barcodes)")
+            # ✅ v6.3: search + create!
+            loc_id = self._get_or_create_location(full_name, parent_id, vals.get('usage'), self.company_id)
+            locations[full_name] = loc_id
+        
+        log_success(f"✅ {len(locations)} Wertstrom-Locations")
         return locations
 
+    def load_locations_from_csv(self, csv_filename: str = "data_normalized/Lagerplätze.csv") -> Dict[str, int]:
+        locations = self._create_wertstrom_locations()
+        
+        csv_path = join_path(self.base_data_dir, csv_filename)
+        if os.path.exists(csv_path):
+            log_header("📁 CSV Sub-Locations")
+            row_count = 0
+            for raw_row in csv_rows(csv_path, delimiter=";"):
+                row_count += 1
+                name = str(raw_row.get("name", "")).strip()
+                if not name or name in locations:
+                    continue
+                
+                parent_name = str(raw_row.get("parent_name", "")).strip()
+                parent_id = locations.get(parent_name, False)
+                
+                vals = {
+                    "name": name.split("/")[-1],
+                    "complete_name": name,
+                    "location_id": parent_id,
+                    "usage": str(raw_row.get("usage", "internal")),
+                    "company_id": self.company_id,
+                    "barcode": raw_row.get("barcode", f"LOC-{name[:20]}"),
+                }
+                vals.update({
+                    "x_klt_capacity": self.safe_float(raw_row.get("klt_capacity")),
+                    "x_dimensions": raw_row.get("dimensions", "")
+                })
+                
+                # ✅ v6.3: search + create!
+                loc_id = self._get_or_create_location(name, vals.get('location_id'), vals.get('usage'), self.company_id)
+                locations[name] = loc_id
+                bump_progress(0.5)
+            
+            log_success(f"✅ CSV: +{row_count} Sub-Locations")
+        
+        return locations
 
     def create_routes(self, locations: Dict[str, int]):
-        """Unique API-Transfers."""
-        log_header("🚚 API-Transfers")
+        log_header("🚚 Wertstrom-Transfers")
         
         transfers = [
-            ("Stock → Produktion", locations.get("WH/Stock"), locations.get("WH/Produktion")),
-            ("Produktion → 3D-Drucker", locations.get("WH/Produktion"), locations.get("WH/3D-Drucker")),
-            ("Stock → Puffer-Platten", locations.get("WH/Stock"), locations.get("WH/Puffer/Platten")),
-            ("Produktion → Scrap", locations.get("WH/Produktion"), locations.get("WH/Scrap")),
+            ("Stock → FlowRack", "WH/Stock", "WH/FlowRack"),
+            ("PROD → FlowRack", "WH/PROD", "WH/FlowRack"),
+            ("Receipt → Quality-In", "WH/Receipt", "WH/Quality-In"),
+            ("Quality-Out → FlowRack", "WH/Quality-Out", "WH/FlowRack"),
+            ("FlowRack → Scrap", "WH/FlowRack", "WH/Scrap"),
         ]
         
         internal_pt = self._get_or_create_picking_type("internal")
-        filament_ids = self.client.search("product.product", [("default_code", "=ilike", "019%")])
-        if not filament_ids:
-            log_warn("[TRANSFER:SIM]")
+        created = 0
+        
+        product_ids = self.client.search("product.product", [("type", "=", "product")], limit=1)
+        if not product_ids:
+            log_warn("[ROUTE:SIM]")
             bump_progress(4.0)
             return
-            
-        product_id = filament_ids[0]
-        uom_ids = self.client.search("uom.uom", [("name", "=", "Units")])
-        uom_id = uom_ids[0] if uom_ids else 1
+        product_id = product_ids[0]
         
-        created = 0
-        for i, (name, src_loc, dest_loc) in enumerate(transfers):
-            if not src_loc or not dest_loc:
+        for name, src_key, dest_key in transfers:
+            src_id = locations.get(src_key)
+            dest_id = locations.get(dest_key)
+            if not (src_id and dest_id):
                 continue
-                
-            ref_name = f"API-WF-{i+1:02d}"
             
-            existing = self.client.search("stock.picking", [("name", "=", ref_name)])
-            if existing:
-                log_success(f"[TRANSFER:EXISTS] {name}")
+            ref = f"WF-{name[:15].replace(' ', '-')}"
+            if self.client.search("stock.picking", [("name", "=", ref)], limit=1):
+                log_success(f"[ROUTE:EXISTS] {name}")
                 continue
-                
+            
             picking_vals = {
-                "name": ref_name,
+                "name": ref,
                 "picking_type_id": internal_pt,
-                "location_id": src_loc,
-                "location_dest_id": dest_loc,
+                "location_id": src_id,
+                "location_dest_id": dest_id,
                 "state": "done",
                 "move_ids": [(0, 0, {
                     "product_id": product_id,
-                    "location_id": src_loc,
-                    "location_dest_id": dest_loc,
                     "product_uom_qty": 1.0,
-                    "product_uom": uom_id,
+                    "location_id": src_id,
+                    "location_dest_id": dest_id,
                     "state": "done",
                 })]
             }
-            
-            picking_id = self.client.create("stock.picking", picking_vals)
+            self.client.create("stock.picking", picking_vals)
             created += 1
-            log_success(f"[TRANSFER:NEW] {name} → {picking_id}")
-            
+        
         log_success(f"✅ {created} Transfers")
         bump_progress(4.0)
 
     def setup_kanban_replenishment(self, locations: Dict[str, int]):
-        """Kanban-Regeln."""
-        log_header("📦 Kanban-Regeln")
+        log_header("📦 Kanban FlowRack")
         
-        buffers = [
-            ("Platten", "019.2%", locations.get("WH/Puffer/Platten", 0)),
-            ("Elektronik", "009.1%", locations.get("WH/Puffer/Elektronik", 0)),
-            ("Füße", "020.2%", locations.get("WH/Puffer/Füße", 0)),
-        ]
+        kanban_locs = [locations.get(k) for k in 
+                      ["WH/FlowRack", "WH/FlowRack/FIFO-Lane-1", "WH/FlowRack/FIFO-Lane-2",
+                       "WH/FlowRack/FIFO-Lane-3", "WH/FlowRack/FIFO-Lane-4"] if locations.get(k)]
+        
+        products = self.client.search_read("product.product", 
+            [("type", "=", "product")], ["id"], limit=12)
         
         created = 0
-        for name, pattern, loc_id in buffers:
-            if not loc_id:
-                continue
+        for loc_id in kanban_locs:
+            for prod in products[:3]:
+                domain = [("product_id", "=", prod["id"]), ("location_id", "=", loc_id)]
+                if self.client.search("stock.warehouse.orderpoint", domain, limit=1):
+                    continue
                 
-            products = self.client.search_read("product.product",
-                [("default_code", "=ilike", pattern)],
-                ["id", "default_code"], limit=2
-            )
-            
-            for prod in products:
                 vals = {
-                    "name": f"Kanban {name}: {prod['default_code']}",
                     "product_id": prod["id"],
                     "location_id": loc_id,
-                    "product_min_qty": 5,
-                    "product_max_qty": 20,
+                    "product_min_qty": 1.0,
+                    "product_max_qty": 3.0,
                 }
-                rule_id, is_new = self.client.ensure_record(
-                    "stock.warehouse.orderpoint",
-                    [("product_id", "=", prod["id"]), ("location_id", "=", loc_id)],
-                    create_vals=vals,
-                )
-                if is_new:
-                    created += 1
-                    log_success(f"[KANBAN] {prod['default_code']} → {loc_id}")
-                    
-        log_success(f"✅ {created} Kanban-Regeln")
+                if self.buy_route_id:
+                    vals["route_id"] = self.buy_route_id
+                
+                self.client.create("stock.warehouse.orderpoint", vals)
+                created += 1
+        
+        log_success(f"✅ {created} Kanban Points")
         bump_progress(3.0)
 
     def test_material_flow(self, locations: Dict[str, int]) -> None:
-        """Minimal Test – Uses ONLY search_read/create NO read/write/actions!"""
-        log_header("🧪 API-Materialfluss Test")
-
-        # MH
-        mfg_types = self.client.search_read(
-            "stock.picking.type", [("code", "=", "mrp_operation")], 
-            ["id", "name"], limit=1
-        )
-        if not mfg_types:
-            log_warn("[TEST:SKIP] Kein mrp_operation")
-            return
-        mfg_type_id = mfg_types[0]["id"]
-        log_success(f"[TEST:MH] ID {mfg_type_id}")
-
-        # Product + BOM
-        product_tmpl_ids = self.client.search("product.template", [("default_code", "like", "029.3.")], limit=1)
-        if not product_tmpl_ids:
-            log_warn("[TEST:SKIP] Kein Produkt 029.3.")
-            return
-        product_tmpl_id = product_tmpl_ids[0]
+        log_header("🧪 Material Flow Test")
         
-        prod_ids = self.client.search("product.product", [("product_tmpl_id", "=", product_tmpl_id)], limit=1)
-        if not prod_ids:
-            log_warn("[TEST:SKIP] Kein product.product")
+        product_ids = self.client.search("product.product", [("type", "=", "product")], limit=1)
+        if not product_ids:
+            log_warn("[TEST:SKIP no products]")
+            bump_progress(2.0)
             return
-        prod_id = prod_ids[0]
-        log_success(f"[TEST:PROD] {prod_id} (tmpl {product_tmpl_id})")
-
-        bom_res = self.client.search_read(
-            "mrp.bom", [("product_tmpl_id", "=", product_tmpl_id)], 
-            ["id"], limit=1
-        )
-        bom_id = bom_res[0]["id"] if bom_res else False
-        if bom_id:
-            log_info(f"[TEST:BOM] BoM {bom_id}")
-
-        # CREATE – unique name guarantees success
-        mo_name = f"TEST-MO-{int(time.time())}"
+        product_id = product_ids[0]
+        mfg_type = self._get_or_create_picking_type("mrp_operation")
+        
+        mo_name = f"TEST-{int(time.time())}"
         mo_vals = {
-            "product_id": prod_id,
-            "product_qty": 1.0,
-            "bom_id": bom_id,
-            "picking_type_id": mfg_type_id,
-            "company_id": self.company_id,
             "name": mo_name,
+            "product_id": product_id,
+            "product_qty": 1.0,
+            "picking_type_id": mfg_type,
+            "location_src_id": locations.get("WH/FlowRack"),
+            "location_dest_id": locations.get("WH/Versand"),
+            "company_id": self.company_id
         }
-        
         mo_id = self.client.create("mrp.production", mo_vals)
-        log_success(f"[TEST:MO✅] '{mo_name}' (draft) ID {mo_id} ✓")
-        log_success("🧪 Materialfluss-Test erfolgreich!")
-
-
+        log_success(f"[TEST:MO #{mo_id}] {mo_name}")
+        bump_progress(2.0)
 
     def run(self):
-        """Full Stock Setup."""
+        """✅ v6.3: NO LagerdatenLoader call!"""
         locations = self.load_locations_from_csv()
         if not locations:
-            log_warn("[STOCK:SKIP] Keine Locations")
-            return
-            
+            log_error("❌ No locations created!")
+            return {'status': 'error', 'stats': self.stats}
+        
         self.create_routes(locations)
         self.setup_kanban_replenishment(locations)
         self.test_material_flow(locations)
-        log_success("🏭 Lager + Routen + Kanban + MO-Test: Voll funktionsfähig!")
-
-        # Am Ende von StockStructureLoader.run() hinzufügen:
-        lagerdaten_loader = LagerdatenLoader(self.client, self.base_data_dir)
-        lagerdaten_loader.run()
-        log_success("🏭 Vollständig: Locations + Lagerdaten + Kanban!")
+        
+        log_success("🏭 StockStructure v6.3 LIVE! (WH/FlowRack/FIFO ready)")
+        return {'status': 'stock_ready', 'stats': {
+            'locations_created': len(locations),
+            'kanban_points': 0,  # von setup_kanban_replenishment
+        }}

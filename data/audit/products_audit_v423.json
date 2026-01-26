@@ -1,4 +1,7 @@
 [
+  "029.3.000: 'list' object has no attribute 'items'",
+  "029.3.001: 'list' object has no attribute 'items'",
+  "029.3.002: 'list' object has no attribute 'items'",
   {
     "action": "update_component",
     "category": "KAEUFER",

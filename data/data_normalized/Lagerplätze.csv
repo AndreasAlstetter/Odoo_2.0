@@ -1,11 +1,15 @@
-name;parent_name;barcode;usage;comment
-WH;;LOC-WH;internal;Hauptlager Drohnen GmbH
-WH/FlowRack;WH;LOC-FLOWRACK;internal;Kanban min1/max3
-WH/FlowRack/FIFO-Lane-1;WH/FlowRack;LOC-LANE1;internal;Hauben/Motor
-WH/FlowRack/FIFO-Lane-2;WH/FlowRack;LOC-LANE2;internal;FüßeA 75x60cm
-WH/FlowRack/FIFO-Lane-3;WH/FlowRack;LOC-LANE3;internal;FüßeB
-WH/FlowRack/FIFO-Lane-4;WH/FlowRack;LOC-LANE4;internal;FüßeC/Grundplatten
-WH/Produktion;WH;LOC-PROD;internal;Zwischenlager Fertigteile
-WH/Puffer;WH;LOC-PUFFER;internal;Sicherheitsbestand kritische Teile
-WH/Versand;WH;LOC-VERSAND;internal;Versand-Hub
-WH/Scrap;WH;LOC-SCRAP;internal;Scrap 0.01%
+name;parent_name;barcode;usage;comment;removal_strategy;klt_capacity;dimensions
+WH;;LOC-WH;internal;Hauptlager - zentrale Versorgungsquelle (alle Roh-/Kaufteile);FIFO;;;
+WH/Stock;WH;LOC-WH-STOCK;internal;Stock Hauptlager (Raw Material, Filament, Acryl-Platten);FIFO;;;
+WH/PROD;WH;LOC-PROD;internal;PROD-Bereich - Zwischenlagerung Fertigteile (Lasercut/3D/Nacharbeit);FIFO;;;
+WH/Puffer;WH;LOC-PUFFER;internal;PUFFER-Location - Sicherheitsbestand kritische Teile;FIFO;;;
+WH/Versand;WH;LOC-VERSAND;outgoing;Versand-Location - Ausgangsbereich Paletten;FIFO;;;
+WH/FlowRack;WH;LOC-FLOWRACK;internal;FlowRack - Kanban-Bereitstellung (min1/max3 Pull);FIFO;;;
+WH/FlowRack/FIFO-Lane-1;WH/FlowRack;LOC-FIFO-1;internal;FIFO-Lane 1 - Artikelspezifisch (z.B. Füße);FIFO;6;75x60cm
+WH/FlowRack/FIFO-Lane-2;WH/FlowRack;LOC-FIFO-2;internal;FIFO-Lane 2 - Artikelspezifisch (z.B. Hauben);FIFO;6;75x60cm
+WH/FlowRack/FIFO-Lane-3;WH/FlowRack;LOC-FIFO-3;internal;FIFO-Lane 3 - Artikelspezifisch (z.B. Motoren);FIFO;6;75x60cm
+WH/FlowRack/FIFO-Lane-4;WH/FlowRack;LOC-FIFO-4;internal;FIFO-Lane 4 - Artikelspezifisch (z.B. Elektronik);FIFO;6;75x60cm
+WH/Receipt;WH;LOC-RECEIPT;internal;Goods Receipt Zone - Incoming Pallets (Punkt 4);FIFO;;;
+WH/Quality-In;WH;LOC-QC-IN;internal;Quality Assurance Inspection - Wareneingang QC;internal;;;
+WH/Quality-Out;WH;LOC-QC-OUT;internal;QC-Passed → FlowRack/PROD (Punkt 4/7);internal;;;
+WH/Scrap;WH;LOC-SCRAP;internal;Scrap-Handling 0.01% (QC-Fail, Nacharbeit);customer;;;

@@ -11,15 +11,13 @@ from provisioning.utils import (
     log_warn,
     bump_progress,
 )
-from provisioning.config import MAILSERVERS_CONFIG  # ← neu!
-
+from provisioning.config import MAILSERVERS_CONFIG
 
 class MailServerLoader:
     """Legt Odoo Mail-Server aus config.py (MAILSERVERS_CONFIG) per API an."""
 
     def __init__(self, client: OdooClient, base_data_dir: str) -> None:
         self.client = client
-        # Kein CSV mehr – alles in config.py!
 
     def _resolve_env_vars(self, value: str) -> str:
         """Ersetzt [VARNAME]-Platzhalter durch os.getenv(VARNAME)."""
@@ -33,14 +31,20 @@ class MailServerLoader:
             return resolved
         return re.sub(pattern, repl, value)
 
+    def _ensure_record(self, model: str, domain: list, vals: Dict[str, Any]) -> int:
+        """🔧 v1.1: search + create/update (NO create_vals!)"""
+        ids = self.client.search(model, domain, limit=1)
+        if ids:
+            self.client.write(model, ids, vals)
+            created = False
+        else:
+            ids = [self.client.create(model, vals)]
+            created = True
+        return ids[0], created
+
     def _ensure_outgoing_server(self, smtp_config: Dict[str, Any]) -> int:
         domain = [("name", "=", smtp_config["name"])]
-        server_id, created = self.client.ensure_record(
-            "ir.mail_server",
-            domain,
-            create_vals=smtp_config,
-            update_vals=smtp_config,
-        )
+        server_id, created = self._ensure_record("ir.mail_server", domain, smtp_config)
         status = "NEW" if created else "UPD"
         log_success(f"[MAILSERVER:{status}] {smtp_config['name']} -> {server_id}")
         return server_id
@@ -52,7 +56,7 @@ class MailServerLoader:
             "server": imap_config.get("server", "imap.gmail.com"),
             "port": int(imap_config.get("port", 993)),
             "is_ssl": imap_config.get("is_ssl", True),
-            "user": imap_config["user"],          # ← FIX: user statt login!
+            "user": imap_config["user"],  # ← FIX: user statt login!
             "password": imap_config["password"],
             "active": imap_config.get("active", True),
         }
@@ -64,12 +68,7 @@ class MailServerLoader:
             vals["object_id"] = int(imap_config["object_id"])
         
         domain = [("name", "=", vals["name"])]
-        server_id, created = self.client.ensure_record(
-            "fetchmail.server",
-            domain,
-            create_vals=vals,
-            update_vals=vals,
-        )
+        server_id, created = self._ensure_record("fetchmail.server", domain, vals)
         status = "NEW" if created else "UPD"
         log_success(f"[FETCHMAIL:{status}] {vals['name']} → {server_id}")
         return server_id
@@ -92,13 +91,10 @@ class MailServerLoader:
                 odoo_vals["smtp_port"] = int(odoo_vals.get("smtp_port", 587))
                 self._ensure_outgoing_server(odoo_vals)
             elif server_type == "imap":
-                # IMAP-spezifisch: Felder für fetchmail.server
                 self._ensure_incoming_server(odoo_vals)
             bump_progress(1.0)
         
-        self._setup_mail_parameters()  # Bounce-Fix
-
-    
+        self._setup_mail_parameters()
         log_info("[MAILSERVER:SUMMARY] SMTP + IMAP + Parameter geladen")
 
     def _setup_mail_parameters(self) -> None:
@@ -112,14 +108,13 @@ class MailServerLoader:
         for key, value in params:
             resolved_value = self._resolve_env_vars(value)
             domain = [("key", "=", key)]
-            self.client.ensure_record(
+            param_id, created = self._ensure_record(
                 "ir.config_parameter",
                 domain,
-                create_vals={"key": key, "value": resolved_value},
-                update_vals={"value": resolved_value},
+                {"key": key, "value": resolved_value}
             )
-            log_success(f"[PARAM] {key} = {resolved_value}")
-
+            status = "NEW" if created else "UPD"
+            log_success(f"[PARAM:{status}] {key} = {resolved_value[:30]}...")
 
     def run(self) -> None:
         self.load_from_config()

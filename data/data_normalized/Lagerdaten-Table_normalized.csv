@@ -1,74 +1,64 @@
-ID;Artikel;Lagerplatz Regal
-000.1.000;Kabelbinder;101B-3-D
-001.1.000;Steckverbindungen;101C-3-D
-002.0.000;Rotorren Links;101C-4-D
-003.0.000;Rotoren Rechts;101C-4-D
-008.1.000;Fernbedienung;101B-0-A
-004.1.000;RFID-tag;101B-4-D
-005.1.000;Akku;101B-4-B
-006.1.000;Akkukabel;101B-3-C
-009.1.000;Steuergerät;101B-3-B
-011.1.000;Motor;101C-5-D
-010.1.000;Motoreinheit;101B-4-A
-014.1.000;Verlängerungskalbel;101B-3-C
-015.1.000;Schrumpfschlauche;101D-5-D
-016.1.000;Resiver Kabel;101B-3-A
-017.1.000;Reciver;101B-4-C
-021.1.000;Verpackung-Karton;101D-1
-022.1.000;Verpackung-Füllmaterial;101D-0
-012.0.000;Motorschrauben;101D-5-A
-013.0.000;Motormuttern;101D-5-B
-018.2.000;Haube EVO2 weiss;101B-1-D
-018.2.001;HAUBE EVO2 gelb;101B-1-C
-018.2.002;HAUBE EVO2 rot;101B-1-A
-018.2.003;HAUBE EVO2 grün;101B-2-D
-018.2.004;HAUBE EVO2 blau;101B-2-C
-018.2.005;HAUBE EVO2 braun;101B-2-B
-018.2.006;HAUBE EVO2 orange;101B-1-B
-018.2.007;HAUBE EVO2 schwarz;101B-2-A
-019.2.008;Grundplatte EVO 2 Spartan weiss;101C-4-A
-019.2.010;Grundplatte EVO 2 Spartan blau;101C-4-B
-019.2.012;Grundplatte EVO 2 Spartan schwarz;101C-4-C
-020.2.000;Fuß EVO2 Spartan weiss;101A-0-A
-020.2.001;Fuß EVO2 Spartan gelb;101A-0-B
-020.2.002;Fuß EVO2 Spartan rot;101A-0-C
-020.2.003;Fuß EVO2 Spartan grün;101A-0-D
-020.2.004;Fuß EVO2 Spartan blau;101A-1-A
-020.2.005;Fuß EVO2 Spartan braun;101A-1-B
-020.2.006;Fuß EVO2 Spartan orange;101A-1-C
-020.2.007;Fuß EVO2 Spartan schwarz;101A-1-D
-019.2.014;Grundplatte EVO 2 Lightweight weiss;101C-5-A
-019.2.015;Grundplatte EVO 2 Lightweight blau;101C-5-B
-019.2.016;Grundplatte EVO 2 Lightweight schwarz;101C-5-C
-020.2.008;Fuß EVO2 Lightweight weiss;101A-2-A
-020.2.009;Fuß EVO2 Lightweight gelb;101A-2-B
-020.2.010;Fuß EVO2 Lightweight rot;101A-2-C
-020.2.011;Fuß EVO2 Lightweight grün;101A-2-D
-020.2.012;Fuß EVO2 Lightweight blau;101A-3-A
-020.2.013;Fuß EVO2 Lightweight braun;101A-3-B
-020.2.014;Fuß EVO2 Lightweight orange;101A-3-C
-020.2.015;Fuß EVO2 Lightweight schwarz;101A-3-D
-019.2.017;Grundplatte EVO 2 Balance weiss;101C-3-A
-019.2.018;Grundplatte EVO 2 Balance blau;101C-3-B
-019.2.019;Grundplatte EVO 2 Balance schwarz;101C-3-C
-020.2.016;Fuß EVO2 Balance weiss;101A-4-A
-020.2.017;Fuß EVO2 Balance gelb;101A-4-B
-020.2.018;Fuß EVO2 Balance rot;101A-4-C
-020.2.019;Fuß EVO2 Balance grün;101A-4-D
-020.2.020;Fuß EVO2 Balance blau;101A-5-A
-020.2.021;Fuß EVO2 Balance braun;101A-5-B
-020.2.022;Fuß EVO2 Balance orange;101A-5-C
-020.2.023;Fuß EVO2 Balance schwarz;101A-5-D
-019.1.009;Acryl Glasplatte - weiß;101D-2
-019.1.011;Acryl Glasplatte - blau;101D-3
-019.1.013;Acryl Glasplatte - schwarz;101D-4
-007.1.000;Lötzinn;101D-4-C
-019.1.000;PLA Filament - Weiß;101C-2-B
-019.1.001;PLA Filament - Gelb;101C-2-C
-019.1.002;PLA Filament - Rot;101C-1-A
-019.1.003;PLA Filament - Grün;101C-2-D
-019.1.004;PLA Filament - Blau;101C-1-B
-019.1.005;PLA Filament - Braun;101C-2-A
-019.1.006;PLA Filament - Orange;101C-1-C
-019.1.007;PLA Filament - Schwarz;101C-1-D
-025.1.000;Fernbedienung;101B-0-A
+Bezeichnung,Karten-Nr.,Lagerplatz,Anlieferstelle,Verbraucher,Lieferant,Transporteinheit,Inhalt,Lagerdaten_ID,Bestand_Regal,Losgröße,PVB,KLT_Groesse
+Steckverbindungen,1 von 2,101C-3-D,Assembly 2,Verpackung,Mouser Electronics Inc.,EG-21512,1000,001.1.000,0.0,1000.0,Assembly 2,KLT-3147
+RFID-tag,1 von 2,101B-4-D,Supermarkt C7,Komissionierer,UWC,KLT-3147,44,004.1.000,12.0,44.0,Supermarkt,KLT-3147
+Akku,1 von 4,101B-4-B,Supermarkt C8,Komissionierer,Amazon,KLT-3147,22,005.1.000,16.0,44.0,Supermarkt,KLT-3147
+Akkukabel,1 von 2,101B-3-C,Supermarkt C1,Komissionierer,Amazon,KLT-3147,44,006.1.000; 014.1.000,58.0,44.0,Supermarkt,KLT-3147
+Steuergerät,1 von 4,101B-3-B,Supermarkt C5,Komissionierer,n-Factory,KLT-3147,22,009.1.000,10.0,44.0,Supermarkt,KLT-3147
+Motoreinheit,1 von 4,101B-4-A,Supermarkt C3,Komissionierer,RCTech,KLT-3147,88,010.1.000,0.0,89.0,,KLT-3147
+Resiver Kabel,1 von 2,101B-3-A,Supermarkt C4,Komissionierer,Wecando,KLT-3147,44,016.1.000,8.0,44.0,Supermarkt,KLT-3147
+Reciver,1 von 2,101B-4-C,Supermarkt C6,Komissionierer,Wecando,KLT-3147,44,017.1.000,10.0,44.0,Supermarkt,KLT-3147
+Verpackung-Karton,1 von 2,101D-1,Assembly 2,Verpackung,Sebastian Meusch,EG-86/42 HG,20,021.1.000,35.0,22.0,Assembly 2,Kein KLT
+Verpackung-Füllmaterial,1 von 2,101D-0,Assembly 2,Verpackung,IPS Karton,EG-86/42 HG,1,022.1.000,,1.0,Assembly 2,Kein KLT
+Haube EVO2 weiss,1 von 4,101B-1-D,Supermarkt A6,Komissionierer,Formicore,KLT-4147,15,018.2.000,0.0,15.0,Supermarkt,KLT-4147
+HAUBE EVO2 gelb,1 von 4,101B-1-C,Supermarkt A5,Komissionierer,Formicore,KLT-4147,15,018.2.001,0.0,15.0,Supermarkt,KLT-4147
+HAUBE EVO2 rot,1 von 4,101B-1-A,Supermarkt B1,Komissionierer,Formicore,KLT-4147,15,018.2.002,0.0,15.0,Supermarkt,KLT-4147
+HAUBE EVO2 grün,1 von 4,101B-2-D,Supermarkt B2,Komissionierer,Formicore,KLT-4147,15,018.2.003,0.0,15.0,Supermarkt,KLT-4147
+HAUBE EVO2 blau,1 von 4,101B-2-C,Supermarkt B5,Komissionierer,Formicore,KLT-4147,15,018.2.004,7.0,15.0,Supermarkt,KLT-4147
+HAUBE EVO2 braun,1 von 4,101B-2-B,Supermarkt B6,Komissionierer,Formicore,KLT-4147,15,018.2.005,0.0,15.0,Supermarkt,KLT-4147
+HAUBE EVO2 orange,1 von 4,101B-1-B,Supermarkt B4,Komissionierer,Formicore,KLT-4147,15,018.2.006,0.0,15.0,Supermarkt,KLT-4147
+HAUBE EVO2 schwarz,1 von 4,101B-2-A,Supermarkt B3,Komissionierer,Formicore,KLT-4147,15,018.2.007,3.0,15.0,Supermarkt,KLT-4147
+Grundplatte EVO 2 Spartan weiss,1 von 2,101C-4-A,Supermarkt D1,Komissionierer,Formicore,KLT-4280,60,019.2.008,,66.0,Supermarkt,KLT-4280
+Grundplatte EVO 2 Spartan blau,1 von 2,101C-4-B,Supermarkt D2,Komissionierer,Formicore,KLT-4280,60,019.2.010,,66.0,Supermarkt,KLT-4280
+Grundplatte EVO 2 Spartan schwarz,1 von 2,101C-4-C,Supermarkt D3,Komissionierer,Formicore,KLT-4280,60,019.2.012,,66.0,Supermarkt,KLT-4280
+Fuß EVO2 Spartan weiss,1 von 6,101A-0-A,Omron,Omron,Formicore,KLT-3147,32,020.2.000,,32.0,Omron,KLT-3147
+Fuß EVO2 Spartan gelb,1 von 6,101A-0-B,Omron,Omron,Formicore,KLT-3147,32,020.2.001,,32.0,Omron,KLT-3147
+Fuß EVO2 Spartan rot,1 von 6,101A-0-C,Omron,Omron,Formicore,KLT-3147,32,020.2.002,,32.0,Omron,KLT-3147
+Fuß EVO2 Spartan grün,1 von 6,101A-0-D,Omron,Omron,Formicore,KLT-3147,32,020.2.003,,32.0,Omron,KLT-3147
+Fuß EVO2 Spartan blau,1 von 6,101A-1-A,Omron,Omron,Formicore,KLT-3147,32,020.2.004,,32.0,Omron,KLT-3147
+Fuß EVO2 Spartan braun,1 von 6,101A-1-B,Omron,Omron,Formicore,KLT-3147,32,020.2.005,,32.0,Omron,KLT-3147
+Fuß EVO2 Spartan orange,1 von 6,101A-1-C,Omron,Omron,Formicore,KLT-3147,32,020.2.006,,32.0,Omron,KLT-3147
+Fuß EVO2 Spartan schwarz,1 von 6,101A-1-D,Omron,Omron,Formicore,KLT-3147,32,020.2.007,26.0,32.0,Omron,KLT-3147
+Grundplatte EVO 2 Lightweight weiss,1 von 2,101C-5-A,Supermarkt A1,Komissionierer,Formicore,KLT-4280,60,019.2.014,0.0,66.0,Supermarkt,KLT-4280
+Grundplatte EVO 2 Lightweight blau,1 von 2,101C-5-B,Supermarkt A2,Komissionierer,Formicore,KLT-4280,60,019.2.015,0.0,66.0,Supermarkt,KLT-4280
+Grundplatte EVO 2 Lightweight schwarz,1 von 2,101C-5-C,Supermarkt A3,Komissionierer,Formicore,KLT-4280,60,019.2.016,0.0,66.0,Supermarkt,KLT-4280
+Fuß EVO2 Lightweight weiss,1 von 6,101A-2-A,Omron,Omron,Formicore,KLT-3147,32,020.2.008,4.0,32.0,Omron,KLT-3147
+Fuß EVO2 Lightweight gelb,1 von 6,101A-2-B,Omron,Omron,Formicore,KLT-3147,32,020.2.009,,32.0,Omron,KLT-3147
+Fuß EVO2 Lightweight rot,1 von 6,101A-2-C,Omron,Omron,Formicore,KLT-3147,32,020.2.010,3.0,32.0,Omron,KLT-3147
+Fuß EVO2 Lightweight grün,1 von 6,101A-2-D,Omron,Omron,Formicore,KLT-3147,32,020.2.011,,32.0,Omron,KLT-3147
+Fuß EVO2 Lightweight blau,1 von 6,101A-3-A,Omron,Omron,Formicore,KLT-3147,32,020.2.012,,32.0,Omron,KLT-3147
+Fuß EVO2 Lightweight braun,1 von 6,101A-3-B,Omron,Omron,Formicore,KLT-3147,32,020.2.013,,32.0,Omron,KLT-3147
+Fuß EVO2 Lightweight orange,1 von 6,101A-3-C,Omron,Omron,Formicore,KLT-3147,32,020.2.014,,32.0,Omron,KLT-3147
+Fuß EVO2 Lightweight schwarz,1 von 6,101A-3-D,Omron,Omron,Formicore,KLT-3147,32,020.2.015,36.0,32.0,Omron,KLT-3147
+Grundplatte EVO 2 Balance weiss,1 von 2,101C-3-A,Supermarkt D4,Komissionierer,Formicore,KLT-4280,60,019.2.017,1.0,66.0,Supermarkt,KLT-4280
+Grundplatte EVO 2 Balance blau,1 von 2,101C-3-B,Supermarkt D5,Komissionierer,Formicore,KLT-4280,60,019.2.018,2.0,66.0,Supermarkt,KLT-4280
+Grundplatte EVO 2 Balance schwarz,1 von 2,101C-3-C,Supermarkt D6,Komissionierer,Formicore,KLT-4280,60,019.2.019,0.0,66.0,Supermarkt,KLT-4280
+Fuß EVO2 Balance weiss,1 von 6,101A-4-A,Omron,Omron,Formicore,KLT-3147,32,020.2.016,,32.0,Omron,KLT-3147
+Fuß EVO2 Balance gelb,1 von 6,101A-4-B,Omron,Omron,Formicore,KLT-3147,32,020.2.017,,32.0,Omron,KLT-3147
+Fuß EVO2 Balance rot,1 von 6,101A-4-C,Omron,Omron,Formicore,KLT-3147,32,020.2.018,,32.0,Omron,KLT-3147
+Fuß EVO2 Balance grün,1 von 6,101A-4-D,Omron,Omron,Formicore,KLT-3147,32,020.2.019,,32.0,Omron,KLT-3147
+Fuß EVO2 Balance blau,1 von 6,101A-5-A,Omron,Omron,Formicore,KLT-3147,32,020.2.020,,32.0,Omron,KLT-3147
+Fuß EVO2 Balance braun,1 von 6,101A-5-B,Omron,Omron,Formicore,KLT-3147,32,020.2.021,,32.0,Omron,KLT-3147
+Fuß EVO2 Balance orange,1 von 6,101A-5-C,Omron,Omron,Formicore,KLT-3147,32,020.2.022,28.0,32.0,Omron,KLT-3147
+Fuß EVO2 Balance schwarz,1 von 6,101A-5-D,Omron,Omron,Formicore,KLT-3147,32,020.2.023,25.0,32.0,Omron,KLT-3147
+Acryl Glasplatte - weiß,1 von 1,101D-2,Lasercutter,Fertigung,Plattenzuschnitt24,KLT-4280,4,019.1.009,,500.0,Lasercutter,Kein KLT
+Acryl Glasplatte - blau,1 von 1,101D-3,Lasercutter,Fertigung,Plattenzuschnitt24,KLT-4280,4,019.1.011,,500.0,Lasercutter,Kein KLT
+Acryl Glasplatte - schwarz,1 von 1,101D-4,Lasercutter,Fertigung,Plattenzuschnitt24,KLT-4280,4,019.1.013,,500.0,Lasercutter,Kein KLT
+Lötzinn,1 von 1,101D-5-C,Lötplatz,Montage,Amazon,KLT-3147,1,,0.0,200.0,Lötplatz,KLT-3147
+PLA Filament - Weiß,1 von 1,101C-2-B,3D-Drucker,Fertigung,Prusa3D,KLT-4280,1,019.1.000,0.0,1000.0,3D-Drucker,Kein KLT
+PLA Filament - Gelb,1 von 1,101C-2-C,3D-Drucker,Fertigung,Prusa3D,KLT-4280,1,019.1.001,0.0,1000.0,3D-Drucker,Kein KLT
+PLA Filament - Rot,1 von 1,101C-1-A,3D-Drucker,Fertigung,Prusa3D,KLT-4280,1,019.1.002,0.0,1000.0,3D-Drucker,Kein KLT
+PLA Filament - Grün,1 von 1,101C-2-D,3D-Drucker,Fertigung,Prusa3D,KLT-4280,1,019.1.003,0.0,1000.0,3D-Drucker,Kein KLT
+PLA Filament - Blau,1 von 1,101C-1-B,3D-Drucker,Fertigung,Prusa3D,KLT-4280,1,019.1.004,0.0,1000.0,3D-Drucker,Kein KLT
+PLA Filament - Braun,1 von 1,101C-2-A,3D-Drucker,Fertigung,Prusa3D,KLT-4280,1,019.1.005,0.0,1000.0,3D-Drucker,Kein KLT
+PLA Filament - Orange,1 von 1,101C-1-C,3D-Drucker,Fertigung,Prusa3D,KLT-4280,1,019.1.006,0.0,1000.0,3D-Drucker,Kein KLT
+PLA Filament - Schwarz,1 von 1,101C-1-D,3D-Drucker,Fertigung,Prusa3D,KLT-4280,1,019.1.007,0.0,1000.0,3D-Drucker,Kein KLT

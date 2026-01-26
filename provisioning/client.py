@@ -1,7 +1,10 @@
 import xmlrpc.client
-from typing import Any, Dict, List, Optional, Tuple
+import logging
+from typing import Any, Dict, List, Optional
 
 from .config import OdooConfig
+
+logger = logging.getLogger(__name__)
 
 class OdooClient:
     def __init__(self, config: Optional[OdooConfig] = None) -> None:
@@ -9,121 +12,118 @@ class OdooClient:
         self._uid: Optional[int] = None
         self._common = xmlrpc.client.ServerProxy(f"{self.config.url}/xmlrpc/2/common")
         self._models = xmlrpc.client.ServerProxy(f"{self.config.url}/xmlrpc/2/object")
+        self._ref_cache = {}
+        self._defaults = {
+            'uom_unit': 1,
+            'product_category': 1,
+            'company': 1,
+            'fifo_strategy': False
+        }
 
     @property
     def uid(self) -> int:
         if self._uid is None:
             self._uid = self._common.authenticate(
-                self.config.db,
-                self.config.user,
-                self.config.password,
-                {},
+                self.config.db, self.config.user, self.config.password, {}
             )
             if not self._uid:
-                raise RuntimeError(
-                    f"Odoo Authentication failed: "
-                    f"DB={self.config.db}, User={self.config.user}, "
-                    f"URL={self.config.url}"
-                )
+                raise RuntimeError(f"Odoo Auth failed: {self.config.db}/{self.config.user}")
         return self._uid
 
     @property
-    def base_data_dir(self) -> str:
-        """Kompatibilität für Loader: config.base_data_dir."""
-        return self.config.base_data_dir or "./data"
-
-    @property
-    def models(self):
-        """Expose models proxy für direkte execute_kw calls."""
-        return self._models
-
-    @property
     def db(self) -> str:
-        """Expose DB name."""
         return self.config.db
 
     @property
     def password(self) -> str:
-        """Expose password."""
         return self.config.password
 
-    def call(self, model: str, method: str, args, **kwargs) -> Any:
-        """
-        Low-Level-Wrapper um execute_kw.
+    def _safe_call(self, model: str, method: str, args: List[Any], kwargs: Optional[Dict] = None) -> Any:
+        """🔧 FIXED: kwargs handling für search/read (limit/fields)."""
+        clean_args = [[v for v in arg if v is not None] if isinstance(arg, list) else arg for arg in args]
+        clean_kwargs = kwargs or {}
+        clean_kwargs = {k: v for k, v in clean_kwargs.items() if v is not None}
+        try:
+            return self._models.execute_kw(self.db, self.uid, self.password, model, method, clean_args, clean_kwargs)
+        except Exception as e:
+            logger.error(f"[{model}.{method}] {str(e)[:150]}")
+            raise
 
-        args: Liste der Positionsargumente für Odoo, z. B.
-              [domain], [ids, fields], [vals], ...
-        """
-        return self._models.execute_kw(
-            self.config.db,
-            self.uid,
-            self.config.password,
-            model,
-            method,
-            args,
-            kwargs,
-        )
+    def search(self, model: str, domain: List[Any], limit: Optional[int] = None) -> List[int]:
+        """✅ search(domain, limit=1) - positional + kwargs OK."""
+        kwargs = {'limit': limit} if limit else {}
+        return self._safe_call(model, 'search', [domain], kwargs)
 
-    # Convenience-Methoden
-    def search(self, model: str, domain: List, limit: Optional[int] = None) -> List[int]:
-        kwargs: Dict[str, Any] = {}
-        if limit:
-            kwargs["limit"] = limit
-        return self.call(model, "search", [domain], **kwargs)
-
-    def search_read(
-        self,
-        model: str,
-        domain: List,
-        fields: Optional[List[str]] = None,
-        limit: Optional[int] = None,
-    ) -> List[Dict[str, Any]]:
-        kwargs: Dict[str, Any] = {}
-        if fields:
-            kwargs["fields"] = fields
-        if limit:
-            kwargs["limit"] = limit
-        return self.call(model, "search_read", [domain], **kwargs)
-
-    def read(self, model: str, ids: List[int], fields: Optional[List[str]] = None) -> List[Dict[str, Any]]:
-        """
-        🚀 v4.1.1 ADDED: Read specific fields from records.
-        
-        Args:
-            model: Odoo model name (e.g. 'stock.rule')
-            ids: List of record IDs
-            fields: Optional list of field names to retrieve
-            
-        Returns:
-            List of dicts with requested fields
-        """
-        kwargs: Dict[str, Any] = {}
-        if fields:
-            kwargs["fields"] = fields
-        return self.call(model, "read", [ids], **kwargs)
+    def search_read(self, model: str, domain: List[Any], fields: List[str], limit: Optional[int] = None) -> List[Dict[str, Any]]:
+        """🔥 NEW: search_read(domain, fields, limit) - für Kanban FlowRack."""
+        kwargs = {'fields': fields, 'limit': limit}
+        return self._safe_call(model, 'search_read', [domain], kwargs)
 
     def create(self, model: str, vals: Dict[str, Any]) -> int:
-        return self.call(model, "create", [vals])
+        """✅ create(vals) - cleaned vals."""
+        clean_vals = {k: v for k, v in vals.items() if v is not None}
+        for bad_field in ['detailed_type', 'product_tmpl_id']:
+            clean_vals.pop(bad_field, None)
+        return self._safe_call(model, 'create', [clean_vals])
 
     def write(self, model: str, ids: List[int], vals: Dict[str, Any]) -> bool:
-        return self.call(model, "write", [ids, vals])
+        clean_vals = {k: v for k, v in vals.items() if v is not None}
+        clean_vals.pop('detailed_type', None)
+        return self._safe_call(model, 'write', [ids, clean_vals])
+
+    def read(self, model: str, ids: List[int], fields: Optional[List[str]] = None) -> List[Dict[str, Any]]:
+        kwargs = {'fields': fields} if fields else {}
+        return self._safe_call(model, 'read', [ids], kwargs)
 
     def unlink(self, model: str, ids: List[int]) -> bool:
-        return self.call(model, "unlink", [ids])
+        return self._safe_call(model, 'unlink', [ids])
 
-    def ensure_record(
-        self,
-        model: str,
-        domain: List,
-        create_vals: Dict[str, Any],
-        update_vals: Optional[Dict[str, Any]] = None,
-    ) -> Tuple[int, bool]:
-        """Erstelle Record oder update existierenden (idempotent)."""
+    def ref(self, xml_id: str, cache: bool = True) -> Optional[int]:
+        if cache and xml_id in self._ref_cache:
+            return self._ref_cache[xml_id]
+        try:
+            res_id = self._safe_call('ir.model.data', 'xmlid_to_res_id', [xml_id])
+            if cache:
+                self._ref_cache[xml_id] = res_id
+            return res_id
+        except:
+            if cache:
+                self._ref_cache[xml_id] = None
+            return None
+
+    # 🔥 v6.0 Helpers (wie in KLTLoader v7.0 verwendet)
+    def get_uom_unit(self) -> int:
+        return self.ref('uom.product_uom_unit') or self._defaults['uom_unit']
+
+    def get_product_category(self) -> int:
+        return self.ref('product.product_category_all') or self._defaults['product_category']
+
+    def get_company_id(self) -> int:
+        if self._defaults['company'] != 1:
+            return self._defaults['company']
+        try:
+            companies = self.read('res.users', [self.uid], ['company_id'])
+            cid = companies[0].get('company_id', [False, 1])[0] or 1
+            self._defaults['company'] = cid
+            return cid
+        except:
+            return 1
+
+    def get_fifo_strategy(self) -> Optional[int]:
+        return self.ref('stock.removal_fifo') or self._defaults['fifo_strategy']
+
+    def ensure_record(self, *args, **kwargs) -> int:
+        """🔥 v6.2: Handle alt: ensure_record(domain, create_vals=vals)"""
+        if len(args) == 2 and 'create_vals' in kwargs:
+            model, domain = args[0], args[1]  # Alte Loaders: ensure_record(model, domain, create_vals=vals)
+            vals = kwargs['create_vals']
+        elif len(args) == 3:
+            model, domain, vals = args  # Neue Syntax
+        else:
+            raise ValueError("ensure_record(model, domain, vals) or ensure_record(model, domain, create_vals=vals)")
+        
         ids = self.search(model, domain, limit=1)
         if ids:
-            if update_vals is not None:  # FIX: None-Check
-                self.write(model, ids, update_vals)
-            return ids[0], False
+            return ids[0]
+        return self.create(model, vals)
 
-        rec_id = self.create(model, create_vals)
-        return rec_id, True

@@ -8,6 +8,7 @@ import os
 import re
 import sys
 from typing import Dict, Iterator, List
+from provisioning.utils import log_header, log_success, log_info, log_warn, log_error
 
 
 # INLINE LOGGING (no utils import)
@@ -34,16 +35,33 @@ def join_path(base_dir: str, *parts: str) -> str:
     return os.path.join(base_dir, *parts)
 
 
-def csv_rows(path: str, delimiter: str = ",") -> Iterator[Dict[str, str]]:
+def csv_rows(path: str, delimiter: str = ",", as_list: bool = False) -> Iterator[Dict[str, str]] | List[Dict[str, str]]:
+    """🔥 v1.1: Optional LIST zurückgeben!"""
     if not os.path.exists(path):
         log_warn(f"CSV missing: {path}")
-        return
-    with open(path, newline="", encoding='utf-8') as f:
-        reader = csv.DictReader(f, delimiter=delimiter)
-        for row in reader:
-            cleaned = {k.strip() or "Unnamed": v.strip() or "" for k, v in row.items()}
-            if any(cleaned.values()):
-                yield cleaned
+        return [] if as_list else iter([])
+    
+    try:
+        with open(path, newline="", encoding='utf-8-sig') as f:
+            reader = csv.DictReader(f, delimiter=delimiter)
+            rows = []
+            for row_num, row in enumerate(reader, 1):
+                if row is None:
+                    log_warn(f"[CSV ROW {row_num}] None row")
+                    continue
+                
+                # 🔥 SAFE CLEANING (identisch)
+                cleaned = {str(k or "").strip() or "Unnamed": str(v or "").strip() for k, v in row.items()}
+                if any(cleaned.values()):
+                    rows.append(cleaned)
+                else:
+                    log_warn(f"[CSV ROW {row_num}] Empty skipped")
+            
+            return rows if as_list else iter(rows)  # 🔥 FLEXIBEL!
+            
+    except Exception as e:
+        log_error(f"[CSV PARSE] {path}: {str(e)}")
+        return [] if as_list else iter([])
 
 
 CSV_MAPPING = {
