@@ -1,2 +1,0 @@
-id,default_code,name,type,categ_id/id,uom_id/id,uom_po_id/id,route_ids/id,work_instruction_code,routing_code,quality_control_code,logistics_area,warehouse_location,warehouse_id,circular_tag
-prod_ele_000,010.1.000,Elektronikeinheit,product,product_category_drohne,product.product_uom_unit,product.product_uom_unit,mrp_route_manufacture,AA_060_070,AP_ELEKTRONIK,QC_ELEKTRONIK,Lötplatz,101B-3-B,010.1.000,reparable

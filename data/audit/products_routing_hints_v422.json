@@ -1,0 +1,33 @@
+{
+  "stats": {
+    "csv_rows_processed": 109,
+    "csv_duplicates_found": 37,
+    "unique_products": 72,
+    "drohnen_templates_created": 0,
+    "drohnen_templates_updated": 0,
+    "drohnen_variants_generated": 0,
+    "variant_codes_assigned": 0,
+    "products_created": 71,
+    "products_updated": 0,
+    "products_skipped": 72,
+    "rpc_retries": 355,
+    "rpc_timeouts": 0,
+    "product_variants_created": 0,
+    "routes_assigned": 0,
+    "kaufartikel_created": 19,
+    "eigenfertig_created": 52,
+    "fertigware_created": 0,
+    "3d_druck_components": 0,
+    "verpackung_kaufartikel": 0,
+    "products_with_list_price": 0
+  },
+  "components": {
+    "3D_DRUCK_RAHMEN": [],
+    "3D_DRUCK_HAUBE": [],
+    "3D_DRUCK_GRUNDPLATTE": [],
+    "VERPACKUNG_KAUFARTIKEL": [],
+    "FUELLMATERIAL_KAUFARTIKEL": [],
+    "DROHNEN_ENDMONTAGE": []
+  },
+  "drohnen_ids": {}
+}

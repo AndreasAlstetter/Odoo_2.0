@@ -4,8 +4,10 @@ import os
 import time  # ← FIX: Für unique MO-Namen
 from typing import Dict, Any, List
 
+from provisioning.loaders.lagerdaten_loader import LagerdatenLoader
+
 from ..client import OdooClient
-from .csv_cleaner import csv_rows, join_path
+from provisioning.utils.csv_cleaner import csv_rows, join_path
 from provisioning.utils import (
     log_header, log_success, log_info, log_warn, bump_progress, log_error
 )
@@ -38,12 +40,20 @@ class StockStructureLoader:
         pt_ids = self.client.search_read("stock.picking.type", domain, ["id"])
         return pt_ids[0]["id"] if pt_ids else 0
 
-    def load_locations_from_csv(self, csv_filename: str = "production_data/Lagerplätze.csv") -> Dict[str, int]:
-        """CSV → Lagerorte mit company-unique Barcodes."""
+    def load_locations_from_csv(self, csv_filename: str = "data_normalized/Lagerplätze.csv") -> Dict[str, int]:
+        """CSV-Pfad fix: data_normalized/ + Fallback."""
         csv_path = join_path(self.base_data_dir, csv_filename)
-        if not os.path.exists(csv_path):
-            log_warn(f"[STOCK:SKIP] {csv_path}")
-            return {}
+        alt_path = join_path(self.base_data_dir, "production_data", "Lagerplätze.csv")  # Legacy
+        
+        if os.path.exists(csv_path):
+            log_info(f"📁 CSV gefunden: {csv_path}")
+        elif os.path.exists(alt_path):
+            csv_path = alt_path
+            log_info(f"📁 Legacy CSV: {alt_path}")
+        else:
+            log_warn(f"❌ CSV fehlt: {csv_path}")
+            log_success("🔄 Automatischer Fallback → Drohnen-Hierarchie")
+            return self._create_drohnen_locations()  # Dein Fallback ist perfekt!
             
         log_header(f"Lagerorte aus {csv_filename}")
         locations: Dict[str, int] = {}
@@ -243,3 +253,8 @@ class StockStructureLoader:
         self.setup_kanban_replenishment(locations)
         self.test_material_flow(locations)
         log_success("🏭 Lager + Routen + Kanban + MO-Test: Voll funktionsfähig!")
+
+        # Am Ende von StockStructureLoader.run() hinzufügen:
+        lagerdaten_loader = LagerdatenLoader(self.client, self.base_data_dir)
+        lagerdaten_loader.run()
+        log_success("🏭 Vollständig: Locations + Lagerdaten + Kanban!")

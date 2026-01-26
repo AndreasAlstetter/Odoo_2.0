@@ -1,0 +1,16 @@
+Teil,Menge,Fertigungsart,Watt,Ferigungszeit pro Teil in min,Fertigungszeit pro teil in h,Ferigungszeit gesamt in min,Fertigungszeit gesamt in h,Stromverbrauch pro Teil,Stromverbrauch gesamt,Strompauschale,Stromkosten pro Teil,Stromkosten gesamt
+Füße,4,3D-Druck (Prusa MK4),80,20,0.3333333333,80,1.333333333,0.02666666667,0.1066666667,0.42,0.0112,0.0448
+Haube,1,3D-Druck (Prusa MK4),80,252,4.2,252,4.2,0.336,0.336,0.42,0.14112,0.14112
+Grundplatte,1,Lasern (OMTech Max-1060 Laser),100,1.5,0.025,1.5,0.025,0.0025,0.0025,0.42,0.00105,0.00105
+Teil,Menge,Fertigungsart,Maschienengröße,Quadratmeterpauschale am Tag,Quadratmeterpreiß Für Machiene,Quadratmeterpreiß pro Teil,Quadratmeterpreiß gesamt,,,,,
+Füße,4,3D-Druck (Prusa MK4),0.275,30,8.25,0.003966346154,0.01586538462,,,,,
+Haube,1,3D-Druck (Prusa MK4),0.275,30,8.25,0.01586538462,0.01586538462,,,,,
+Grundplatte,1,Lasern (OMTech Max-1060 Laser),1.984,30,59.52,0.1144615385,0.1144615385,,,,,
+Teil,Menge,Arbeitszeit pro teil in sec,Arbeitszeit pro teil in h,Arbeitszeit gesamt in sec,Arbeitszeit gesamt in h,Stundenlohn,Mitarbeiterkosten pro teil,Mitarbeiterksoten gesamt,,,,
+Füße,4,5.5188,0.001533,5.5188,0.04599,19.3,0.0295869,0.887607,es wird adavon ausgegangen das der Arbeiter bei der MTM-Analyse immer 4 füße auf einmal vom Druckbett entfernt,,,
+Haube,1,9.288,0.00258,9.288,0.0774,19.3,0.049794,1.49382,,,,
+Grundplatte,1,16.4124,0.004559,16.4124,0.13677,19.3,0.0879887,2.639661,,,,
+Teil,Menge,produktionspreiß pro teil,Gesamt Produktionskosten,,,,,,,,,
+Füße,4,0.04475324615,0.9482723846,,,,,,,,,
+Haube,1,0.2067793846,1.650805385,,,,,,,,,
+Grundplatte,1,0.2035002385,2.755172538,,,,,,,,,

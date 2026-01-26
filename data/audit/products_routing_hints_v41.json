@@ -1,0 +1,363 @@
+{
+  "stats": {
+    "csv_rows_processed": 109,
+    "csv_duplicates_found": 37,
+    "unique_products": 72,
+    "drohnen_templates_created": 0,
+    "products_created": 0,
+    "products_updated": 0,
+    "products_skipped": 1,
+    "rpc_retries": 0,
+    "rpc_timeouts": 0,
+    "product_variants_created": 0,
+    "routes_assigned": 0,
+    "kaufartikel_created": 0,
+    "eigenfertig_created": 0,
+    "fertigware_created": 0,
+    "3d_druck_components": 52,
+    "verpackung_kaufartikel": 2,
+    "products_with_list_price": 0
+  },
+  "components": {
+    "3D_DRUCK_RAHMEN": [
+      {
+        "default_code": "020.2.000",
+        "name": "Fu\u00df 35mm Spartan weiss",
+        "product_id": 49,
+        "cost_price": 1.62
+      },
+      {
+        "default_code": "020.2.001",
+        "name": "Fu\u00df 35mm Spartan gelb",
+        "product_id": 50,
+        "cost_price": 1.62
+      },
+      {
+        "default_code": "020.2.002",
+        "name": "Fu\u00df 35mm Spartan rot",
+        "product_id": 51,
+        "cost_price": 1.62
+      },
+      {
+        "default_code": "020.2.003",
+        "name": "Fu\u00df 35mm Spartan gr\u00fcn",
+        "product_id": 52,
+        "cost_price": 1.62
+      },
+      {
+        "default_code": "020.2.004",
+        "name": "Fu\u00df 35mm Spartan blau",
+        "product_id": 53,
+        "cost_price": 1.62
+      },
+      {
+        "default_code": "020.2.005",
+        "name": "Fu\u00df 35mm Spartan braun",
+        "product_id": 54,
+        "cost_price": 1.62
+      },
+      {
+        "default_code": "020.2.006",
+        "name": "Fu\u00df 35mm Spartan orange",
+        "product_id": 55,
+        "cost_price": 1.62
+      },
+      {
+        "default_code": "020.2.007",
+        "name": "Fu\u00df 35mm Spartan schwarz",
+        "product_id": 56,
+        "cost_price": 1.62
+      },
+      {
+        "default_code": "020.2.008",
+        "name": "Fu\u00df 35mm Lightweight weiss",
+        "product_id": 60,
+        "cost_price": 1.37
+      },
+      {
+        "default_code": "020.2.009",
+        "name": "Fu\u00df 35mm Lightweight gelb",
+        "product_id": 61,
+        "cost_price": 1.37
+      },
+      {
+        "default_code": "020.2.010",
+        "name": "Fu\u00df 35mm Lightweight rot",
+        "product_id": 62,
+        "cost_price": 1.37
+      },
+      {
+        "default_code": "020.2.011",
+        "name": "Fu\u00df 35mm Lightweight gr\u00fcn",
+        "product_id": 63,
+        "cost_price": 1.37
+      },
+      {
+        "default_code": "020.2.012",
+        "name": "Fu\u00df 35mm Lightweight blau",
+        "product_id": 64,
+        "cost_price": 1.37
+      },
+      {
+        "default_code": "020.2.013",
+        "name": "Fu\u00df 35mm Lightweight braun",
+        "product_id": 65,
+        "cost_price": 1.37
+      },
+      {
+        "default_code": "020.2.014",
+        "name": "Fu\u00df 35mm Lightweight orange",
+        "product_id": 66,
+        "cost_price": 1.37
+      },
+      {
+        "default_code": "020.2.015",
+        "name": "Fu\u00df 35mm Lightweight schwarz",
+        "product_id": 67,
+        "cost_price": 1.37
+      },
+      {
+        "default_code": "020.2.016",
+        "name": "Fu\u00df 35mm Balance weiss",
+        "product_id": 71,
+        "cost_price": 1.48
+      },
+      {
+        "default_code": "020.2.017",
+        "name": "Fu\u00df 35mm Balance gelb",
+        "product_id": 72,
+        "cost_price": 1.48
+      },
+      {
+        "default_code": "020.2.018",
+        "name": "Fu\u00df 35mm Balance rot",
+        "product_id": 73,
+        "cost_price": 1.48
+      },
+      {
+        "default_code": "020.2.019",
+        "name": "Fu\u00df 35mm Balance gr\u00fcn",
+        "product_id": 74,
+        "cost_price": 1.48
+      },
+      {
+        "default_code": "020.2.020",
+        "name": "Fu\u00df 35mm Balance blau",
+        "product_id": 75,
+        "cost_price": 1.48
+      },
+      {
+        "default_code": "020.2.021",
+        "name": "Fu\u00df 35mm Balance braun",
+        "product_id": 76,
+        "cost_price": 1.48
+      },
+      {
+        "default_code": "020.2.022",
+        "name": "Fu\u00df 35mm Balance orange",
+        "product_id": 77,
+        "cost_price": 1.48
+      },
+      {
+        "default_code": "020.2.023",
+        "name": "Fu\u00df 35mm Balance schwarz",
+        "product_id": 78,
+        "cost_price": 1.48
+      }
+    ],
+    "3D_DRUCK_HAUBE": [
+      {
+        "default_code": "018.2.000",
+        "name": "Haube EVO2 weiss",
+        "product_id": 27,
+        "cost_price": 4.69
+      },
+      {
+        "default_code": "018.2.001",
+        "name": "HAUBE EVO2 gelb",
+        "product_id": 29,
+        "cost_price": 4.69
+      },
+      {
+        "default_code": "018.2.002",
+        "name": "HAUBE EVO2 rot",
+        "product_id": 31,
+        "cost_price": 4.69
+      },
+      {
+        "default_code": "018.2.003",
+        "name": "HAUBE EVO2 gr\u00fcn",
+        "product_id": 33,
+        "cost_price": 4.69
+      },
+      {
+        "default_code": "018.2.004",
+        "name": "HAUBE EVO2 blau",
+        "product_id": 35,
+        "cost_price": 4.69
+      },
+      {
+        "default_code": "018.2.005",
+        "name": "HAUBE EVO2 braun",
+        "product_id": 37,
+        "cost_price": 4.69
+      },
+      {
+        "default_code": "018.2.006",
+        "name": "HAUBE EVO2 orange",
+        "product_id": 39,
+        "cost_price": 4.69
+      },
+      {
+        "default_code": "018.2.007",
+        "name": "HAUBE EVO2 schwarz",
+        "product_id": 41,
+        "cost_price": 4.69
+      }
+    ],
+    "3D_DRUCK_GRUNDPLATTE": [
+      {
+        "default_code": "019.1.000",
+        "name": "PLA Filament 3mm - Wei\u00df",
+        "product_id": 28,
+        "cost_price": 3.04
+      },
+      {
+        "default_code": "019.1.001",
+        "name": "PLA Filament 3mm - Gelb",
+        "product_id": 30,
+        "cost_price": 3.04
+      },
+      {
+        "default_code": "019.1.002",
+        "name": "PLA Filament 3mm - Rot",
+        "product_id": 32,
+        "cost_price": 3.04
+      },
+      {
+        "default_code": "019.1.003",
+        "name": "PLA Filament 3mm - Gr\u00fcn",
+        "product_id": 34,
+        "cost_price": 3.04
+      },
+      {
+        "default_code": "019.1.004",
+        "name": "PLA Filament 3mm - Blau",
+        "product_id": 36,
+        "cost_price": 3.04
+      },
+      {
+        "default_code": "019.1.005",
+        "name": "PLA Filament 3mm - Braun",
+        "product_id": 38,
+        "cost_price": 3.04
+      },
+      {
+        "default_code": "019.1.006",
+        "name": "PLA Filament 3mm - Orange",
+        "product_id": 40,
+        "cost_price": 3.04
+      },
+      {
+        "default_code": "019.1.007",
+        "name": "PLA Filament 3mm - Schwarz",
+        "product_id": 42,
+        "cost_price": 3.04
+      },
+      {
+        "default_code": "019.2.008",
+        "name": "Grundplatte EVO 2 Spartan weiss",
+        "product_id": 43,
+        "cost_price": 6.48
+      },
+      {
+        "default_code": "019.1.009",
+        "name": "Acryl Glasplatte - Wei\u00df 1000mm*330mm*5mm (3300 cm^2)",
+        "product_id": 44,
+        "cost_price": 3.72
+      },
+      {
+        "default_code": "019.2.010",
+        "name": "Grundplatte EVO 2 Spartan blau",
+        "product_id": 45,
+        "cost_price": 6.48
+      },
+      {
+        "default_code": "019.1.011",
+        "name": "Acryl Glasplatte - Wei\u00df 1000mm*330mm*5mm (3300 cm^2)",
+        "product_id": 46,
+        "cost_price": 3.72
+      },
+      {
+        "default_code": "019.2.012",
+        "name": "Grundplatte EVO 2 Spartan schwarz",
+        "product_id": 47,
+        "cost_price": 6.48
+      },
+      {
+        "default_code": "019.1.013",
+        "name": "Acryl Glasplatte - Wei\u00df 1000mm*330mm*5mm (3300 cm^2)",
+        "product_id": 48,
+        "cost_price": 3.72
+      },
+      {
+        "default_code": "019.2.014",
+        "name": "Grundplatte EVO 2 Lightweight weiss",
+        "product_id": 57,
+        "cost_price": 6.48
+      },
+      {
+        "default_code": "019.2.015",
+        "name": "Grundplatte EVO 2 Lightweight blau",
+        "product_id": 58,
+        "cost_price": 6.48
+      },
+      {
+        "default_code": "019.2.016",
+        "name": "Grundplatte EVO 2 Lightweight schwarz",
+        "product_id": 59,
+        "cost_price": 6.48
+      },
+      {
+        "default_code": "019.2.017",
+        "name": "Grundplatte EVO 2 Balance weiss",
+        "product_id": 68,
+        "cost_price": 6.48
+      },
+      {
+        "default_code": "019.2.018",
+        "name": "Grundplatte EVO 2 Balance blau",
+        "product_id": 69,
+        "cost_price": 6.48
+      },
+      {
+        "default_code": "019.2.019",
+        "name": "Grundplatte EVO 2 Balance schwarz",
+        "product_id": 70,
+        "cost_price": 6.48
+      }
+    ],
+    "VERPACKUNG_KAUFARTIKEL": [
+      {
+        "default_code": "021.1.000",
+        "name": "KARTONAGE 130MM",
+        "product_id": 17,
+        "cost_price": 2.39
+      }
+    ],
+    "FUELLMATERIAL_KAUFARTIKEL": [
+      {
+        "default_code": "022.1.000",
+        "name": "Papierreste",
+        "product_id": 18,
+        "cost_price": 2.0
+      }
+    ],
+    "DROHNEN_ENDMONTAGE": []
+  },
+  "drohnen_ids": {
+    "029.3.000": 81,
+    "029.3.001": 80,
+    "029.3.002": 79
+  }
+}

@@ -9,7 +9,7 @@ lfd. Nummer,ID Nummer,Artikelart,Benennung,Artikelbezeichnung,Menge EVO Spartan,
 8,6.1,Kaufartikel,Lötzinn,Lötzinn 1.0mm 50g,"6,00 g","6,00 g","6,00 g",67,"0,07€/g","0,42€","",0,"passt",6.0,6.0,6.0,g,0.07,€/g,0.42,0,"",0,"",007.1.000
 9,6.2,Kaufartikel,Akkukabel,Anstecker an Akku (zweipolig),1 stk.,1 stk.,1 stk.,006.1.000,"0,95€/stk.","0,95€","",0,"passt",1.0,1.0,1.0,stk.,0.95,€/stk.,0.95,0,"",0,"",006.1.000
 10,6.3,Kaufartikel,Steuergerät,Mamba F405 MK2 kpl.,1 stk.,1 stk.,1 stk.,17,"84,90€/stk.","84,90€","",0,"",1.0,1.0,1.0,stk.,84.9,€/stk.,84.9,0,"",0,"",009.1.000
-11,6.4,Eigenfertigung,Motoreinheit,Motoreinheit iFlight.Xing.2207 2 kpl.,4 stk.,4 stk.,4 stk.,010.1.000,"","","",0,"besteht aus Motor, Motorschrauben, Motormuttern, Verlängerungskabel, Schrumpfschlauch, Lötzinn",4.0,4.0,4.0,stk.,0,"",0,0,"",0,"",010.1.000
+11,6.4,Kaufartikel,Motoreinheit,Motoreinheit iFlight.Xing.2207 2 kpl.,4 stk.,4 stk.,4 stk.,010.1.000,"","","",0,"besteht aus Motor, Motorschrauben, Motormuttern, Verlängerungskabel, Schrumpfschlauch, Lötzinn",4.0,4.0,4.0,stk.,0,"",0,0,"",0,"",010.1.000
 12,6.4.1,Kaufartikel,Motor,XING-E Pro2207 2750kv,4 stk.,4 stk.,4 stk.,66,"16,90€/stk.","67,60€","",0,"passt",4.0,4.0,4.0,stk.,16.9,€/stk.,67.6,0,"",0,"",011.1.000
 13,6.4.1.1,Lagerartikel,Motorschrauben,Motorschrauben für iFlight.Xing.2207 2,8 stk.,8 stk.,8 stk.,63,"0,08€/stk.","0,64€","",0,"Default-Wert",8.0,8.0,8.0,stk.,0.08,€/stk.,0.64,0,"",0,"",012.0.000
 14,6.4.1.2,Lagerartikel,Motormuttern,Motormuttern für iFlight.Xing.2207 2,4 stk.,4 stk.,4 stk.,64,"0,05€/stk.","0,20€","",0,"Default-Wert",4.0,4.0,4.0,stk.,0.05,€/stk.,0.2,0,"",0,"",013.0.000
@@ -102,10 +102,9 @@ lfd. Nummer,ID Nummer,Artikelart,Benennung,Artikelbezeichnung,Menge EVO Spartan,
 101,13.8.1,Kaufartikel,PLA Filament - Schwarz,PLA Filament 3mm - Schwarz,0,0,"17,59 g",V_BLACK_9,"0,03€/g","0,53€","29,99€","1000 g","passt",0,0,17.59,g,0.03,€/g,0.53,29.99,€,1000.0,g,019.1.007
 102,14.0,Kaufartikel,Verpackung-Karton,KARTONAGE 130MM,1 stk.,1 stk.,1 stk.,54,"2,39€/stk.","2,39€","",0,"passt",1.0,1.0,1.0,stk.,2.39,€/stk.,2.39,0,"",0,"",021.1.000
 103,15.0,Kaufartikel,Verpackung-Füllmaterial,Papierreste,"10,00 g","10,00 g","10,00 g",74,"0,20€/g","2,00€","",0,"Ab SAP Fertigungsversion 4",10.0,10.0,10.0,g,0.2,€/g,2.0,0,"",0,"",022.1.000
-104,16.0,Kaufartikel,Verpackung-Füllmaterial,Papierreste,"10,00 g","10,00 g","10,00 g",74,"0,20€/g","2,00€","",0,"aus Odoo Prod.",10.0,10.0,10.0,g,0.2,€/g,2.0,0,"",0,"",022.1.000
-105,16.1,Kaufartikel,[Unbekannt],[Unbekannt],1 stk.,1 stk.,1 stk.,08,"1,00€/stk.","1,00€","",0,"Name/Preis prüfen (008.1.000)",1.0,1.0,1.0,stk.,1.0,€/stk.,1.0,0,"",0,"",008.1.000
-106,16.2,Kaufartikel,Steckverbindungen,Steckverbindungen,7 stk.,7 stk.,7 stk.,14,"0,30€/stk.","2,10€","",0,"doppelt? (001.1.000)",7.0,7.0,7.0,stk.,0.3,€/stk.,2.1,0,"",0,"",001.1.000
-107,16.3,Eigenfertigung,Motoreinheit,Motoreinheit,4 stk.,4 stk.,4 stk.,010,"0€/stk.","0€","",0,"Eigenfertigung (010.1.000)",4.0,4.0,4.0,stk.,0,"",0,0,"",0,"",010.1.000
-108,16.4,Kaufartikel,Fernbedienung,Fernbedienung,1 stk.,1 stk.,1 stk.,25,"50,00€/stk.","50,00€","",0,"aus Odoo (025.1.000)",1.0,1.0,1.0,stk.,50.0,€/stk.,50.0,0,"",0,"",025.1.000
-109,16.5,Kaufartikel,[Unbekannt],[Unbekannt],1 stk.,1 stk.,1 stk.,08,"1,00€/stk.","1,00€","",0,"Typo/Duplikat 008.1.000?",1.0,1.0,1.0,stk.,1.0,€/stk.,1.0,0,"",0,"",008.1.00
-110,16.6,Kaufartikel,Verlängerungskabel,Verlängerungskabel,"30,00 cm","30,00 cm","30,00 cm",61,"0,50€/cm","15,00€","",0,"doppelt? (014.1.000)",30.0,30.0,30.0,cm,0.5,€/cm,15.0,0,"",0,"",014.1.000
+104,16.0,Kaufartikel,Verpackung-Füllmaterial,Papierreste,"10,00 g","10,00 g","10,00 g",74,"0,20€/g","2,00€","",0,"passt",10.0,10.0,10.0,g,0.2,€/g,2.0,0,"",0,"",022.1.000
+105,16.1,Kaufartikel,[Unbekannt],[Unbekannt],1 stk.,1 stk.,1 stk.,08,"1,00€/stk.","1,00€","",0,"passt",1.0,1.0,1.0,stk.,1.0,€/stk.,1.0,0,"",0,"",008.1.000
+106,16.2,Kaufartikel,Steckverbindungen,Steckverbindungen,7 stk.,7 stk.,7 stk.,14,"0,30€/stk.","2,10€","",0,"passt)",7.0,7.0,7.0,stk.,0.3,€/stk.,2.1,0,"",0,"",001.1.000
+107,16.3,Eigenfertigung,Motoreinheit,Motoreinheit,4 stk.,4 stk.,4 stk.,010,"0€/stk.","0€","",0,"passt",4.0,4.0,4.0,stk.,0,"",0,0,"",0,"",010.1.000
+108,16.4,Kaufartikel,Fernbedienung,Fernbedienung,1 stk.,1 stk.,1 stk.,25,"50,00€/stk.","50,00€","",0,"passt",1.0,1.0,1.0,stk.,50.0,€/stk.,50.0,0,"",0,"",008.1.000
+110,16.6,Kaufartikel,Verlängerungskabel,Verlängerungskabel,"30,00 cm","30,00 cm","30,00 cm",61,"0,50€/cm","15,00€","",0,"passt",30.0,30.0,30.0,cm,0.5,€/cm,15.0,0,"",0,"",014.1.000

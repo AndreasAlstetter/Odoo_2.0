@@ -3,7 +3,6 @@ from typing import Any, Dict, List, Optional, Tuple
 
 from .config import OdooConfig
 
-
 class OdooClient:
     def __init__(self, config: Optional[OdooConfig] = None) -> None:
         self.config = config or OdooConfig.from_env()
@@ -32,6 +31,21 @@ class OdooClient:
     def base_data_dir(self) -> str:
         """Kompatibilität für Loader: config.base_data_dir."""
         return self.config.base_data_dir or "./data"
+
+    @property
+    def models(self):
+        """Expose models proxy für direkte execute_kw calls."""
+        return self._models
+
+    @property
+    def db(self) -> str:
+        """Expose DB name."""
+        return self.config.db
+
+    @property
+    def password(self) -> str:
+        """Expose password."""
+        return self.config.password
 
     def call(self, model: str, method: str, args, **kwargs) -> Any:
         """
@@ -70,6 +84,23 @@ class OdooClient:
         if limit:
             kwargs["limit"] = limit
         return self.call(model, "search_read", [domain], **kwargs)
+
+    def read(self, model: str, ids: List[int], fields: Optional[List[str]] = None) -> List[Dict[str, Any]]:
+        """
+        🚀 v4.1.1 ADDED: Read specific fields from records.
+        
+        Args:
+            model: Odoo model name (e.g. 'stock.rule')
+            ids: List of record IDs
+            fields: Optional list of field names to retrieve
+            
+        Returns:
+            List of dicts with requested fields
+        """
+        kwargs: Dict[str, Any] = {}
+        if fields:
+            kwargs["fields"] = fields
+        return self.call(model, "read", [ids], **kwargs)
 
     def create(self, model: str, vals: Dict[str, Any]) -> int:
         return self.call(model, "create", [vals])

@@ -1,0 +1,11 @@
+name;parent_name;barcode;usage;comment
+WH;;LOC-WH;internal;Hauptlager Drohnen GmbH
+WH/FlowRack;WH;LOC-FLOWRACK;internal;Kanban min1/max3
+WH/FlowRack/FIFO-Lane-1;WH/FlowRack;LOC-LANE1;internal;Hauben/Motor
+WH/FlowRack/FIFO-Lane-2;WH/FlowRack;LOC-LANE2;internal;FüßeA 75x60cm
+WH/FlowRack/FIFO-Lane-3;WH/FlowRack;LOC-LANE3;internal;FüßeB
+WH/FlowRack/FIFO-Lane-4;WH/FlowRack;LOC-LANE4;internal;FüßeC/Grundplatten
+WH/Produktion;WH;LOC-PROD;internal;Zwischenlager Fertigteile
+WH/Puffer;WH;LOC-PUFFER;internal;Sicherheitsbestand kritische Teile
+WH/Versand;WH;LOC-VERSAND;internal;Versand-Hub
+WH/Scrap;WH;LOC-SCRAP;internal;Scrap 0.01%

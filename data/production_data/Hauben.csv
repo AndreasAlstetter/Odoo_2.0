@@ -1,9 +1,0 @@
-id,default_code,name,type,categ_id/id,uom_id/id,uom_po_id/id,route_ids/id,work_instruction_code,routing_code,quality_control_code,logistics_area,warehouse_location,warehouse_id,circular_tag
-prod_018_2_000,018.2.000,Haube EVO2 weiss,product,product_category_drohne,product.product_uom_unit,product.product_uom_unit,mrp_route_manufacture,AA_030_03,AP_3DDRUCK,QC_HAUBE,Supermarkt,101B-1-D,018.2.000,reparable
-prod_018_2_001,018.2.001,HAUBE EVO2 gelb,product,product_category_drohne,product.product_uom_unit,product.product_uom_unit,mrp_route_manufacture,AA_030_03,AP_3DDRUCK,QC_HAUBE,Supermarkt,101B-1-C,018.2.001,reparable
-prod_018_2_002,018.2.002,HAUBE EVO2 rot,product,product_category_drohne,product.product_uom_unit,product.product_uom_unit,mrp_route_manufacture,AA_030_03,AP_3DDRUCK,QC_HAUBE,Supermarkt,101B-1-A,018.2.002,reparable
-prod_018_2_003,018.2.003,HAUBE EVO2 grün,product,product_category_drohne,product.product_uom_unit,product.product_uom_unit,mrp_route_manufacture,AA_030_03,AP_3DDRUCK,QC_HAUBE,Supermarkt,101B-2-D,018.2.003,reparable
-prod_018_2_004,018.2.004,HAUBE EVO2 blau,product,product_category_drohne,product.product_uom_unit,product.product_uom_unit,mrp_route_manufacture,AA_030_03,AP_3DDRUCK,QC_HAUBE,Supermarkt,101B-2-C,018.2.004,reparable
-prod_018_2_005,018.2.005,HAUBE EVO2 braun,product,product_category_drohne,product.product_uom_unit,product.product_uom_unit,mrp_route_manufacture,AA_030_03,AP_3DDRUCK,QC_HAUBE,Supermarkt,101B-2-B,018.2.005,reparable
-prod_018_2_006,018.2.006,HAUBE EVO2 orange,product,product_category_drohne,product.product_uom_unit,product.product_uom_unit,mrp_route_manufacture,AA_030_03,AP_3DDRUCK,QC_HAUBE,Supermarkt,101B-1-B,018.2.006,reparable
-prod_018_2_007,018.2.007,HAUBE EVO2 schwarz,product,product_category_drohne,product.product_uom_unit,product.product_uom_unit,mrp_route_manufacture,AA_030_03,AP_3DDRUCK,QC_HAUBE,Supermarkt,101B-2-A,018.2.007,reparable

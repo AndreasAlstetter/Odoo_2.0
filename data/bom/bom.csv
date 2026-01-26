@@ -1,4 +1,13 @@
+# ==============================================================================
+# ODOO MES BOMs: DROHNEN GmbH - KOMPLETT (Level 1 + Level 2)
+# Multi-Level Structure: Haupt-BOMs + Phantom Sub-BOMs
+# ==============================================================================
+
+# LEVEL 1: HAUPT-BOMs (3 Drohnen-Templates)
+# Format: id,product_tmpl_id/default_code,product_qty,product_uom_id/id,bom_line_ids/id,bom_line_ids/product_id/default_code,bom_line_ids/product_qty,bom_line_ids/product_uom_id/id
 id,product_tmpl_id/default_code,product_qty,product_uom_id/id,bom_line_ids/id,bom_line_ids/product_id/default_code,bom_line_ids/product_qty,bom_line_ids/product_uom_id/id
+
+# EVO2 Spartan (029.3.000)
 bom_evo_spartan,029.3.000,1,unit.product_uom_unit,bom_evo_spartan_0001000,000.1.000,4,unit.product_uom_unit
 bom_evo_spartan,029.3.000,1,unit.product_uom_unit,bom_evo_spartan_0011000,001.1.000,7,unit.product_uom_unit
 bom_evo_spartan,029.3.000,1,unit.product_uom_unit,bom_evo_spartan_0020000,002.0.000,2,unit.product_uom_unit
@@ -25,15 +34,10 @@ bom_evo_spartan,029.3.000,1,unit.product_uom_unit,bom_evo_spartan_0182004,018.2.
 bom_evo_spartan,029.3.000,1,unit.product_uom_unit,bom_evo_spartan_0182005,018.2.005,1,unit.product_uom_unit
 bom_evo_spartan,029.3.000,1,unit.product_uom_unit,bom_evo_spartan_0182006,018.2.006,1,unit.product_uom_unit
 bom_evo_spartan,029.3.000,1,unit.product_uom_unit,bom_evo_spartan_0182007,018.2.007,1,unit.product_uom_unit
-bom_evo_spartan,029.3.000,1,unit.product_uom_unit,bom_evo_spartan_0191000,019.1.000,101.36,unit.product_uom_unit
-bom_evo_spartan,029.3.000,1,unit.product_uom_unit,bom_evo_spartan_0191001,019.1.001,101.36,unit.product_uom_unit
-bom_evo_spartan,029.3.000,1,unit.product_uom_unit,bom_evo_spartan_0191002,019.1.002,101.36,unit.product_uom_unit
-bom_evo_spartan,029.3.000,1,unit.product_uom_unit,bom_evo_spartan_0191003,019.1.003,101.36,unit.product_uom_unit
-bom_evo_spartan,029.3.000,1,unit.product_uom_unit,bom_evo_spartan_0191004,019.1.004,101.36,unit.product_uom_unit
-bom_evo_spartan,029.3.000,1,unit.product_uom_unit,bom_evo_spartan_0191005,019.1.005,101.36,unit.product_uom_unit
-bom_evo_spartan,029.3.000,1,unit.product_uom_unit,bom_evo_spartan_0191006,019.1.006,101.36,unit.product_uom_unit
-bom_evo_spartan,029.3.000,1,unit.product_uom_unit,bom_evo_spartan_0191007,019.1.007,101.36,unit.product_uom_unit
 
+
+
+# EVO2 Lightweight (029.3.001) 
 bom_evo_lightweight,029.3.001,1,unit.product_uom_unit,bom_evo_lw_0001000,000.1.000,4,unit.product_uom_unit
 bom_evo_lightweight,029.3.001,1,unit.product_uom_unit,bom_evo_lw_0011000,001.1.000,7,unit.product_uom_unit
 bom_evo_lightweight,029.3.001,1,unit.product_uom_unit,bom_evo_lw_0020000,002.0.000,2,unit.product_uom_unit
@@ -60,15 +64,10 @@ bom_evo_lightweight,029.3.001,1,unit.product_uom_unit,bom_evo_lw_0182004,018.2.0
 bom_evo_lightweight,029.3.001,1,unit.product_uom_unit,bom_evo_lw_0182005,018.2.005,1,unit.product_uom_unit
 bom_evo_lightweight,029.3.001,1,unit.product_uom_unit,bom_evo_lw_0182006,018.2.006,1,unit.product_uom_unit
 bom_evo_lightweight,029.3.001,1,unit.product_uom_unit,bom_evo_lw_0182007,018.2.007,1,unit.product_uom_unit
-bom_evo_lightweight,029.3.001,1,unit.product_uom_unit,bom_evo_lw_0191000,019.1.000,101.36,unit.product_uom_unit
-bom_evo_lightweight,029.3.001,1,unit.product_uom_unit,bom_evo_lw_0191001,019.1.001,101.36,unit.product_uom_unit
-bom_evo_lightweight,029.3.001,1,unit.product_uom_unit,bom_evo_lw_0191002,019.1.002,101.36,unit.product_uom_unit
-bom_evo_lightweight,029.3.001,1,unit.product_uom_unit,bom_evo_lw_0191003,019.1.003,101.36,unit.product_uom_unit
-bom_evo_lightweight,029.3.001,1,unit.product_uom_unit,bom_evo_lw_0191004,019.1.004,101.36,unit.product_uom_unit
-bom_evo_lightweight,029.3.001,1,unit.product_uom_unit,bom_evo_lw_0191005,019.1.005,101.36,unit.product_uom_unit
-bom_evo_lightweight,029.3.001,1,unit.product_uom_unit,bom_evo_lw_0191006,019.1.006,101.36,unit.product_uom_unit
-bom_evo_lightweight,029.3.001,1,unit.product_uom_unit,bom_evo_lw_0191007,019.1.007,101.36,unit.product_uom_unit
 
+
+
+# EVO2 Balance (029.3.002) 
 bom_evo_balance,029.3.002,1,unit.product_uom_unit,bom_evo_bal_0001000,000.1.000,4,unit.product_uom_unit
 bom_evo_balance,029.3.002,1,unit.product_uom_unit,bom_evo_bal_0011000,001.1.000,7,unit.product_uom_unit
 bom_evo_balance,029.3.002,1,unit.product_uom_unit,bom_evo_bal_0020000,002.0.000,2,unit.product_uom_unit
@@ -95,11 +94,66 @@ bom_evo_balance,029.3.002,1,unit.product_uom_unit,bom_evo_bal_0182004,018.2.004,
 bom_evo_balance,029.3.002,1,unit.product_uom_unit,bom_evo_bal_0182005,018.2.005,1,unit.product_uom_unit
 bom_evo_balance,029.3.002,1,unit.product_uom_unit,bom_evo_bal_0182006,018.2.006,1,unit.product_uom_unit
 bom_evo_balance,029.3.002,1,unit.product_uom_unit,bom_evo_bal_0182007,018.2.007,1,unit.product_uom_unit
-bom_evo_balance,029.3.002,1,unit.product_uom_unit,bom_evo_bal_0191000,019.1.000,101.36,unit.product_uom_unit
-bom_evo_balance,029.3.002,1,unit.product_uom_unit,bom_evo_bal_0191001,019.1.001,101.36,unit.product_uom_unit
-bom_evo_balance,029.3.002,1,unit.product_uom_unit,bom_evo_bal_0191002,019.1.002,101.36,unit.product_uom_unit
-bom_evo_balance,029.3.002,1,unit.product_uom_unit,bom_evo_bal_0191003,019.1.003,101.36,unit.product_uom_unit
-bom_evo_balance,029.3.002,1,unit.product_uom_unit,bom_evo_bal_0191004,019.1.004,101.36,unit.product_uom_unit
-bom_evo_balance,029.3.002,1,unit.product_uom_unit,bom_evo_bal_0191005,019.1.005,101.36,unit.product_uom_unit
-bom_evo_balance,029.3.002,1,unit.product_uom_unit,bom_evo_bal_0191006,019.1.006,101.36,unit.product_uom_unit
-bom_evo_balance,029.3.002,1,unit.product_uom_unit,bom_evo_bal_0191007,019.1.007,101.36,unit.product_uom_unit
+
+# LEVEL 2: SUB-BOMs (41 Phantom-BOMs)
+
+# HAUBEN (8 Varianten → Filament)
+sub_bom_haube_weiss,018.2.000,1,unit.product_uom_unit,sub_haube_0001,019.1.000,101.36,unit.product_uom_unit
+sub_bom_haube_gelb,018.2.001,1,unit.product_uom_unit,sub_haube_0002,019.1.001,101.36,unit.product_uom_unit
+sub_bom_haube_rot,018.2.002,1,unit.product_uom_unit,sub_haube_0003,019.1.002,101.36,unit.product_uom_unit
+sub_bom_haube_gruen,018.2.003,1,unit.product_uom_unit,sub_haube_0004,019.1.003,101.36,unit.product_uom_unit
+sub_bom_haube_blau,018.2.004,1,unit.product_uom_unit,sub_haube_0005,019.1.004,101.36,unit.product_uom_unit
+sub_bom_haube_braun,018.2.005,1,unit.product_uom_unit,sub_haube_0006,019.1.005,101.36,unit.product_uom_unit
+sub_bom_haube_orange,018.2.006,1,unit.product_uom_unit,sub_haube_0007,019.1.006,101.36,unit.product_uom_unit
+sub_bom_haube_schwarz,018.2.007,1,unit.product_uom_unit,sub_haube_0008,019.1.007,101.36,unit.product_uom_unit
+
+
+# FÜSSE (24 Varianten → Filament 50g)
+
+# SPARTAN FÜSSE (020.2.000-007 → 8 Farben)
+sub_bom_fuss_spartan_weiss,020.2.000,1,unit.product_uom_unit,sub_fuss_spartan_001,019.1.000,50.0,unit.product_uom_unit
+sub_bom_fuss_spartan_gelb,020.2.001,1,unit.product_uom_unit,sub_fuss_spartan_002,019.1.001,50.0,unit.product_uom_unit
+sub_bom_fuss_spartan_rot,020.2.002,1,unit.product_uom_unit,sub_fuss_spartan_003,019.1.002,50.0,unit.product_uom_unit
+sub_bom_fuss_spartan_gruen,020.2.003,1,unit.product_uom_unit,sub_fuss_spartan_004,019.1.003,50.0,unit.product_uom_unit
+sub_bom_fuss_spartan_blau,020.2.004,1,unit.product_uom_unit,sub_fuss_spartan_005,019.1.004,50.0,unit.product_uom_unit
+sub_bom_fuss_spartan_braun,020.2.005,1,unit.product_uom_unit,sub_fuss_spartan_006,019.1.005,50.0,unit.product_uom_unit
+sub_bom_fuss_spartan_orange,020.2.006,1,unit.product_uom_unit,sub_fuss_spartan_007,019.1.006,50.0,unit.product_uom_unit
+sub_bom_fuss_spartan_schwarz,020.2.007,1,unit.product_uom_unit,sub_fuss_spartan_008,019.1.007,50.0,unit.product_uom_unit
+
+# LIGHTWEIGHT FÜSSE (020.2.008-015 → 8 Farben)
+sub_bom_fuss_lw_weiss,020.2.008,1,unit.product_uom_unit,sub_fuss_lw_001,019.1.000,50.0,unit.product_uom_unit
+sub_bom_fuss_lw_gelb,020.2.009,1,unit.product_uom_unit,sub_fuss_lw_002,019.1.001,50.0,unit.product_uom_unit
+sub_bom_fuss_lw_rot,020.2.010,1,unit.product_uom_unit,sub_fuss_lw_003,019.1.002,50.0,unit.product_uom_unit
+sub_bom_fuss_lw_gruen,020.2.011,1,unit.product_uom_unit,sub_fuss_lw_004,019.1.003,50.0,unit.product_uom_unit
+sub_bom_fuss_lw_blau,020.2.012,1,unit.product_uom_unit,sub_fuss_lw_005,019.1.004,50.0,unit.product_uom_unit
+sub_bom_fuss_lw_braun,020.2.013,1,unit.product_uom_unit,sub_fuss_lw_006,019.1.005,50.0,unit.product_uom_unit
+sub_bom_fuss_lw_orange,020.2.014,1,unit.product_uom_unit,sub_fuss_lw_007,019.1.006,50.0,unit.product_uom_unit
+sub_bom_fuss_lw_schwarz,020.2.015,1,unit.product_uom_unit,sub_fuss_lw_008,019.1.007,50.0,unit.product_uom_unit
+
+# BALANCE FÜSSE (020.2.016-023 → 8 Farben)
+sub_bom_fuss_balance_weiss,020.2.016,1,unit.product_uom_unit,sub_fuss_balance_001,019.1.000,50.0,unit.product_uom_unit
+sub_bom_fuss_balance_gelb,020.2.017,1,unit.product_uom_unit,sub_fuss_balance_002,019.1.001,50.0,unit.product_uom_unit
+sub_bom_fuss_balance_rot,020.2.018,1,unit.product_uom_unit,sub_fuss_balance_003,019.1.002,50.0,unit.product_uom_unit
+sub_bom_fuss_balance_gruen,020.2.019,1,unit.product_uom_unit,sub_fuss_balance_004,019.1.003,50.0,unit.product_uom_unit
+sub_bom_fuss_balance_blau,020.2.020,1,unit.product_uom_unit,sub_fuss_balance_005,019.1.004,50.0,unit.product_uom_unit
+sub_bom_fuss_balance_braun,020.2.021,1,unit.product_uom_unit,sub_fuss_balance_006,019.1.005,50.0,unit.product_uom_unit
+sub_bom_fuss_balance_orange,020.2.022,1,unit.product_uom_unit,sub_fuss_balance_007,019.1.006,50.0,unit.product_uom_unit
+sub_bom_fuss_balance_schwarz,020.2.023,1,unit.product_uom_unit,sub_fuss_balance_008,019.1.007,50.0,unit.product_uom_unit
+
+# GRUNDPLATTEN (9 Varianten → Acrylglas)
+
+# SPARTAN GRUNDPLATTEN (019.2.008/010/012 → Acrylglas)
+sub_bom_gp_spartan_weiss,019.2.008,1,unit.product_uom_unit,sub_gp_spartan_001,019.1.009,1.0,unit.product_uom_unit
+sub_bom_gp_spartan_blau,019.2.010,1,unit.product_uom_unit,sub_gp_spartan_002,019.1.011,1.0,unit.product_uom_unit
+sub_bom_gp_spartan_schwarz,019.2.012,1,unit.product_uom_unit,sub_gp_spartan_003,019.1.013,1.0,unit.product_uom_unit
+
+# LIGHTWEIGHT GRUNDPLATTEN (019.2.014/015/016 → Acrylglas)
+sub_bom_gp_lw_weiss,019.2.014,1,unit.product_uom_unit,sub_gp_lw_001,019.1.009,1.0,unit.product_uom_unit
+sub_bom_gp_lw_blau,019.2.015,1,unit.product_uom_unit,sub_gp_lw_002,019.1.011,1.0,unit.product_uom_unit
+sub_bom_gp_lw_schwarz,019.2.016,1,unit.product_uom_unit,sub_gp_lw_003,019.1.013,1.0,unit.product_uom_unit
+
+# BALANCE GRUNDPLATTEN (019.2.017/018/019 → Acrylglas)
+sub_bom_gp_balance_weiss,019.2.017,1,unit.product_uom_unit,sub_gp_balance_001,019.1.009,1.0,unit.product_uom_unit
+sub_bom_gp_balance_blau,019.2.018,1,unit.product_uom_unit,sub_gp_balance_002,019.1.011,1.0,unit.product_uom_unit
+sub_bom_gp_balance_schwarz,019.2.019,1,unit.product_uom_unit,sub_gp_balance_003,019.1.013,1.0,unit.product_uom_unit
+

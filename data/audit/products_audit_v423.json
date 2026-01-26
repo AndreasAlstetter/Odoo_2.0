@@ -1,0 +1,712 @@
+[
+  {
+    "action": "update_component",
+    "category": "KAEUFER",
+    "warehouse_id": "000.1.000",
+    "product_id": 3,
+    "cost_price": 0.08,
+    "routing_hint": "UNDEFINED",
+    "variant_count": 1,
+    "source": "CSV"
+  },
+  {
+    "action": "update_component",
+    "category": "KAEUFER",
+    "warehouse_id": "001.1.000",
+    "product_id": 4,
+    "cost_price": 2.1,
+    "routing_hint": "UNDEFINED",
+    "variant_count": 2,
+    "source": "CSV"
+  },
+  {
+    "action": "update_component",
+    "category": "KAEUFER",
+    "warehouse_id": "002.0.000",
+    "product_id": 5,
+    "cost_price": 1.72,
+    "routing_hint": "UNDEFINED",
+    "variant_count": 1,
+    "source": "CSV"
+  },
+  {
+    "action": "update_component",
+    "category": "KAEUFER",
+    "warehouse_id": "003.0.000",
+    "product_id": 6,
+    "cost_price": 1.72,
+    "routing_hint": "UNDEFINED",
+    "variant_count": 1,
+    "source": "CSV"
+  },
+  {
+    "action": "update_component",
+    "category": "KAEUFER",
+    "warehouse_id": "004.1.000",
+    "product_id": 7,
+    "cost_price": 4.5,
+    "routing_hint": "UNDEFINED",
+    "variant_count": 1,
+    "source": "CSV"
+  },
+  {
+    "action": "update_component",
+    "category": "KAEUFER",
+    "warehouse_id": "005.1.000",
+    "product_id": 8,
+    "cost_price": 18.07,
+    "routing_hint": "UNDEFINED",
+    "variant_count": 1,
+    "source": "CSV"
+  },
+  {
+    "action": "update_component",
+    "category": "KAEUFER",
+    "warehouse_id": "007.1.000",
+    "product_id": 9,
+    "cost_price": 0.42,
+    "routing_hint": "UNDEFINED",
+    "variant_count": 2,
+    "source": "CSV"
+  },
+  {
+    "action": "update_component",
+    "category": "KAEUFER",
+    "warehouse_id": "006.1.000",
+    "product_id": 10,
+    "cost_price": 0.95,
+    "routing_hint": "UNDEFINED",
+    "variant_count": 1,
+    "source": "CSV"
+  },
+  {
+    "action": "update_component",
+    "category": "KAEUFER",
+    "warehouse_id": "009.1.000",
+    "product_id": 11,
+    "cost_price": 84.9,
+    "routing_hint": "UNDEFINED",
+    "variant_count": 1,
+    "source": "CSV"
+  },
+  {
+    "action": "update_component",
+    "category": "KAEUFER",
+    "warehouse_id": "011.1.000",
+    "product_id": 12,
+    "cost_price": 67.6,
+    "routing_hint": "UNDEFINED",
+    "variant_count": 1,
+    "source": "CSV"
+  },
+  {
+    "action": "update_component",
+    "category": "KAEUFER",
+    "warehouse_id": "012.0.000",
+    "product_id": 13,
+    "cost_price": 0.64,
+    "routing_hint": "UNDEFINED",
+    "variant_count": 1,
+    "source": "CSV"
+  },
+  {
+    "action": "update_component",
+    "category": "KAEUFER",
+    "warehouse_id": "013.0.000",
+    "product_id": 14,
+    "cost_price": 0.2,
+    "routing_hint": "UNDEFINED",
+    "variant_count": 1,
+    "source": "CSV"
+  },
+  {
+    "action": "update_component",
+    "category": "KAEUFER",
+    "warehouse_id": "014.1.000",
+    "product_id": 15,
+    "cost_price": 15.0,
+    "routing_hint": "UNDEFINED",
+    "variant_count": 2,
+    "source": "CSV"
+  },
+  {
+    "action": "update_component",
+    "category": "KAEUFER",
+    "warehouse_id": "015.1.000",
+    "product_id": 16,
+    "cost_price": 0.14,
+    "routing_hint": "UNDEFINED",
+    "variant_count": 1,
+    "source": "CSV"
+  },
+  {
+    "action": "update_component",
+    "category": "KAEUFER",
+    "warehouse_id": "016.1.000",
+    "product_id": 17,
+    "cost_price": 3.99,
+    "routing_hint": "UNDEFINED",
+    "variant_count": 1,
+    "source": "CSV"
+  },
+  {
+    "action": "update_component",
+    "category": "KAEUFER",
+    "warehouse_id": "017.1.000",
+    "product_id": 18,
+    "cost_price": 17.42,
+    "routing_hint": "UNDEFINED",
+    "variant_count": 1,
+    "source": "CSV"
+  },
+  {
+    "action": "update_component",
+    "category": "EIGENFERTIG",
+    "warehouse_id": "018.2.000",
+    "product_id": 19,
+    "cost_price": 4.69,
+    "routing_hint": "3D_DRUCK_HAUBE",
+    "variant_count": 1,
+    "source": "CSV"
+  },
+  {
+    "action": "update_component",
+    "category": "EIGENFERTIG",
+    "warehouse_id": "019.1.000",
+    "product_id": 20,
+    "cost_price": 3.04,
+    "routing_hint": "3D_DRUCK_GRUNDPLATTE",
+    "variant_count": 4,
+    "source": "CSV"
+  },
+  {
+    "action": "update_component",
+    "category": "EIGENFERTIG",
+    "warehouse_id": "018.2.001",
+    "product_id": 21,
+    "cost_price": 4.69,
+    "routing_hint": "3D_DRUCK_HAUBE",
+    "variant_count": 1,
+    "source": "CSV"
+  },
+  {
+    "action": "update_component",
+    "category": "EIGENFERTIG",
+    "warehouse_id": "019.1.001",
+    "product_id": 22,
+    "cost_price": 3.04,
+    "routing_hint": "3D_DRUCK_GRUNDPLATTE",
+    "variant_count": 4,
+    "source": "CSV"
+  },
+  {
+    "action": "update_component",
+    "category": "EIGENFERTIG",
+    "warehouse_id": "018.2.002",
+    "product_id": 23,
+    "cost_price": 4.69,
+    "routing_hint": "3D_DRUCK_HAUBE",
+    "variant_count": 1,
+    "source": "CSV"
+  },
+  {
+    "action": "update_component",
+    "category": "EIGENFERTIG",
+    "warehouse_id": "019.1.002",
+    "product_id": 24,
+    "cost_price": 3.04,
+    "routing_hint": "3D_DRUCK_GRUNDPLATTE",
+    "variant_count": 4,
+    "source": "CSV"
+  },
+  {
+    "action": "update_component",
+    "category": "EIGENFERTIG",
+    "warehouse_id": "018.2.003",
+    "product_id": 25,
+    "cost_price": 4.69,
+    "routing_hint": "3D_DRUCK_HAUBE",
+    "variant_count": 1,
+    "source": "CSV"
+  },
+  {
+    "action": "update_component",
+    "category": "EIGENFERTIG",
+    "warehouse_id": "019.1.003",
+    "product_id": 26,
+    "cost_price": 3.04,
+    "routing_hint": "3D_DRUCK_GRUNDPLATTE",
+    "variant_count": 4,
+    "source": "CSV"
+  },
+  {
+    "action": "update_component",
+    "category": "EIGENFERTIG",
+    "warehouse_id": "018.2.004",
+    "product_id": 27,
+    "cost_price": 4.69,
+    "routing_hint": "3D_DRUCK_HAUBE",
+    "variant_count": 1,
+    "source": "CSV"
+  },
+  {
+    "action": "update_component",
+    "category": "EIGENFERTIG",
+    "warehouse_id": "019.1.004",
+    "product_id": 28,
+    "cost_price": 3.04,
+    "routing_hint": "3D_DRUCK_GRUNDPLATTE",
+    "variant_count": 4,
+    "source": "CSV"
+  },
+  {
+    "action": "update_component",
+    "category": "EIGENFERTIG",
+    "warehouse_id": "018.2.005",
+    "product_id": 29,
+    "cost_price": 4.69,
+    "routing_hint": "3D_DRUCK_HAUBE",
+    "variant_count": 1,
+    "source": "CSV"
+  },
+  {
+    "action": "update_component",
+    "category": "EIGENFERTIG",
+    "warehouse_id": "019.1.005",
+    "product_id": 30,
+    "cost_price": 3.04,
+    "routing_hint": "3D_DRUCK_GRUNDPLATTE",
+    "variant_count": 4,
+    "source": "CSV"
+  },
+  {
+    "action": "update_component",
+    "category": "EIGENFERTIG",
+    "warehouse_id": "018.2.006",
+    "product_id": 31,
+    "cost_price": 4.69,
+    "routing_hint": "3D_DRUCK_HAUBE",
+    "variant_count": 1,
+    "source": "CSV"
+  },
+  {
+    "action": "update_component",
+    "category": "EIGENFERTIG",
+    "warehouse_id": "019.1.006",
+    "product_id": 32,
+    "cost_price": 3.04,
+    "routing_hint": "3D_DRUCK_GRUNDPLATTE",
+    "variant_count": 4,
+    "source": "CSV"
+  },
+  {
+    "action": "update_component",
+    "category": "EIGENFERTIG",
+    "warehouse_id": "018.2.007",
+    "product_id": 33,
+    "cost_price": 4.69,
+    "routing_hint": "3D_DRUCK_HAUBE",
+    "variant_count": 1,
+    "source": "CSV"
+  },
+  {
+    "action": "update_component",
+    "category": "EIGENFERTIG",
+    "warehouse_id": "019.1.007",
+    "product_id": 34,
+    "cost_price": 3.04,
+    "routing_hint": "3D_DRUCK_GRUNDPLATTE",
+    "variant_count": 4,
+    "source": "CSV"
+  },
+  {
+    "action": "update_component",
+    "category": "EIGENFERTIG",
+    "warehouse_id": "019.2.008",
+    "product_id": 35,
+    "cost_price": 6.48,
+    "routing_hint": "3D_DRUCK_GRUNDPLATTE",
+    "variant_count": 1,
+    "source": "CSV"
+  },
+  {
+    "action": "update_component",
+    "category": "EIGENFERTIG",
+    "warehouse_id": "019.1.009",
+    "product_id": 36,
+    "cost_price": 3.72,
+    "routing_hint": "3D_DRUCK_GRUNDPLATTE",
+    "variant_count": 3,
+    "source": "CSV"
+  },
+  {
+    "action": "update_component",
+    "category": "EIGENFERTIG",
+    "warehouse_id": "019.2.010",
+    "product_id": 37,
+    "cost_price": 6.48,
+    "routing_hint": "3D_DRUCK_GRUNDPLATTE",
+    "variant_count": 1,
+    "source": "CSV"
+  },
+  {
+    "action": "update_component",
+    "category": "EIGENFERTIG",
+    "warehouse_id": "019.1.011",
+    "product_id": 38,
+    "cost_price": 3.72,
+    "routing_hint": "3D_DRUCK_GRUNDPLATTE",
+    "variant_count": 3,
+    "source": "CSV"
+  },
+  {
+    "action": "update_component",
+    "category": "EIGENFERTIG",
+    "warehouse_id": "019.2.012",
+    "product_id": 39,
+    "cost_price": 6.48,
+    "routing_hint": "3D_DRUCK_GRUNDPLATTE",
+    "variant_count": 1,
+    "source": "CSV"
+  },
+  {
+    "action": "update_component",
+    "category": "EIGENFERTIG",
+    "warehouse_id": "019.1.013",
+    "product_id": 40,
+    "cost_price": 3.72,
+    "routing_hint": "3D_DRUCK_GRUNDPLATTE",
+    "variant_count": 3,
+    "source": "CSV"
+  },
+  {
+    "action": "update_component",
+    "category": "EIGENFERTIG",
+    "warehouse_id": "020.2.000",
+    "product_id": 41,
+    "cost_price": 1.62,
+    "routing_hint": "3D_DRUCK_RAHMEN",
+    "variant_count": 1,
+    "source": "CSV"
+  },
+  {
+    "action": "update_component",
+    "category": "EIGENFERTIG",
+    "warehouse_id": "020.2.001",
+    "product_id": 42,
+    "cost_price": 1.62,
+    "routing_hint": "3D_DRUCK_RAHMEN",
+    "variant_count": 1,
+    "source": "CSV"
+  },
+  {
+    "action": "update_component",
+    "category": "EIGENFERTIG",
+    "warehouse_id": "020.2.002",
+    "product_id": 43,
+    "cost_price": 1.62,
+    "routing_hint": "3D_DRUCK_RAHMEN",
+    "variant_count": 1,
+    "source": "CSV"
+  },
+  {
+    "action": "update_component",
+    "category": "EIGENFERTIG",
+    "warehouse_id": "020.2.003",
+    "product_id": 44,
+    "cost_price": 1.62,
+    "routing_hint": "3D_DRUCK_RAHMEN",
+    "variant_count": 1,
+    "source": "CSV"
+  },
+  {
+    "action": "update_component",
+    "category": "EIGENFERTIG",
+    "warehouse_id": "020.2.004",
+    "product_id": 45,
+    "cost_price": 1.62,
+    "routing_hint": "3D_DRUCK_RAHMEN",
+    "variant_count": 1,
+    "source": "CSV"
+  },
+  {
+    "action": "update_component",
+    "category": "EIGENFERTIG",
+    "warehouse_id": "020.2.005",
+    "product_id": 46,
+    "cost_price": 1.62,
+    "routing_hint": "3D_DRUCK_RAHMEN",
+    "variant_count": 1,
+    "source": "CSV"
+  },
+  {
+    "action": "update_component",
+    "category": "EIGENFERTIG",
+    "warehouse_id": "020.2.006",
+    "product_id": 47,
+    "cost_price": 1.62,
+    "routing_hint": "3D_DRUCK_RAHMEN",
+    "variant_count": 1,
+    "source": "CSV"
+  },
+  {
+    "action": "update_component",
+    "category": "EIGENFERTIG",
+    "warehouse_id": "020.2.007",
+    "product_id": 48,
+    "cost_price": 1.62,
+    "routing_hint": "3D_DRUCK_RAHMEN",
+    "variant_count": 1,
+    "source": "CSV"
+  },
+  {
+    "action": "update_component",
+    "category": "EIGENFERTIG",
+    "warehouse_id": "019.2.014",
+    "product_id": 49,
+    "cost_price": 6.48,
+    "routing_hint": "3D_DRUCK_GRUNDPLATTE",
+    "variant_count": 1,
+    "source": "CSV"
+  },
+  {
+    "action": "update_component",
+    "category": "EIGENFERTIG",
+    "warehouse_id": "019.2.015",
+    "product_id": 50,
+    "cost_price": 6.48,
+    "routing_hint": "3D_DRUCK_GRUNDPLATTE",
+    "variant_count": 1,
+    "source": "CSV"
+  },
+  {
+    "action": "update_component",
+    "category": "EIGENFERTIG",
+    "warehouse_id": "019.2.016",
+    "product_id": 51,
+    "cost_price": 6.48,
+    "routing_hint": "3D_DRUCK_GRUNDPLATTE",
+    "variant_count": 1,
+    "source": "CSV"
+  },
+  {
+    "action": "update_component",
+    "category": "EIGENFERTIG",
+    "warehouse_id": "020.2.008",
+    "product_id": 52,
+    "cost_price": 1.37,
+    "routing_hint": "3D_DRUCK_RAHMEN",
+    "variant_count": 1,
+    "source": "CSV"
+  },
+  {
+    "action": "update_component",
+    "category": "EIGENFERTIG",
+    "warehouse_id": "020.2.009",
+    "product_id": 53,
+    "cost_price": 1.37,
+    "routing_hint": "3D_DRUCK_RAHMEN",
+    "variant_count": 1,
+    "source": "CSV"
+  },
+  {
+    "action": "update_component",
+    "category": "EIGENFERTIG",
+    "warehouse_id": "020.2.010",
+    "product_id": 54,
+    "cost_price": 1.37,
+    "routing_hint": "3D_DRUCK_RAHMEN",
+    "variant_count": 1,
+    "source": "CSV"
+  },
+  {
+    "action": "update_component",
+    "category": "EIGENFERTIG",
+    "warehouse_id": "020.2.011",
+    "product_id": 55,
+    "cost_price": 1.37,
+    "routing_hint": "3D_DRUCK_RAHMEN",
+    "variant_count": 1,
+    "source": "CSV"
+  },
+  {
+    "action": "update_component",
+    "category": "EIGENFERTIG",
+    "warehouse_id": "020.2.012",
+    "product_id": 56,
+    "cost_price": 1.37,
+    "routing_hint": "3D_DRUCK_RAHMEN",
+    "variant_count": 1,
+    "source": "CSV"
+  },
+  {
+    "action": "update_component",
+    "category": "EIGENFERTIG",
+    "warehouse_id": "020.2.013",
+    "product_id": 57,
+    "cost_price": 1.37,
+    "routing_hint": "3D_DRUCK_RAHMEN",
+    "variant_count": 1,
+    "source": "CSV"
+  },
+  {
+    "action": "update_component",
+    "category": "EIGENFERTIG",
+    "warehouse_id": "020.2.014",
+    "product_id": 58,
+    "cost_price": 1.37,
+    "routing_hint": "3D_DRUCK_RAHMEN",
+    "variant_count": 1,
+    "source": "CSV"
+  },
+  {
+    "action": "update_component",
+    "category": "EIGENFERTIG",
+    "warehouse_id": "020.2.015",
+    "product_id": 59,
+    "cost_price": 1.37,
+    "routing_hint": "3D_DRUCK_RAHMEN",
+    "variant_count": 1,
+    "source": "CSV"
+  },
+  {
+    "action": "update_component",
+    "category": "EIGENFERTIG",
+    "warehouse_id": "019.2.017",
+    "product_id": 60,
+    "cost_price": 6.48,
+    "routing_hint": "3D_DRUCK_GRUNDPLATTE",
+    "variant_count": 1,
+    "source": "CSV"
+  },
+  {
+    "action": "update_component",
+    "category": "EIGENFERTIG",
+    "warehouse_id": "019.2.018",
+    "product_id": 61,
+    "cost_price": 6.48,
+    "routing_hint": "3D_DRUCK_GRUNDPLATTE",
+    "variant_count": 1,
+    "source": "CSV"
+  },
+  {
+    "action": "update_component",
+    "category": "EIGENFERTIG",
+    "warehouse_id": "019.2.019",
+    "product_id": 62,
+    "cost_price": 6.48,
+    "routing_hint": "3D_DRUCK_GRUNDPLATTE",
+    "variant_count": 1,
+    "source": "CSV"
+  },
+  {
+    "action": "update_component",
+    "category": "EIGENFERTIG",
+    "warehouse_id": "020.2.016",
+    "product_id": 63,
+    "cost_price": 1.48,
+    "routing_hint": "3D_DRUCK_RAHMEN",
+    "variant_count": 1,
+    "source": "CSV"
+  },
+  {
+    "action": "update_component",
+    "category": "EIGENFERTIG",
+    "warehouse_id": "020.2.017",
+    "product_id": 64,
+    "cost_price": 1.48,
+    "routing_hint": "3D_DRUCK_RAHMEN",
+    "variant_count": 1,
+    "source": "CSV"
+  },
+  {
+    "action": "update_component",
+    "category": "EIGENFERTIG",
+    "warehouse_id": "020.2.018",
+    "product_id": 65,
+    "cost_price": 1.48,
+    "routing_hint": "3D_DRUCK_RAHMEN",
+    "variant_count": 1,
+    "source": "CSV"
+  },
+  {
+    "action": "update_component",
+    "category": "EIGENFERTIG",
+    "warehouse_id": "020.2.019",
+    "product_id": 66,
+    "cost_price": 1.48,
+    "routing_hint": "3D_DRUCK_RAHMEN",
+    "variant_count": 1,
+    "source": "CSV"
+  },
+  {
+    "action": "update_component",
+    "category": "EIGENFERTIG",
+    "warehouse_id": "020.2.020",
+    "product_id": 67,
+    "cost_price": 1.48,
+    "routing_hint": "3D_DRUCK_RAHMEN",
+    "variant_count": 1,
+    "source": "CSV"
+  },
+  {
+    "action": "update_component",
+    "category": "EIGENFERTIG",
+    "warehouse_id": "020.2.021",
+    "product_id": 68,
+    "cost_price": 1.48,
+    "routing_hint": "3D_DRUCK_RAHMEN",
+    "variant_count": 1,
+    "source": "CSV"
+  },
+  {
+    "action": "update_component",
+    "category": "EIGENFERTIG",
+    "warehouse_id": "020.2.022",
+    "product_id": 69,
+    "cost_price": 1.48,
+    "routing_hint": "3D_DRUCK_RAHMEN",
+    "variant_count": 1,
+    "source": "CSV"
+  },
+  {
+    "action": "update_component",
+    "category": "EIGENFERTIG",
+    "warehouse_id": "020.2.023",
+    "product_id": 70,
+    "cost_price": 1.48,
+    "routing_hint": "3D_DRUCK_RAHMEN",
+    "variant_count": 1,
+    "source": "CSV"
+  },
+  {
+    "action": "update_component",
+    "category": "KAEUFER",
+    "warehouse_id": "021.1.000",
+    "product_id": 71,
+    "cost_price": 2.39,
+    "routing_hint": "VERPACKUNG_KAUFARTIKEL",
+    "variant_count": 1,
+    "source": "CSV"
+  },
+  {
+    "action": "update_component",
+    "category": "KAEUFER",
+    "warehouse_id": "022.1.000",
+    "product_id": 72,
+    "cost_price": 2.0,
+    "routing_hint": "FUELLMATERIAL_KAUFARTIKEL",
+    "variant_count": 2,
+    "source": "CSV"
+  },
+  {
+    "action": "update_component",
+    "category": "KAEUFER",
+    "warehouse_id": "008.1.000",
+    "product_id": 73,
+    "cost_price": 1.0,
+    "routing_hint": "UNDEFINED",
+    "variant_count": 2,
+    "source": "CSV"
+  }
+]

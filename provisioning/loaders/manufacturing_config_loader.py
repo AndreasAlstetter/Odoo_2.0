@@ -1,7 +1,7 @@
 # provisioning/loaders/manufacturing_config_loader.py
 import os
 from typing import Dict, Any
-from .csv_cleaner import join_path
+from provisioning.utils.csv_cleaner import join_path
 from ..client import OdooClient
 from provisioning.utils import log_header, log_info, log_success, log_warn
 

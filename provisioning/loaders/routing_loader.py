@@ -1,7 +1,7 @@
 import os
 import ast
 from typing import Dict, Any, Optional, List, Tuple
-from .csv_cleaner import csv_rows, join_path
+from provisioning.utils.csv_cleaner import csv_rows, join_path
 from ..client import OdooClient
 from provisioning.utils import log_header, log_info, log_success, log_warn
 
